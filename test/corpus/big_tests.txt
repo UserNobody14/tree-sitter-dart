@@ -461,8 +461,9 @@ more tests 6
           (block 
             (expression_statement 
               (assignment_expression (assignable_expression (identifier)) 
-              (type_cast_expression (identifier) 
-              (type_cast (as_operator) (type_identifier) (type_arguments (type_identifier)))) 
+              (parenthesized_expression 
+                (type_cast_expression (identifier) 
+                  (type_cast (as_operator) (type_identifier) (type_arguments (type_identifier))))) 
               (selector (unconditional_assignable_selector (identifier))) 
               (selector (argument_part (arguments (argument (this)) (argument (identifier))))))) 
             (expression_statement 

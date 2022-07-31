@@ -1047,14 +1047,13 @@ module.exports = grammar({
             $.identifier,
             $.new_expression,
             $.const_object_expression,
-            seq('(', $._expression, ')'),
+            $.parenthesized_expression,
             // $.class_literal,
             $.this,
             seq(
                 $.super,
                 $.unconditional_assignable_selector
             )
-            // $.parenthesized_expression,
             // $.object_creation_expression,
             // $.field_access,
             // $.array_access,

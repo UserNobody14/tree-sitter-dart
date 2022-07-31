@@ -203,7 +203,7 @@ max = (a > b) ? a : b;
   (expression_statement (assignment_expression
     left: (assignable_expression (identifier))
     right: (conditional_expression
-      (relational_expression (identifier) (relational_operator) (identifier))
+      (parenthesized_expression (relational_expression (identifier) (relational_operator) (identifier)))
       consequence: (identifier)
       alternative: (identifier)))))
 
@@ -400,12 +400,12 @@ if ((data['frame_count'] as int) < 5) {
     (if_statement
         (parenthesized_expression
             (relational_expression
-                (type_cast_expression
+                (parenthesized_expression (type_cast_expression
                     (identifier) (selector
                                     (unconditional_assignable_selector (string_literal))
                                  )
                                  (type_cast (as_operator) (type_identifier))
-                )
+                ))
                     (relational_operator)
                     (decimal_integer_literal)
             )
@@ -539,10 +539,10 @@ printStream((args['json'] as bool) ? '' : 'hi');
                 (arguments
                   (argument
                     (conditional_expression
-                        (type_cast_expression (identifier)
+                        (parenthesized_expression (type_cast_expression (identifier)
                             (selector (unconditional_assignable_selector (string_literal)))
                             (type_cast (as_operator) (type_identifier))
-                        )
+                        ))
                         (string_literal)
                         (string_literal)
                     )
