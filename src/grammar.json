@@ -3226,21 +3226,8 @@
           "name": "const_object_expression"
         },
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "("
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_expression"
-            },
-            {
-              "type": "STRING",
-              "value": ")"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "parenthesized_expression"
         },
         {
           "type": "SYMBOL",
@@ -10429,7 +10416,8 @@
   ],
   "inline": [
     "_ambiguous_name",
-    "_class_member_definition"
+    "_class_member_definition",
+    "_if_null_expression"
   ],
   "supertypes": [
     "_declaration",
