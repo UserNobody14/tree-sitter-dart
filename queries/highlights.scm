@@ -151,7 +151,9 @@
 (null_literal) @constant.builtin
 
 (documentation_comment) @comment
+(documentation_comment) @spell
 (comment) @comment
+(comment) @spell
 
 ; Keywords
 ; --------------------
