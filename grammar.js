@@ -149,6 +149,7 @@ module.exports = grammar({
         [$.constant_pattern, $._type_name],
         [$._pattern_field, $.label],
         [$._pattern],
+        [$._legacy_pattern],
         [$.constructor_tearoff, $._identifier_or_new],
         [$._primary, $.constant_pattern, $._simple_formal_parameter],
         [$.record_type_field, $._final_var_or_type],
@@ -1328,6 +1329,13 @@ module.exports = grammar({
             )
         ),
 
+        _legacy_pattern: $ => choice(
+           seq($._legacy_pattern, $.logical_or_operator, $._legacy_pattern),
+           seq($._legacy_pattern, $.logical_and_operator, $._legacy_pattern),
+           seq(choice($.relational_operator, $.equality_operator), $._real_expression),
+           $._unary_pattern,
+        ),
+
         _unary_pattern: $ => choice(
             $.cast_pattern,
             $.null_check_pattern,
@@ -1367,7 +1375,7 @@ module.exports = grammar({
 
         variable_pattern: $ => seq($._final_var_or_type, $.identifier),
 
-        _parenthesized_pattern: $ => seq('(', $._pattern, ')'),
+        _parenthesized_pattern: $ => seq('(', $._legacy_pattern, ')'),
 
         list_pattern: $ => seq(optional($.type_arguments), '[', commaSepTrailingComma($._list_pattern_element), ']'),
 

@@ -4517,6 +4517,71 @@
         ]
       }
     },
+    "_legacy_pattern": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_legacy_pattern"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "logical_or_operator"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_legacy_pattern"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_legacy_pattern"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "logical_and_operator"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_legacy_pattern"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "relational_operator"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "equality_operator"
+                }
+              ]
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_real_expression"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_unary_pattern"
+        }
+      ]
+    },
     "_unary_pattern": {
       "type": "CHOICE",
       "members": [
@@ -4843,7 +4908,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_pattern"
+          "name": "_legacy_pattern"
         },
         {
           "type": "STRING",
@@ -12323,6 +12388,9 @@
       "_pattern"
     ],
     [
+      "_legacy_pattern"
+    ],
+    [
       "constructor_tearoff",
       "_identifier_or_new"
     ],
@@ -12552,8 +12620,7 @@
   "supertypes": [
     "_declaration",
     "_statement",
-    "_literal",
-    "_element"
+    "_literal"
   ]
 }
 
