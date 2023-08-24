@@ -11,8 +11,6 @@
 ; --------------------
 (annotation
   name: (identifier) @attribute)
-(annotation
-  name: (identifier) @attribute)
 
 ; Operators and Tokens
 ; --------------------
