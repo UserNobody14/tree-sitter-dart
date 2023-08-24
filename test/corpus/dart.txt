@@ -296,7 +296,7 @@ abstract class MyDataClass implements _$MyDataClass {
 
 (program 
   (class_definition 
-    (marker_annotation (identifier)) 
+    (annotation (identifier)) 
     (abstract) (identifier) (interfaces (type_identifier)) 
     (class_body 
       (declaration (redirecting_factory_constructor_signature (const_builtin) (identifier) (identifier) (formal_parameter_list 

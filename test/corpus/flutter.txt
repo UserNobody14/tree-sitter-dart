@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
     (declaration (constant_constructor_signature (const_builtin) (identifier) 
       (formal_parameter_list (optional_formal_parameters (formal_parameter (type_identifier) (identifier))))) 
         (initializers (initializer_list_entry (super) (arguments (named_argument (label (identifier)) (identifier)))))) 
-    (marker_annotation (identifier)) 
+    (annotation (identifier)) 
     (method_signature (function_signature (type_identifier) (identifier) 
       (formal_parameter_list (formal_parameter (type_identifier) (identifier))))) 
       (function_body (block (return_statement (identifier) (selector (argument_part (arguments)))))))))
@@ -83,7 +83,7 @@ class CatalogThumbnailUI extends StatelessWidget {
             (declaration (constructor_signature (identifier)
                 (formal_parameter_list (formal_parameter (constructor_param (this) (identifier))))))
             (declaration (final_builtin) (type_identifier) (initialized_identifier_list (initialized_identifier (identifier))))
-            (marker_annotation (identifier))
+            (annotation (identifier))
             (method_signature
                 (function_signature (type_identifier) (identifier)
                     (formal_parameter_list (formal_parameter (type_identifier) (identifier)))))
@@ -205,7 +205,7 @@ class AWidget extends StatelessWidget {
 (program 
   (import_or_export (library_import (import_specification (configurable_uri (uri (string_literal)))))) 
   (class_definition (identifier) (superclass (type_identifier)) 
-    (class_body (marker_annotation (identifier)) 
+    (class_body (annotation (identifier)) 
       (method_signature (function_signature (type_identifier) (identifier) (formal_parameter_list (formal_parameter (type_identifier) (identifier))))) 
         (function_body (block 
           (return_statement (identifier) 

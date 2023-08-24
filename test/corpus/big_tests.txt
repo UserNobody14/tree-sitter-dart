@@ -187,7 +187,7 @@ class _RecompileRequest extends _CompilationRequest {
          (initialized_identifier (identifier)))) 
          (declaration (final_builtin) (type_identifier) (nullable_type)
           (initialized_identifier_list (initialized_identifier (identifier)))) 
-          (marker_annotation (identifier)) (method_signature 
+          (annotation (identifier)) (method_signature 
           (function_signature (type_identifier) (type_arguments (type_identifier) (nullable_type)) 
           (identifier) (formal_parameter_list (formal_parameter (type_identifier) 
           (identifier))))) (function_body (identifier) (selector 
@@ -574,7 +574,7 @@ class TestRoot extends StatefulWidget {
           (formal_parameter (super_formal_parameter (super) (identifier))))))) 
           (declaration (final_builtin) (type_identifier) 
             (initialized_identifier_list (initialized_identifier (identifier)))) 
-            (marker_annotation (identifier)) 
+            (annotation (identifier)) 
           (method_signature 
             (function_signature (type_identifier) 
             (type_arguments (type_identifier)) (identifier) (formal_parameter_list))) 

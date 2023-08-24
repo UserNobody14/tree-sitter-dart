@@ -278,16 +278,6 @@
     "type": "annotation",
     "named": true,
     "fields": {
-      "arguments": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "arguments",
-            "named": true
-          }
-        ]
-      },
       "name": {
         "multiple": false,
         "required": true,
@@ -302,6 +292,20 @@
           }
         ]
       }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "arguments",
+          "named": true
+        },
+        {
+          "type": "type_arguments",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -2066,10 +2070,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "method_signature",
           "named": true
         }
@@ -2149,10 +2149,6 @@
         },
         {
           "type": "interface",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -3207,10 +3203,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "method_signature",
           "named": true
         }
@@ -3250,10 +3242,6 @@
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -3298,10 +3286,6 @@
         },
         {
           "type": "interfaces",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -3701,10 +3685,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "method_signature",
           "named": true
         }
@@ -3790,10 +3770,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         }
       ]
@@ -4800,10 +4776,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "multiplicative_expression",
           "named": true
         },
@@ -4981,10 +4953,6 @@
         },
         {
           "type": "inferred_type",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -6988,10 +6956,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "nullable_type",
           "named": true
         },
@@ -7161,10 +7125,6 @@
         {
           "type": "configurable_uri",
           "named": true
-        },
-        {
-          "type": "marker_annotation",
-          "named": true
         }
       ]
     }
@@ -7184,10 +7144,6 @@
         {
           "type": "import_specification",
           "named": true
-        },
-        {
-          "type": "marker_annotation",
-          "named": true
         }
       ]
     }
@@ -7206,10 +7162,6 @@
         },
         {
           "type": "dotted_identifier_list",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         }
       ]
@@ -7576,10 +7528,6 @@
         {
           "type": "lambda_expression",
           "named": true
-        },
-        {
-          "type": "marker_annotation",
-          "named": true
         }
       ]
     }
@@ -7598,10 +7546,6 @@
         },
         {
           "type": "initialized_variable_definition",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -8071,26 +8015,6 @@
     }
   },
   {
-    "type": "marker_annotation",
-    "named": true,
-    "fields": {
-      "name": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "scoped_identifier",
-            "named": true
-          }
-        ]
-      }
-    }
-  },
-  {
     "type": "method_signature",
     "named": true,
     "fields": {},
@@ -8226,10 +8150,6 @@
         },
         {
           "type": "interfaces",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -8522,10 +8442,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "typed_identifier",
           "named": true
         }
@@ -8590,10 +8506,6 @@
         },
         {
           "type": "function_type",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -9840,10 +9752,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "uri",
           "named": true
         }
@@ -9864,10 +9772,6 @@
         },
         {
           "type": "dotted_identifier_list",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -10394,10 +10298,6 @@
         },
         {
           "type": "library_name",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -10979,10 +10879,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "nullable_type",
           "named": true
         },
@@ -11015,10 +10911,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {
@@ -13389,10 +13281,6 @@
           "named": true
         },
         {
-          "type": "marker_annotation",
-          "named": true
-        },
-        {
           "type": "nullable_type",
           "named": true
         },
@@ -13657,10 +13545,6 @@
       "types": [
         {
           "type": "annotation",
-          "named": true
-        },
-        {
-          "type": "marker_annotation",
           "named": true
         },
         {

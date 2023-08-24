@@ -362,7 +362,7 @@ final y = 0;
 ---
 
 (program 
-  (marker_annotation (identifier)) 
+  (annotation (identifier)) 
   (final_builtin)
   (static_final_declaration_list (static_final_declaration (identifier) (decimal_integer_literal))))
 
@@ -435,7 +435,7 @@ typedef DismissMethod = Future<void> Function(WidgetTester tester, Finder finder
     (type_identifier) 
     (function_type (type_identifier) (type_arguments (void_type)) 
       (parameter_type_list (normal_parameter_type (typed_identifier (type_identifier) (identifier))) (normal_parameter_type (typed_identifier (type_identifier) (identifier))) 
-      (optional_parameter_types (named_parameter_types (marker_annotation (identifier)) (typed_identifier (type_identifier) (identifier))))))))
+      (optional_parameter_types (named_parameter_types (annotation (identifier)) (typed_identifier (type_identifier) (identifier))))))))
 
 =================
 script tag

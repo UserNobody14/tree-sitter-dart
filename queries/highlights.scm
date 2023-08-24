@@ -11,7 +11,7 @@
 ; --------------------
 (annotation
   name: (identifier) @attribute)
-(marker_annotation
+(annotation
   name: (identifier) @attribute)
 
 ; Operators and Tokens

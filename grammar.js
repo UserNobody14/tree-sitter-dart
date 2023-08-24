@@ -107,7 +107,6 @@ module.exports = grammar({
         [$._normal_formal_parameters],
         [$._declared_identifier],
         [$.equality_expression],
-        [$.annotation, $.marker_annotation],
         [$._primary, $._type_name, $._simple_formal_parameter],
         [$.record_type_field, $._function_formal_parameter, $._var_or_type],
         [$.typed_identifier, $._var_or_type, $._function_formal_parameter],
@@ -1557,22 +1556,14 @@ module.exports = grammar({
         ),
 
         // Annotations
-
-        _annotation: $ => choice(
-            $.marker_annotation,
-            $.annotation
-        ),
-
-        marker_annotation: $ => seq(
-            '@',
-            field('name', choice($.identifier, $.scoped_identifier))
-        ),
-
-        annotation: $ => seq(
+        annotation: $ => prec.right(seq(
             '@',
             field('name', choice($.identifier, $.scoped_identifier)),
-            field('arguments', $.arguments)
-        ),
+            choice(
+                optional(seq($.type_arguments, $.arguments)),
+                optional($.arguments)
+            )
+        )),
 
         // Declarations
 
@@ -1758,7 +1749,7 @@ module.exports = grammar({
             ),
         ),
 
-        _metadata: $ => prec.right(repeat1($._annotation)),
+        _metadata: $ => prec.right(repeat1($.annotation)),
 
 
         type_parameters: $ => seq(

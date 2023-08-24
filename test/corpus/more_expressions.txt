@@ -222,11 +222,11 @@ class Quack {
 
 (program
   (class_definition
-    (marker_annotation
+    (annotation
       (identifier))
     (identifier)
     (class_body
-      (marker_annotation
+      (annotation
         (identifier))
       (method_signature
         (function_signature
