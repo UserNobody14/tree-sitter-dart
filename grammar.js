@@ -2556,6 +2556,9 @@ module.exports = grammar({
         _default_named_parameter: $ => choice(
             seq(
                 optional(
+                    $._metadata
+                ),
+                optional(
                     $._required
                 ),
                 $.formal_parameter,
@@ -2567,6 +2570,9 @@ module.exports = grammar({
                 )
             ),
             seq(
+                optional(
+                    $._metadata
+                ),
                 optional(
                     $._required
                 ),

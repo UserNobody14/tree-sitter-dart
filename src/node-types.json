@@ -9147,6 +9147,10 @@
           "named": true
         },
         {
+          "type": "annotation",
+          "named": true
+        },
+        {
           "type": "assignment_expression",
           "named": true
         },

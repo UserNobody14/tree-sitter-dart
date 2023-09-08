@@ -41,3 +41,47 @@ class LoginRoute {}
               (identifier))))))
     (identifier)
     (class_body)))
+
+================================================================
+Annotation in Constructor Parameters
+================================================================
+
+@freezed
+class Item with _$Item {
+  const factory Item({
+    required int id,
+    @JsonKey(name: 'user_id') required int userId,
+  }) = _Item;
+}
+
+---
+
+ (program
+      (class_definition
+        (annotation
+          (identifier))
+        (identifier)
+        (superclass
+          (mixins
+            (type_identifier)))
+        (class_body
+          (declaration
+            (redirecting_factory_constructor_signature
+              (const_builtin)
+              (identifier)
+              (formal_parameter_list
+                (optional_formal_parameters
+                  (formal_parameter
+                    (type_identifier)
+                    (identifier))
+                  (annotation
+                    (identifier)
+                    (arguments
+                      (named_argument
+                        (label
+                          (identifier))
+                        (string_literal))))
+                  (formal_parameter
+                    (type_identifier)
+                    (identifier))))
+              (type_identifier))))))
