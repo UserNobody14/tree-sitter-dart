@@ -346,3 +346,38 @@ void main() {
             (argument 
               (identifier) 
               (selector (unconditional_assignable_selector (identifier)))))))))))
+
+======================================
+Basic program
+======================================
+void main() {
+  test('', () {
+    'åÅ';
+    'åÅ';
+  });
+}
+
+---
+(program
+      (function_signature
+        (void_type)
+        (identifier)
+        (formal_parameter_list))
+      (function_body
+        (block
+          (expression_statement
+            (identifier)
+            (selector
+              (argument_part
+                (arguments
+                  (argument
+                    (string_literal))
+                  (argument
+                    (function_expression
+                      (formal_parameter_list)
+                      (function_expression_body
+                        (block
+                          (expression_statement
+                            (string_literal))
+                          (expression_statement
+                            (string_literal)))))))))))))

@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:ffi';
 import 'dart:ffi' as ffi;
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dylib/dylib.dart';
 import 'package:ffi/ffi.dart';
@@ -76,13 +77,13 @@ base class Parser implements Finalizable {
   /// Parses out a tree from the given string
   Tree parse(String program, {int? encoding}) {
     _contents = program;
-    final pProgram = program.toNativeUtf8().cast<Char>();
+    final (pProgram, len) = program.toNativeUtf8Len();
     if (encoding == null) {
       return Tree(treeSitterApi.ts_parser_parse_string(
-          parser, nullptr, pProgram, program.length));
+          parser, nullptr, pProgram.cast(), len));
     } else {
       return Tree(treeSitterApi.ts_parser_parse_string_encoding(
-          parser, nullptr, pProgram, program.length, encoding));
+          parser, nullptr, pProgram.cast(), len, encoding));
     }
   }
 
@@ -160,13 +161,12 @@ base class Query implements Finalizable {
 
   Query.fromSource(
       {required Pointer<TSLanguage> language, required String source}) {
-    final pSource = source.toNativeUtf8().cast<Char>();
-    final length = utf8.encode(source).length;
+    final (pSource, len) = source.toNativeUtf8Len();
     using((alloc) {
       final errorOffset = alloc<Uint32>(1);
       final errorType = alloc<Int32>(1);
       query = treeSitterApi.ts_query_new(
-          language, pSource, length, errorOffset, errorType);
+          language, pSource.cast(), len, errorOffset, errorType);
       if (query == nullptr) {
         final errOff = errorOffset.value;
         final errType = errorType.value;
@@ -286,10 +286,10 @@ extension TSNodeX on TSNode {
 
   int get namedChildCount => treeSitterApi.ts_node_named_child_count(this);
 
-  TSNode childByFieldName(String fieldName, int fieldNameLength) {
-    final pFieldName = fieldName.toNativeUtf8().cast<Char>();
+  TSNode childByFieldName(String fieldName) {
+    final (pFieldName, nameLength) = fieldName.toNativeUtf8Len();
     final result = treeSitterApi.ts_node_child_by_field_name(
-        this, pFieldName, fieldNameLength);
+        this, pFieldName.cast(), nameLength);
     malloc.free(pFieldName);
     return result;
   }
@@ -302,4 +302,15 @@ extension TSNodeX on TSNode {
 
   TSNode get nextNamedSibling => treeSitterApi.ts_node_next_named_sibling(this);
   TSNode get prevNamedSibling => treeSitterApi.ts_node_prev_named_sibling(this);
+}
+
+extension on String {
+  (Pointer<Utf8>, int) toNativeUtf8Len({Allocator allocator = malloc}) {
+    final units = utf8.encode(this);
+    final Pointer<Uint8> result = allocator<Uint8>(units.length + 1);
+    final Uint8List nativeString = result.asTypedList(units.length + 1);
+    nativeString.setAll(0, units);
+    nativeString[units.length] = 0;
+    return (result.cast(), units.length);
+  }
 }
