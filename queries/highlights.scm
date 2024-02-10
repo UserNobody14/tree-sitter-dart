@@ -28,6 +28,23 @@
 (escape_sequence) @string.escape
 
 [
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+]  @punctuation.bracket
+
+(type_arguments
+  "<" @punctuation.bracket
+  ">" @punctuation.bracket)
+
+(type_parameters
+  "<" @punctuation.bracket
+  ">" @punctuation.bracket)
+
+[
  "@"
  "=>"
  ".."
@@ -49,15 +66,6 @@
  (equality_operator)
  (additive_operator)
 ] @operator
-
-[
-  "("
-  ")"
-  "["
-  "]"
-  "{"
-  "}"
-]  @punctuation.bracket
 
 ; Delimiters
 ; --------------------
