@@ -42,3 +42,26 @@ class someClass<T> {
     List<S> list = Collections.emptyList<S>();
   }
 }
+
+class TestClass<A, B> {
+  //           ^ punctuation.bracket
+  //                ^ punctuation.bracket
+
+  List<String> foo() {
+    //^ punctuation.bracket
+    //       ^ punctuation.bracket
+    return <String>[];
+    //     ^ punctuation.bracket
+    //            ^ punctuation.bracket
+  }
+
+  Map test<A, B>() {
+    //    ^ punctuation.bracket
+    //         ^ punctuation.bracket
+    return Map<int, String>.from(<int, String>{});
+    //        ^ punctuation.bracket
+    //                    ^ punctuation.bracket
+    //                           ^ punctuation.bracket
+    //                                       ^ punctuation.bracket
+  }
+}
