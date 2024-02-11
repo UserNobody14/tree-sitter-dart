@@ -119,6 +119,8 @@
 
 ("Function" @type)
 
+(this) @variable.builtin
+
 ; properties
 ; TODO: add method/call_expression to grammar and
 ; distinguish method call from variable access

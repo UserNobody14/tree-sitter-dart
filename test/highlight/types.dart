@@ -16,6 +16,10 @@ class Person {
     //                ^ type
     //                       ^ type
   }
+
+  Person.other(this.name);
+  //            ^ variable.builtin
+
   String getName() {
     // <- type
     //    ^ method
