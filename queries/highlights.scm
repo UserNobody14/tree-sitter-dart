@@ -119,6 +119,8 @@
 
 ("Function" @type)
 
+(this) @variable.builtin
+
 ; properties
 ; TODO: add method/call_expression to grammar and
 ; distinguish method call from variable access
@@ -211,8 +213,8 @@
 ] @keyword
 
 ; when used as an identifier:
-((identifier) @variable.builtin
- (#vim-match? @variable.builtin "^(abstract|as|covariant|deferred|dynamic|export|external|factory|Function|get|implements|import|interface|library|operator|mixin|part|set|static|typedef)$"))
+((identifier) @variable
+ (#vim-match? @variable "^(abstract|as|covariant|deferred|dynamic|export|external|factory|Function|get|implements|import|interface|library|operator|mixin|part|set|static|typedef)$"))
 
 ["if" "else" "switch" "default"] @conditional
 
