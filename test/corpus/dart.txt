@@ -65,9 +65,9 @@ dart identifier name r (used to conflict/error with raw string literal)
 String hello(r) => 'hello';
 
 ---
-(program 
-  (function_signature (type_identifier) (identifier) 
-    (formal_parameter_list (formal_parameter (identifier)))) (function_body (string_literal))) 
+(program
+  (function_signature (type_identifier) (identifier)
+    (formal_parameter_list (formal_parameter (identifier)))) (function_body (string_literal)))
 
 ==================================================
 dart set literals
@@ -187,12 +187,12 @@ final set = {"hello", "world"};
 
 ---
 
-(program 
+(program
   (final_builtin)
-  (static_final_declaration_list (static_final_declaration (identifier) 
-    (set_or_map_literal (pair (string_literal) (string_literal))))) 
+  (static_final_declaration_list (static_final_declaration (identifier)
+    (set_or_map_literal (pair (string_literal) (string_literal)))))
   (final_builtin)
-  (static_final_declaration_list (static_final_declaration (identifier) 
+  (static_final_declaration_list (static_final_declaration (identifier)
     (set_or_map_literal (string_literal) (string_literal)))))
 
 ==================================================
@@ -206,8 +206,8 @@ final dynamic opts = <dynamic, dynamic>{
 
 ---
 
-(program (final_builtin) (type_identifier) (static_final_declaration_list (static_final_declaration (identifier) 
-  (set_or_map_literal (type_arguments (type_identifier) (type_identifier)) (pair (string_literal) 
+(program (final_builtin) (type_identifier) (static_final_declaration_list (static_final_declaration (identifier)
+  (set_or_map_literal (type_arguments (type_identifier) (type_identifier)) (pair (string_literal)
     (list_literal (string_literal))) (pair (string_literal) (true))))))
 
 ==================================================
@@ -220,10 +220,10 @@ void main() {
 
 ---
 
-(program 
-  (function_signature (void_type) (identifier) (formal_parameter_list)) 
-  (function_body (block (expression_statement (unary_expression 
-    (await_expression (identifier) (selector (unconditional_assignable_selector (identifier))) (selector (argument_part 
+(program
+  (function_signature (void_type) (identifier) (formal_parameter_list))
+  (function_body (block (expression_statement (unary_expression
+    (await_expression (identifier) (selector (unconditional_assignable_selector (identifier))) (selector (argument_part
     (arguments (argument (decimal_integer_literal) (selector (unconditional_assignable_selector (identifier))))
       (argument (function_expression (formal_parameter_list) (function_expression_body (block)))))))))))))
 
@@ -246,7 +246,11 @@ part of 'hello.dart';
 
 ---
 
-(program (part_of_directive (uri (string_literal))))
+(program
+  (part_of_directive
+    (part_of_builtin)
+    (uri
+    (string_literal))))
 
 ==================================================
 extension methods
@@ -258,8 +262,8 @@ extension Hello on String {
 
 ---
 
-(program 
-  (extension_declaration (identifier) (type_identifier) (extension_body 
+(program
+  (extension_declaration (identifier) (type_identifier) (extension_body
     (method_signature (getter_signature (type_identifier) (identifier))) (function_body (string_literal)))))
 
 ==================================================
@@ -294,16 +298,16 @@ abstract class MyDataClass implements _$MyDataClass {
 
 ---
 
-(program 
-  (class_definition 
-    (annotation (identifier)) 
-    (abstract) (identifier) (interfaces (type_identifier)) 
-    (class_body 
-      (declaration (redirecting_factory_constructor_signature (const_builtin) (identifier) (identifier) (formal_parameter_list 
-        (optional_formal_parameters (formal_parameter 
-          (annotation (identifier) (arguments (argument (false)))) (type_identifier) (identifier)))) (type_identifier))) 
-      (method_signature (factory_constructor_signature (identifier) (identifier) (formal_parameter_list))) 
-        (function_body (identifier) (selector (unconditional_assignable_selector (identifier))) 
+(program
+  (class_definition
+    (annotation (identifier))
+    (abstract) (identifier) (interfaces (type_identifier))
+    (class_body
+      (declaration (redirecting_factory_constructor_signature (const_builtin) (identifier) (identifier) (formal_parameter_list
+        (optional_formal_parameters (formal_parameter
+          (annotation (identifier) (arguments (argument (false)))) (type_identifier) (identifier)))) (type_identifier)))
+      (method_signature (factory_constructor_signature (identifier) (identifier) (formal_parameter_list)))
+        (function_body (identifier) (selector (unconditional_assignable_selector (identifier)))
           (selector (argument_part (arguments (named_argument (label (identifier)) (true)))))))))
 
 
@@ -319,10 +323,10 @@ class MyClass {
 
 ---
 
-(program (class_definition (identifier) 
-  (class_body (method_signature 
-    (setter_signature (identifier) 
-      (formal_parameter_list (formal_parameter (type_identifier) (identifier))))) 
+(program (class_definition (identifier)
+  (class_body (method_signature
+    (setter_signature (identifier)
+      (formal_parameter_list (formal_parameter (type_identifier) (identifier)))))
         (function_body (block (expression_statement (assignment_expression (assignable_expression (identifier)) (identifier))))))))
 
 
@@ -336,15 +340,15 @@ void main() {
 
 ---
 
- (program 
-  (function_signature (void_type) (identifier) (formal_parameter_list)) 
-  (function_body (block 
-    (expression_statement 
-      (identifier) 
-        (selector (argument_part 
-          (arguments 
-            (argument 
-              (identifier) 
+ (program
+  (function_signature (void_type) (identifier) (formal_parameter_list))
+  (function_body (block
+    (expression_statement
+      (identifier)
+        (selector (argument_part
+          (arguments
+            (argument
+              (identifier)
               (selector (unconditional_assignable_selector (identifier)))))))))))
 
 ======================================

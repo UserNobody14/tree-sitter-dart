@@ -90,7 +90,7 @@ var a;
 
 (program
 
- (getter_signature 
+ (getter_signature
     name: (identifier))
     (function_body
          (block
@@ -354,9 +354,7 @@ class SwitchDemo {
             (type_identifier)
             name: (identifier)
           )
-        )
-
-            ))
+        )))
         (function_body (block
           (local_variable_declaration
             (initialized_variable_definition
@@ -383,7 +381,8 @@ class SwitchDemo {
                         left: (assignable_expression
                           (identifier))
                         right: (string_literal)))
-                    (break_statement))
+                    (break_statement
+                      (break_builtin)))
                   (switch_statement_case
                   (case_builtin)
                     (constant_pattern
@@ -393,7 +392,8 @@ class SwitchDemo {
                         left: (assignable_expression
                           (identifier))
                         right: (string_literal)))
-                    (break_statement))
+                    (break_statement
+                      (break_builtin)))
                   (switch_statement_case
                   (case_builtin)
                     (constant_pattern
@@ -403,14 +403,16 @@ class SwitchDemo {
                         left: (assignable_expression
                           (identifier))
                         right: (string_literal)))
-                    (break_statement))
+                    (break_statement
+                      (break_builtin)))
                   (switch_statement_default
                     (expression_statement
                       (assignment_expression
                         left: (assignable_expression
                           (identifier))
                         right: (string_literal)))
-                    (break_statement))))
+                    (break_statement
+                      (break_builtin)))))
           (expression_statement
               (identifier)
               (selector
@@ -597,8 +599,8 @@ Box<Integer> integerBox = new Box<>();
 ---
 
 (program
-  (type_identifier) (type_arguments (type_identifier)) 
-  (initialized_identifier_list 
-    (initialized_identifier (identifier) 
+  (type_identifier) (type_arguments (type_identifier))
+  (initialized_identifier_list
+    (initialized_identifier (identifier)
       (new_expression (type_identifier) (type_arguments) (arguments)))))
 
