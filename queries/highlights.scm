@@ -111,9 +111,6 @@
 ; var keyword
 (inferred_type) @keyword
 
-(const_builtin) @constant.builtin
-(final_builtin) @constant.builtin
-
 ((identifier) @type
  (#match? @type "^_?[A-Z]"))
 
