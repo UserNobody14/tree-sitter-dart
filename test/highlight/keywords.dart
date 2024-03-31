@@ -148,3 +148,57 @@ Stream<int> bar2() async* {
   yield 1;
   // <- keyword
 }
+
+
+// the following are keywords, that can also be used as identifiers
+// verify that each is highlighted as an identifier
+void identifierTest() {
+  var abstract = 1;
+  //   ^ variable
+  var as = 1;
+  //   ^ variable
+  var async = 1;
+  //   ^ variable
+  var covariant = 1;
+  //   ^ variable
+  var deferred = 1;
+  //   ^ variable
+  var export = 1;
+  //   ^ variable
+  var extension = 1;
+  //   ^ variable
+  var external = 1;
+  //   ^ variable
+  var factory = 1;
+  //   ^ variable
+  var get = 1;
+  //   ^ variable
+  var hide = 1;
+  //   ^ variable
+  var implements = 1;
+  //   ^ variable
+  var import = 1;
+  //   ^ variable
+  var interface = 1;
+  //   ^ variable
+  var library = 1;
+  //   ^ variable
+  var mixin = 1;
+  //   ^ variable
+  var on = 1;
+  //   ^ variable
+  var operator = 1;
+  //   ^ variable
+  var part = 1;
+  //   ^ variable
+  var set = 1;
+  //   ^ variable
+  var show = 1;
+  //   ^ variable
+  var static = 1;
+  //   ^ variable
+  var sync = 1;
+  //   ^ variable
+  var typedef = 1;
+  //   ^ variable
+}
