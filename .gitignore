@@ -18,3 +18,4 @@ pubspec.lock
 *.dll
 *.dylib
 doc
+.vscode

@@ -8,12 +8,11 @@ final a = StateProvider<T12345678>   // Complete expression is: final a = StateP
 ---
 
 
-(program
-  (ERROR
-    (final_builtin)
-    (identifier)
-    (type_identifier)
-    (type_arguments
-      (type_identifier)))
+(ERROR
+  (final_builtin)
+  (identifier)
+  (type_identifier)
+  (type_arguments
+    (type_identifier))
   (comment)
   (comment))

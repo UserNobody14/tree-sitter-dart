@@ -1,3 +1,5 @@
+/// <reference types="tree-sitter-cli/dsl" />
+
 // Using the informal draft spec to support the newest features of dart
 // https://spec.dart.dev/DartLangSpecDraft.pdf
 
@@ -206,7 +208,7 @@ module.exports = grammar({
 
     rules: {
 
-        // Page 188 libraryDeclaration 
+        // Page 188 libraryDeclaration
         program: $ => seq(
             optional($.script_tag),
             optional($.library_name),
@@ -256,7 +258,7 @@ module.exports = grammar({
                 $.function_signature,
                 $.function_body
             ),
-            //    final or const static final declaration list            
+            //    final or const static final declaration list
             seq(
                 optional($._metadata),
                 choice(
@@ -588,6 +590,7 @@ module.exports = grammar({
             $.pattern_assignment,
             $.assignment_expression,
             $.throw_expression,
+            $.rethrow_expression,
             seq(
                 $._real_expression,
                 repeat($.cascade_section)
@@ -661,13 +664,13 @@ module.exports = grammar({
         throw_expression: $ => seq(
             'throw',
             $._expression
-
         ),
         throw_expression_without_cascade: $ => seq(
             'throw',
             $._expression_without_cascade
         ),
 
+        rethrow_expression: $ => $.rethrow_builtin,
 
         /**************************************************************************************************
          ***********************Assignment Expressions*****************************************************
@@ -1128,7 +1131,7 @@ module.exports = grammar({
         )),
 
         constructor_tearoff: $ => prec.right(seq(
-          $._type_name, optional($.type_arguments), '.', $._new_builtin, 
+          $._type_name, optional($.type_arguments), '.', $._new_builtin,
         )),
 
         arguments: $ => seq('(', optional($._argument_list), ')'),
@@ -1275,7 +1278,7 @@ module.exports = grammar({
         assert_statement: $ => seq($.assertion, ';'),
 
         assertion: $ => seq(
-            $._assert_builtin,
+            $.assert_builtin,
             $.assertion_arguments,
         ),
 
@@ -1320,7 +1323,7 @@ module.exports = grammar({
 
         _logical_or_pattern: $ => seq($._logical_and_pattern, repeat(seq($.logical_or_operator, $._logical_and_pattern))),
         _logical_and_pattern: $ => seq($._relational_pattern, repeat(seq($.logical_and_operator, $._relational_pattern))),
-        _relational_pattern: $ => 
+        _relational_pattern: $ =>
         prec(DART_PREC.Relational, choice(
                 seq(choice($.relational_operator, $.equality_operator), $._real_expression),
                 $._unary_pattern,
@@ -1428,7 +1431,7 @@ module.exports = grammar({
             $._semicolon
         ),
 
-        break_statement: $ => seq($._break_builtin, optional($.identifier), $._semicolon),
+        break_statement: $ => seq($.break_builtin, optional($.identifier), $._semicolon),
 
         continue_statement: $ => seq('continue', optional($.identifier), $._semicolon),
 
@@ -1628,7 +1631,7 @@ module.exports = grammar({
 
         part_of_directive: $ => seq(
             optional($._metadata),
-            'part', 'of',
+            $.part_of_builtin,
             choice($.dotted_identifier_list, $.uri),
             $._semicolon
         ),
@@ -2081,7 +2084,7 @@ module.exports = grammar({
         ),
         initializer_list_entry: $ => choice(
             seq($.super, $.arguments),
-            seq($.super, 
+            seq($.super,
               seq('.', choice($.identifier, $._new_builtin), $.arguments),
             ),
             $.field_initializer,
@@ -2330,7 +2333,7 @@ module.exports = grammar({
             // $.generic_type
         ),
 
-        record_type: $ => choice( 
+        record_type: $ => choice(
             seq('(', ')'),
             seq('(', commaSep1($.record_type_field), ',', '{' , commaSep1TrailingComma($.record_type_named_field), '}', ')'),
             seq('(', commaSep1TrailingComma($.record_type_field), ')'),
@@ -2701,9 +2704,11 @@ module.exports = grammar({
             DART_PREC.BUILTIN,
             'as',
         ),
-        _break_builtin: $ => token('break'),
-        _assert_builtin: $ => token('assert'),
+        break_builtin: $ => token('break'),
+        assert_builtin: $ => token('assert'),
         case_builtin: $ => token('case'),
+        rethrow_builtin: $ => token('rethrow'),
+        part_of_builtin: $ => token('part of'),
         _covariant: $ => prec(
             DART_PREC.BUILTIN,
             'covariant',
@@ -2815,7 +2820,7 @@ module.exports = grammar({
             DART_PREC.BUILTIN,
             'external',
         ),
-       
+
         this: $ => prec(
             DART_PREC.BUILTIN,
             'this',

@@ -405,6 +405,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -510,9 +514,13 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "assert_builtin",
+          "named": true
+        },
         {
           "type": "assertion_arguments",
           "named": true
@@ -614,6 +622,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -892,6 +904,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -1639,9 +1655,13 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": false,
+      "multiple": true,
+      "required": true,
       "types": [
+        {
+          "type": "break_builtin",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true
@@ -2821,6 +2841,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -3622,6 +3646,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -4055,6 +4083,10 @@
             "named": true
           },
           {
+            "type": "rethrow_expression",
+            "named": true
+          },
+          {
             "type": "selector",
             "named": true
           },
@@ -4209,6 +4241,10 @@
             "named": true
           },
           {
+            "type": "rethrow_expression",
+            "named": true
+          },
+          {
             "type": "selector",
             "named": true
           },
@@ -4344,6 +4380,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -4491,6 +4531,10 @@
             "named": true
           },
           {
+            "type": "rethrow_expression",
+            "named": true
+          },
+          {
             "type": "selector",
             "named": true
           },
@@ -4622,6 +4666,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -5106,6 +5154,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -5276,6 +5328,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -5597,6 +5653,10 @@
             "named": true
           },
           {
+            "type": "rethrow_expression",
+            "named": true
+          },
+          {
             "type": "selector",
             "named": true
           },
@@ -5744,6 +5804,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -5931,6 +5995,10 @@
         },
         {
           "type": "relational_operator",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -6388,6 +6456,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -6577,6 +6649,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -6718,6 +6794,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -6882,6 +6962,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -7277,6 +7361,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -7964,6 +8052,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -8384,6 +8476,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -9235,6 +9331,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -9408,6 +9508,10 @@
             "named": true
           },
           {
+            "type": "rethrow_expression",
+            "named": true
+          },
+          {
             "type": "selector",
             "named": true
           },
@@ -9539,6 +9643,10 @@
           },
           {
             "type": "relational_expression",
+            "named": true
+          },
+          {
+            "type": "rethrow_expression",
             "named": true
           },
           {
@@ -9701,6 +9809,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -9776,6 +9888,10 @@
         },
         {
           "type": "dotted_identifier_list",
+          "named": true
+        },
+        {
+          "type": "part_of_builtin",
           "named": true
         },
         {
@@ -9927,6 +10043,10 @@
         },
         {
           "type": "relational_operator",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -10126,6 +10246,10 @@
         },
         {
           "type": "relational_operator",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -10475,6 +10599,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -10623,6 +10751,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -11298,6 +11430,21 @@
     }
   },
   {
+    "type": "rethrow_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "rethrow_builtin",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "return_statement",
     "named": true,
     "fields": {},
@@ -11391,6 +11538,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -11613,6 +11764,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -11953,6 +12108,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -12089,6 +12248,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -12473,6 +12636,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -12702,6 +12869,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -12883,6 +13054,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -13024,6 +13199,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -14096,6 +14275,10 @@
           "named": true
         },
         {
+          "type": "rethrow_expression",
+          "named": true
+        },
+        {
           "type": "selector",
           "named": true
         },
@@ -14232,6 +14415,10 @@
         },
         {
           "type": "relational_expression",
+          "named": true
+        },
+        {
+          "type": "rethrow_expression",
           "named": true
         },
         {
@@ -14514,6 +14701,10 @@
     "named": false
   },
   {
+    "type": "assert_builtin",
+    "named": true
+  },
+  {
     "type": "async",
     "named": false
   },
@@ -14532,6 +14723,10 @@
   {
     "type": "bool",
     "named": false
+  },
+  {
+    "type": "break_builtin",
+    "named": true
   },
   {
     "type": "case",
@@ -14706,10 +14901,6 @@
     "named": false
   },
   {
-    "type": "of",
-    "named": false
-  },
-  {
     "type": "on",
     "named": false
   },
@@ -14720,6 +14911,10 @@
   {
     "type": "part",
     "named": false
+  },
+  {
+    "type": "part_of_builtin",
+    "named": true
   },
   {
     "type": "r\"",
@@ -14740,6 +14935,10 @@
   {
     "type": "required",
     "named": false
+  },
+  {
+    "type": "rethrow_builtin",
+    "named": true
   },
   {
     "type": "return",

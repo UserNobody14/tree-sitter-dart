@@ -1902,6 +1902,10 @@
           "name": "throw_expression"
         },
         {
+          "type": "SYMBOL",
+          "name": "rethrow_expression"
+        },
+        {
           "type": "SEQ",
           "members": [
             {
@@ -2026,6 +2030,10 @@
           "name": "_expression_without_cascade"
         }
       ]
+    },
+    "rethrow_expression": {
+      "type": "SYMBOL",
+      "name": "rethrow_builtin"
     },
     "assignment_expression": {
       "type": "PREC_RIGHT",
@@ -4222,7 +4230,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_assert_builtin"
+          "name": "assert_builtin"
         },
         {
           "type": "SYMBOL",
@@ -5520,7 +5528,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_break_builtin"
+          "name": "break_builtin"
         },
         {
           "type": "CHOICE",
@@ -6614,12 +6622,8 @@
           ]
         },
         {
-          "type": "STRING",
-          "value": "part"
-        },
-        {
-          "type": "STRING",
-          "value": "of"
+          "type": "SYMBOL",
+          "name": "part_of_builtin"
         },
         {
           "type": "CHOICE",
@@ -11732,14 +11736,14 @@
         "value": "as"
       }
     },
-    "_break_builtin": {
+    "break_builtin": {
       "type": "TOKEN",
       "content": {
         "type": "STRING",
         "value": "break"
       }
     },
-    "_assert_builtin": {
+    "assert_builtin": {
       "type": "TOKEN",
       "content": {
         "type": "STRING",
@@ -11751,6 +11755,20 @@
       "content": {
         "type": "STRING",
         "value": "case"
+      }
+    },
+    "rethrow_builtin": {
+      "type": "TOKEN",
+      "content": {
+        "type": "STRING",
+        "value": "rethrow"
+      }
+    },
+    "part_of_builtin": {
+      "type": "TOKEN",
+      "content": {
+        "type": "STRING",
+        "value": "part of"
       }
     },
     "_covariant": {

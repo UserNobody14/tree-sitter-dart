@@ -111,13 +111,11 @@
 ; var keyword
 (inferred_type) @keyword
 
-(const_builtin) @constant.builtin
-(final_builtin) @constant.builtin
-
 ((identifier) @type
  (#match? @type "^_?[A-Z]"))
 
 ("Function" @type)
+(void_type) @type
 
 (this) @variable.builtin
 
@@ -163,70 +161,77 @@
 
 ; Keywords
 ; --------------------
-["import" "library" "export"] @include
-
-; Reserved words (cannot be used as identifiers)
-; TODO: "rethrow" @keyword
 [
-    ; "assert"
-    (case_builtin)
-    "extension"
-    "on"
-    "class"
-    "enum"
-    "extends"
-    "in"
-    "is"
-    "new"
-    "return"
-    "super"
-    "with"
-] @keyword
-
-
-; Built in identifiers:
-; alone these are marked as keywords
-[
+    (assert_builtin)
+    (break_statement)
+    (const_builtin)
+    (part_of_builtin)
+    (rethrow_builtin)
     "abstract"
     "as"
     "async"
     "async*"
-    "yield"
-    "sync*"
     "await"
+    "base"
+    "case"
+    "catch"
+    "class"
+    "continue"
     "covariant"
+    "default"
     "deferred"
+    "do"
     "dynamic"
+    "else"
+    "enum"
+    "export"
+    "extends"
+    "extension"
     "external"
     "factory"
+    "false"
+    "final"
+    "finally"
+    "for"
+    "Function"
     "get"
+    "hide"
+    "if"
     "implements"
+    "import"
+    "in"
     "interface"
+    "is"
+    "late"
     "library"
-    "operator"
     "mixin"
+    "new"
+    "null"
+    "on"
+    "operator"
     "part"
+    "required"
+    "return"
+    "sealed"
     "set"
     "show"
     "static"
+    "super"
+    "switch"
+    "sync*"
+    "throw"
+    "true"
+    "try"
     "typedef"
+    "var"
+    "when"
+    "while"
+    "with"
+    "yield"
 ] @keyword
 
-; when used as an identifier:
-((identifier) @variable
- (#vim-match? @variable "^(abstract|as|covariant|deferred|dynamic|export|external|factory|Function|get|implements|import|interface|library|operator|mixin|part|set|static|typedef)$"))
-
-["if" "else" "switch" "default"] @conditional
-
-[
-  "try"
-  "throw"
-  "catch"
-  "finally"
-  (break_statement)
-] @exception
-
-["do" "while" "continue" "for"] @repeat
+; Variable
+(identifier) @variable
 
 ; Error
 (ERROR) @error
