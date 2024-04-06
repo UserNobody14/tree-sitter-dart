@@ -22,8 +22,7 @@ class Person {
 
   String getName() {
     // <- type
-    //    ^ method
-    // The above used to be 'function.method', not 'method'. Fix it?
+    //    ^ function
     return this.name;
 
     return Material.DENIM;
