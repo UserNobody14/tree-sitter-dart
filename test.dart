@@ -21,6 +21,6 @@ void main() {
   instance.extensionMethod();
   instance
     ..method()
-      ..str
-      ..getter;
+    ..str
+    ..getter;
 }
