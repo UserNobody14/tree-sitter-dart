@@ -19,3 +19,4 @@ pubspec.lock
 *.dylib
 doc
 .vscode
+target
