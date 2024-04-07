@@ -44,7 +44,7 @@ class Other extends Foo {
   final int b = 2;
 
   void foo(covariant String test) {}
-  // <- type
+  // <- keyword
   //         ^ keyword
   factory Other.something() => Other();
   // <- keyword
@@ -121,7 +121,7 @@ void main() {
 }
 
 void foo() async {
-// <- type
+// <- keyword
   //        ^ keyword
   await other('');
   // <- keyword
