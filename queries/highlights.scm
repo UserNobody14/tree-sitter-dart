@@ -99,10 +99,6 @@
   (identifier) @function)
 (setter_signature
   name: (identifier) @function)
-(enum_declaration
-  name: (identifier) @type)
-(enum_constant
-  name: (identifier) @method)
 (type_identifier) @type
 
 ((scoped_identifier
