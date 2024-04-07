@@ -1,6 +1,7 @@
 enum Material {
   //  ^ type
   DENIM,
+  // <- identifier.constant
   CANVAS
 }
 

@@ -102,7 +102,7 @@
 (enum_declaration
   name: (identifier) @type)
 (enum_constant
-  name: (identifier) @type)
+  name: (identifier) @method)
 (type_identifier) @type
 
 ((scoped_identifier
@@ -111,6 +111,13 @@
  (#match? @type "^[a-zA-Z]"))
 
 (type_identifier) @type
+
+; Enums
+; -------------------
+(enum_declaration
+  name: (identifier) @type)
+(enum_constant
+  name: (identifier) @identifier.constant)
 
 ; Variables
 ; --------------------
