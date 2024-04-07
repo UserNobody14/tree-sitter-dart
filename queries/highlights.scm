@@ -92,10 +92,6 @@
   (identifier) @method)
 (setter_signature
   name: (identifier) @method)
-(enum_declaration
-  name: (identifier) @type)
-(enum_constant
-  name: (identifier) @type)
 (type_identifier) @type
 (void_type) @type
 
@@ -105,6 +101,13 @@
  (#match? @type "^[a-zA-Z]"))
 
 (type_identifier) @type
+
+; Enums
+; -------------------
+(enum_declaration
+  name: (identifier) @type)
+(enum_constant
+  name: (identifier) @identifier.constant)
 
 ; Variables
 ; --------------------
