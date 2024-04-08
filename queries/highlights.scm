@@ -4,8 +4,6 @@
 ; --------------------
 (super) @function
 
-; TODO: add method/call_expression to grammar and
-; distinguish method call from variable access
 (function_expression_body
   (identifier) @function)
 
@@ -99,10 +97,6 @@
   (identifier) @function)
 (setter_signature
   name: (identifier) @function)
-(enum_declaration
-  name: (identifier) @type)
-(enum_constant
-  name: (identifier) @method)
 (type_identifier) @type
 
 ((scoped_identifier
