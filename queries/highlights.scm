@@ -1,11 +1,5 @@
-(dotted_identifier_list) @string
-
 ; Methods
 ; --------------------
-(super) @function
-
-(function_expression_body
-  (identifier) @function)
 
 ; NOTE: This query is a bit of a work around for the fact that the dart grammar doesn't
 ; specifically identify a node as a function call
@@ -65,6 +59,7 @@
  ">="
  "<="
  "||"
+ "~/"
  (increment_operator)
  (is_operator)
  (prefix_operator)
@@ -82,13 +77,13 @@
 
 ; Types
 ; --------------------
+((type_identifier) @type.builtin
+  (#match? @type.builtin "^(int|double|String|bool|List|Set|Map|Runes|Symbol)$"))
+(type_identifier) @type
 (class_definition
   name: (identifier) @type)
 (constructor_signature
   name: (identifier) @type)
-;; TODO: does not work
-;(type_identifier
-  ;(identifier) @type)
 (scoped_identifier
   scope: (identifier) @type)
 (function_signature
@@ -103,8 +98,6 @@
   scope: (identifier) @type
   name: (identifier) @type)
  (#match? @type "^[a-zA-Z]"))
-
-(type_identifier) @type
 
 ; Enums
 ; -------------------
@@ -126,17 +119,14 @@
 (this) @variable.builtin
 
 ; properties
-(expression_statement
-  (selector
-  	(unconditional_assignable_selector
-    	(identifier) @function))
+((selector
+  (unconditional_assignable_selector (identifier) @function))
   (selector (argument_part (arguments)))
 )
-(expression_statement
-  (cascade_section
-  	(cascade_selector (identifier) @function)
-    (argument_part (arguments))
-  )
+
+(cascade_section
+  (cascade_selector (identifier) @function)
+  (argument_part (arguments))
 )
 
 (unconditional_assignable_selector
@@ -158,10 +148,10 @@
 ; Parameters
 ; --------------------
 (formal_parameter
-    name: (identifier) @parameter)
+    name: (identifier) @identifier.parameter)
 
 (named_argument
-  (label (identifier) @parameter))
+  (label (identifier) @identifier.parameter))
 
 ; Literals
 ; --------------------
@@ -174,11 +164,11 @@
     ; (hex_floating_point_literal)
 ] @number
 
-(symbol_literal) @symbol
 (string_literal) @string
+(symbol_literal (identifier) @constant) @constant
 (true) @boolean
 (false) @boolean
-(null_literal) @constant.builtin
+(null_literal) @constant.null
 
 (documentation_comment) @comment
 (comment) @comment
@@ -187,7 +177,7 @@
 ; --------------------
 [
     (assert_builtin)
-    (break_statement)
+    (break_builtin)
     (const_builtin)
     (part_of_builtin)
     (rethrow_builtin)
@@ -214,7 +204,6 @@
     "extension"
     "external"
     "factory"
-    "false"
     "final"
     "finally"
     "for"
@@ -231,7 +220,6 @@
     "library"
     "mixin"
     "new"
-    "null"
     "on"
     "operator"
     "part"
@@ -245,7 +233,6 @@
     "switch"
     "sync*"
     "throw"
-    "true"
     "try"
     "typedef"
     "var"
@@ -257,6 +244,3 @@
 
 ; Variable
 (identifier) @variable
-
-; Error
-(ERROR) @error

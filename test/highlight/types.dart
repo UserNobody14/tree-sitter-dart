@@ -11,7 +11,7 @@ class Person {
 
   Person(String name) {
     // <- type
-    //    ^ type
+    //    ^ type.builtin
     this.name = name;
     this.pants = new Pants<Pocket>();
     //                ^ type
@@ -22,7 +22,7 @@ class Person {
   //            ^ variable.builtin
 
   String getName() {
-    // <- type
+    // <- type.builtin
     //    ^ function
     return this.name;
 
