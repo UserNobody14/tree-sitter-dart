@@ -1530,7 +1530,7 @@
               },
               {
                 "type": "PATTERN",
-                "value": "u{[0-9a-fA-F]+}"
+                "value": "u\\{[0-9a-fA-F]+\\}"
               }
             ]
           }
@@ -12148,10 +12148,6 @@
       "set_or_map_literal"
     ],
     [
-      "_primary",
-      "function_signature"
-    ],
-    [
       "_type_name",
       "_primary",
       "function_signature"
@@ -12161,32 +12157,12 @@
       "_type_name"
     ],
     [
-      "variable_declaration",
-      "initialized_variable_definition"
-    ],
-    [
-      "_final_const_var_or_type",
-      "function_signature"
-    ],
-    [
-      "_primary",
-      "_function_formal_parameter"
-    ],
-    [
       "_primary",
       "_simple_formal_parameter"
     ],
     [
       "_primary",
-      "labeled_statement"
-    ],
-    [
-      "_primary",
       "_type_name",
-      "_function_formal_parameter"
-    ],
-    [
-      "_final_const_var_or_type",
       "_function_formal_parameter"
     ],
     [
@@ -12201,11 +12177,6 @@
     ],
     [
       "equality_expression"
-    ],
-    [
-      "_primary",
-      "_type_name",
-      "_simple_formal_parameter"
     ],
     [
       "record_type_field",
@@ -12229,16 +12200,8 @@
       "switch_statement_case"
     ],
     [
-      "variable_declaration",
-      "initialized_identifier"
-    ],
-    [
       "declaration",
       "_external_and_static"
-    ],
-    [
-      "method_signature",
-      "_static_or_covariant"
     ],
     [
       "constructor_signature",
@@ -12275,24 +12238,12 @@
       "_type_name"
     ],
     [
-      "parenthesized_expression",
-      "if_statement"
-    ],
-    [
-      "_top_level_definition",
-      "lambda_expression"
-    ],
-    [
       "_literal",
       "constant_pattern"
     ],
     [
       "_primary",
       "constant_pattern"
-    ],
-    [
-      "_type_not_void_not_function",
-      "qualified"
     ],
     [
       "_final_var_or_type"
@@ -12345,19 +12296,12 @@
       "list_pattern"
     ],
     [
-      "_real_expression",
-      "_pattern"
-    ],
-    [
       "constant_pattern",
       "_type_name"
     ],
     [
       "_pattern_field",
       "label"
-    ],
-    [
-      "_pattern"
     ],
     [
       "constructor_tearoff",
@@ -12373,27 +12317,12 @@
       "_final_var_or_type"
     ],
     [
-      "_var_or_type",
-      "_final_var_or_type",
-      "function_signature"
-    ],
-    [
-      "_top_level_definition",
-      "_var_or_type",
-      "function_signature"
-    ],
-    [
       "set_or_map_literal",
       "constant_pattern"
     ],
     [
       "list_literal",
       "constant_pattern"
-    ],
-    [
-      "set_or_map_literal",
-      "block",
-      "map_pattern"
     ],
     [
       "_var_or_type",
@@ -12412,19 +12341,6 @@
       "_var_or_type"
     ],
     [
-      "_top_level_definition",
-      "_var_or_type"
-    ],
-    [
-      "_top_level_definition",
-      "_final_const_var_or_type"
-    ],
-    [
-      "_top_level_definition",
-      "const_object_expression",
-      "_final_const_var_or_type"
-    ],
-    [
       "_final_const_var_or_type",
       "const_object_expression"
     ],
@@ -12439,19 +12355,6 @@
       "_normal_formal_parameter"
     ],
     [
-      "library_name",
-      "dotted_identifier_list"
-    ],
-    [
-      "_top_level_definition",
-      "inferred_type"
-    ],
-    [
-      "_final_const_var_or_type",
-      "_top_level_definition",
-      "function_signature"
-    ],
-    [
       "_assignable_selector_part",
       "selector"
     ],
@@ -12460,20 +12363,12 @@
       "_postfix_expression"
     ],
     [
-      "_assignable_selector_part",
-      "postfix_expression"
-    ],
-    [
       "_primary",
       "assignable_expression"
     ],
     [
       "_simple_formal_parameter",
       "assignable_expression"
-    ],
-    [
-      "assignable_expression",
-      "postfix_expression"
     ],
     [
       "assignable_expression",
@@ -12487,32 +12382,9 @@
       "_type_name"
     ],
     [
-      "assignable_expression"
-    ],
-    [
-      "method_signature",
-      "declaration",
-      "_static_or_covariant"
-    ],
-    [
-      "type_arguments"
-    ],
-    [
       "_primary",
       "_type_name",
       "assignable_expression"
-    ],
-    [
-      "_primary",
-      "_type_name",
-      "assignable_expression",
-      "function_signature"
-    ],
-    [
-      "_primary",
-      "_type_name",
-      "assignable_expression",
-      "_function_formal_parameter"
     ],
     [
       "_type_name",
@@ -12524,10 +12396,6 @@
     ],
     [
       "relational_expression"
-    ],
-    [
-      "factory_constructor_signature",
-      "redirecting_factory_constructor_signature"
     ],
     [
       "_function_type_tail"
@@ -12545,9 +12413,6 @@
     [
       "super_formal_parameter",
       "unconditional_assignable_selector"
-    ],
-    [
-      "function_signature"
     ]
   ],
   "precedences": [],
@@ -12592,4 +12457,3 @@
     "_literal"
   ]
 }
-
