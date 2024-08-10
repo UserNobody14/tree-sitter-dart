@@ -3,10 +3,19 @@
   "version": "1.0.0",
   "description": "Dart grammar attempt for tree-sitter",
   "main": "bindings/node",
+  "types": "bindings/node",
   "keywords": [
     "tree-sitter",
     "parser",
     "dart"
+  ],
+  "files": [
+    "grammar.js",
+    "binding.gyp",
+    "prebuilds/**",
+    "bindings/node/*",
+    "queries/*",
+    "src/**"
   ],
   "contributors": [
     "Benjamin Sobel",
@@ -20,12 +29,22 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "nan": "^2.18.0"
+    "node-addon-api": "^7.1.0",
+    "node-gyp-build": "^4.8.0"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.21.0"
+  },
+  "peerDependenciesMeta": {
+    "tree_sitter": {
+      "optional": true
+    }
   },
   "devDependencies": {
-    "node-gyp": "^10.0.1",
-    "npm-watch": "^0.11.0",
-    "tree-sitter-cli": "^0.20.8"
+    "node-gyp": "^10.2.0",
+    "npm-watch": "^0.13.0",
+    "tree-sitter-cli": "^0.22.6",
+    "prebuildify": "^6.0.0"
   },
   "watch": {
     "test": {
@@ -53,7 +72,9 @@
     "test": "tree-sitter test",
     "build-test": "tree-sitter generate && node-gyp build && tree-sitter test",
     "watch-test": "npm-watch test",
-    "watch-grammar": "npm-watch build-test"
+    "watch-grammar": "npm-watch build-test",
+    "install": "node-gyp-build",
+    "prebuildify": "prebuildify --napi --strip"
   },
   "tree-sitter": [
     {
@@ -61,6 +82,7 @@
       "file-types": [
         "dart"
       ],
+      "highlights": "queries/highlights.scm",
       "injection-regex": "dart"
     }
   ]
