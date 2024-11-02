@@ -19,16 +19,36 @@ extension SomeExtension on SomeClass {
 }
 
 void main() {
-  final instance = SomeClass();
+  final instance = SomeClass(1, 2, 3).method();
+  //               ^ @reference.class
+  //                                    ^ @reference.call
+  SomeClass().getter;
   instance.str;
   instance.getter;
+  //        ^ @reference.call
+  instance?.getter;
+  //        ^ @reference.call
   instance.setter = 12;
+  //        ^ @reference.call
+  instance?.setter = 12;
+  //        ^ @reference.call
   instance.method();
-  topLevelFn();
+  //        ^ @reference.call
+  instance?.method()!.length();
+  //        ^ @reference.call
+  topLevelFn(1, 2)!.length?.toString();
+  //                             ^ @reference.call
+  topLevelFn;
+  //      ^ @reference.call
   instance.extensionMethod();
+  instance!.extensionMethod();
+  //          ^ @reference.call
   instance
     ..method()
+    // ^ @reference.call
     ..str
+    // ^ @reference.call
     ..getter;
+  //   ^ @reference.call
 }
 
