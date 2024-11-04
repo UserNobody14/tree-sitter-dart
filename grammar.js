@@ -170,6 +170,7 @@ module.exports = grammar({
         [$._type_not_void],
         [$._type_not_void_not_function],
         [$.super_formal_parameter, $.unconditional_assignable_selector],
+        [$._primary, $.labeled_statement],
     ],
 
     word: $ => $.identifier,
@@ -1222,7 +1223,12 @@ module.exports = grammar({
             $.yield_each_statement,
             $.expression_statement,
             $.assert_statement,
-            // $.labeled_statement,
+            $.labeled_statement,
+        ),
+
+        labeled_statement: $ => seq(
+            $.label,
+            $._statement
         ),
 
         local_function_declaration: $ => seq(

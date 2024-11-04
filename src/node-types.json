@@ -104,6 +104,10 @@
         "named": true
       },
       {
+        "type": "labeled_statement",
+        "named": true
+      },
+      {
         "type": "local_function_declaration",
         "named": true
       },
@@ -7157,6 +7161,25 @@
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "labeled_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "_statement",
+          "named": true
+        },
         {
           "type": "identifier",
           "named": true

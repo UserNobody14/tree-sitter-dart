@@ -1,0 +1,53 @@
+=====================
+Labeled Statement
+=====================
+
+import 'package:meta/meta.dart';
+void func() {
+    outer:
+    for (int i = 0; i < 0; i++) {
+        continue outer;
+    }
+}
+
+---
+
+    (program
+      (import_or_export
+        (library_import
+          (import_specification
+            (configurable_uri
+              (uri
+                (string_literal))))))
+      (function_signature
+        (void_type)
+        (identifier)
+        (formal_parameter_list))
+      (function_body
+        (block
+          (labeled_statement
+            (identifier)
+            (for_statement
+            (for_loop_parts
+              (local_variable_declaration
+                (initialized_variable_definition
+                  (type_identifier)
+                  (identifier)
+                  (decimal_integer_literal)))
+              (relational_expression
+                (identifier)
+                (relational_operator)
+                (decimal_integer_literal))
+              (postfix_expression
+                (assignable_expression
+                  (identifier))
+                (postfix_operator
+                  (increment_operator))))
+            (block
+              (continue_statement
+                (identifier))
+            )
+        )
+            )
+
+    )))
