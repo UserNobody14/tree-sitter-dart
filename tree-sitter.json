@@ -1,0 +1,12 @@
+{
+  "grammars": [
+    {
+      "name": "dart",
+      "scope": "source.dart",
+      "file-types": ["dart"],
+      "highlights": "queries/highlights.scm",
+      "tags": "queries/tags.scm",
+      "injection-regex": "dart"
+    }
+  ]
+}
