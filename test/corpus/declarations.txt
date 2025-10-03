@@ -697,6 +697,7 @@ class LinkedHashMap {
       (declaration (factory_constructor_signature (identifier) (formal_parameter_list))) 
       (declaration (factory_constructor_signature (identifier) (identifier) (formal_parameter_list))))))
 
+
 ==================================
 extension type basic
 ==================================
@@ -716,19 +717,20 @@ extension type IdNumber(int id) {
     body: (class_body
       (method_signature
         (operator_signature
-          (binary_operator)
+          (binary_operator
+            (relational_operator))
           (formal_parameter_list
             (formal_parameter
               (type_identifier)
-              name: (identifier))))
-        (function_body
-          (relational_expression
-            (identifier)
-            (relational_operator)
-            (assignable_expression
-              (identifier)
-              (unconditional_assignable_selector
-                (identifier)))))))))
+              name: (identifier)))))
+      (function_body
+        (relational_expression
+          (identifier)
+          (relational_operator)
+          (identifier)
+          (selector
+            (unconditional_assignable_selector
+              (identifier))))))))
 
 ==================================
 extension type with const
@@ -769,9 +771,9 @@ extension type Wrapper<T>(T value) {
       (method_signature
         (getter_signature
           (type_identifier)
-          (identifier))
-        (function_body
-          (identifier))))))
+          name: (identifier)))
+      (function_body
+        (identifier)))))
 
 ==================================
 extension type with interfaces
@@ -795,21 +797,23 @@ extension type NumberE(int value) implements int {
       (method_signature
         (operator_signature
           (type_identifier)
-          (binary_operator)
+          (binary_operator
+            (additive_operator))
           (formal_parameter_list
             (formal_parameter
               (type_identifier)
-              name: (identifier))))
-        (function_body
-          (new_expression
-            (type_identifier)
+              name: (identifier)))))
+      (function_body
+        (identifier)
+        (selector
+          (argument_part
             (arguments
               (argument
                 (additive_expression
                   (identifier)
                   (additive_operator)
-                  (assignable_expression
-                    (identifier)
+                  (identifier)
+                  (selector
                     (unconditional_assignable_selector
                       (identifier))))))))))))
 
@@ -834,9 +838,9 @@ extension type E.named(int value) {
       (method_signature
         (getter_signature
           (type_identifier)
-          (identifier))
-        (function_body
-          (identifier))))))
+          name: (identifier)))
+      (function_body
+        (identifier)))))
 
 ==================================
 extension type with new constructor
@@ -866,7 +870,8 @@ extension type E(@deprecated int value) {}
   (extension_type_declaration
     name: (identifier)
     representation: (representation_declaration
-      (annotation (identifier))
+      (annotation
+        name: (identifier))
       type: (type_identifier)
       name: (identifier))
     body: (class_body)))
