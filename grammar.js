@@ -191,6 +191,7 @@ module.exports = grammar({
             $.class_definition,
             $.mixin_declaration,
             $.extension_declaration,
+            $.extension_type_declaration,
             $.enum_declaration,
             $.type_alias,
             seq(
@@ -1718,6 +1719,27 @@ module.exports = grammar({
                 field('class', $._type),
                 field('body', $.extension_body)
             ),
+        ),
+
+        extension_type_declaration: $ => seq(
+            optional($._metadata),
+            'extension',
+            'type',
+            optional($.const_builtin),
+            field('name', $.identifier),
+            optional(field('type_parameters', $.type_parameters)),
+            field('representation', $.representation_declaration),
+            optional(field('interfaces', $.interfaces)),
+            field('body', $.class_body)
+        ),
+
+        representation_declaration: $ => seq(
+            optional(seq('.', choice($.identifier, $._new_builtin))),
+            '(',
+            optional($._metadata),
+            field('type', $._type),
+            field('name', $.identifier),
+            ')'
         ),
 
         _metadata: $ => prec.right(repeat1($.annotation)),
