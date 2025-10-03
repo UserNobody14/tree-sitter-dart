@@ -5,7 +5,7 @@ Weird file
 d
 
 ---------------
-(ERROR (ERROR (identifier)))
+(program (ERROR (identifier)))
 
 =====================================
 more tests

@@ -20,3 +20,4 @@ pubspec.lock
 doc
 .vscode
 target
+.build
