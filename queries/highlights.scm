@@ -24,7 +24,6 @@
     "default"
     "deferred"
     "do"
-    "dynamic"
     "else"
     "enum"
     "export"

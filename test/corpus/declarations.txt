@@ -696,3 +696,182 @@ class LinkedHashMap {
     (class_body 
       (declaration (factory_constructor_signature (identifier) (formal_parameter_list))) 
       (declaration (factory_constructor_signature (identifier) (identifier) (formal_parameter_list))))))
+
+
+==================================
+extension type basic
+==================================
+
+extension type IdNumber(int id) {
+  operator <(IdNumber other) => id < other.id;
+}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body
+      (method_signature
+        (operator_signature
+          (binary_operator
+            (relational_operator))
+          (formal_parameter_list
+            (formal_parameter
+              (type_identifier)
+              name: (identifier)))))
+      (function_body
+        (relational_expression
+          (identifier)
+          (relational_operator)
+          (identifier)
+          (selector
+            (unconditional_assignable_selector
+              (identifier))))))))
+
+==================================
+extension type with const
+==================================
+
+extension type const E(int it) {}
+
+---
+
+(program
+  (extension_type_declaration
+    (const_builtin)
+    name: (identifier)
+    representation: (representation_declaration
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body)))
+
+==================================
+extension type with type parameters
+==================================
+
+extension type Wrapper<T>(T value) {
+  T get val => value;
+}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    type_parameters: (type_parameters
+      (type_parameter (type_identifier)))
+    representation: (representation_declaration
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body
+      (method_signature
+        (getter_signature
+          (type_identifier)
+          name: (identifier)))
+      (function_body
+        (identifier)))))
+
+==================================
+extension type with interfaces
+==================================
+
+extension type NumberE(int value) implements int {
+  NumberE operator +(NumberE other) => NumberE(value + other.value);
+}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      type: (type_identifier)
+      name: (identifier))
+    interfaces: (interfaces
+      (type_identifier))
+    body: (class_body
+      (method_signature
+        (operator_signature
+          (type_identifier)
+          (binary_operator
+            (additive_operator))
+          (formal_parameter_list
+            (formal_parameter
+              (type_identifier)
+              name: (identifier)))))
+      (function_body
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (additive_expression
+                  (identifier)
+                  (additive_operator)
+                  (identifier)
+                  (selector
+                    (unconditional_assignable_selector
+                      (identifier))))))))))))
+
+==================================
+extension type with named constructor
+==================================
+
+extension type E.named(int value) {
+  int get val => value;
+}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      (identifier)
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body
+      (method_signature
+        (getter_signature
+          (type_identifier)
+          name: (identifier)))
+      (function_body
+        (identifier)))))
+
+==================================
+extension type with new constructor
+==================================
+
+extension type E.new(int value) {}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body)))
+
+==================================
+extension type with metadata in representation
+==================================
+
+extension type E(@deprecated int value) {}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      (annotation
+        name: (identifier))
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body)))
