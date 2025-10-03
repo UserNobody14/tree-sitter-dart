@@ -853,3 +853,20 @@ extension type E.new(int value) {}
       type: (type_identifier)
       name: (identifier))
     body: (class_body)))
+
+==================================
+extension type with metadata in representation
+==================================
+
+extension type E(@deprecated int value) {}
+
+---
+
+(program
+  (extension_type_declaration
+    name: (identifier)
+    representation: (representation_declaration
+      (annotation (identifier))
+      type: (type_identifier)
+      name: (identifier))
+    body: (class_body)))
