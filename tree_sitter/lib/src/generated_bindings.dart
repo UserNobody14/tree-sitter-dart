@@ -33,10 +33,10 @@ class TreeSitter {
 
   /// Delete the parser, freeing all of the memory that it used.
   void ts_parser_delete(
-    ffi.Pointer<TSParser> parser,
+    ffi.Pointer<TSParser> self,
   ) {
     return _ts_parser_delete(
-      parser,
+      self,
     );
   }
 
@@ -45,31 +45,6 @@ class TreeSitter {
           'ts_parser_delete');
   late final _ts_parser_delete =
       _ts_parser_deletePtr.asFunction<void Function(ffi.Pointer<TSParser>)>();
-
-  /// Set the language that the parser should use for parsing.
-  ///
-  /// Returns a boolean indicating whether or not the language was successfully
-  /// assigned. True means assignment succeeded. False means there was a version
-  /// mismatch: the language was generated with an incompatible version of the
-  /// Tree-sitter CLI. Check the language's version using `ts_language_version`
-  /// and compare it to this library's `TREE_SITTER_LANGUAGE_VERSION` and
-  /// `TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION` constants.
-  bool ts_parser_set_language(
-    ffi.Pointer<TSParser> self,
-    ffi.Pointer<TSLanguage> language,
-  ) {
-    return _ts_parser_set_language(
-      self,
-      language,
-    );
-  }
-
-  late final _ts_parser_set_languagePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Bool Function(ffi.Pointer<TSParser>,
-              ffi.Pointer<TSLanguage>)>>('ts_parser_set_language');
-  late final _ts_parser_set_language = _ts_parser_set_languagePtr.asFunction<
-      bool Function(ffi.Pointer<TSParser>, ffi.Pointer<TSLanguage>)>();
 
   /// Get the parser's current language.
   ffi.Pointer<TSLanguage> ts_parser_language(
@@ -87,6 +62,31 @@ class TreeSitter {
   late final _ts_parser_language = _ts_parser_languagePtr
       .asFunction<ffi.Pointer<TSLanguage> Function(ffi.Pointer<TSParser>)>();
 
+  /// Set the language that the parser should use for parsing.
+  ///
+  /// Returns a boolean indicating whether or not the language was successfully
+  /// assigned. True means assignment succeeded. False means there was a version
+  /// mismatch: the language was generated with an incompatible version of the
+  /// Tree-sitter CLI. Check the language's ABI version using [`ts_language_abi_version`]
+  /// and compare it to this library's [`TREE_SITTER_LANGUAGE_VERSION`] and
+  /// [`TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION`] constants.
+  bool ts_parser_set_language(
+    ffi.Pointer<TSParser> self,
+    ffi.Pointer<TSLanguage> language,
+  ) {
+    return _ts_parser_set_language(
+      self,
+      language,
+    );
+  }
+
+  late final _ts_parser_set_languagePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(ffi.Pointer<TSParser>,
+              ffi.Pointer<TSLanguage>)>>('ts_parser_set_language');
+  late final _ts_parser_set_language = _ts_parser_set_languagePtr.asFunction<
+      bool Function(ffi.Pointer<TSParser>, ffi.Pointer<TSLanguage>)>();
+
   /// Set the ranges of text that the parser should include when parsing.
   ///
   /// By default, the parser will always include entire documents. This function
@@ -98,10 +98,11 @@ class TreeSitter {
   /// of ranges. The parser does *not* take ownership of these ranges; it copies
   /// the data, so it doesn't matter how these ranges are allocated.
   ///
-  /// If `length` is zero, then the entire document will be parsed. Otherwise,
+  /// If `count` is zero, then the entire document will be parsed. Otherwise,
   /// the given ranges must be ordered from earliest to latest in the document,
-  /// and they must not overlap. That is, the following must hold for all
-  /// `i` < `length - 1`: ranges[i].end_byte <= ranges[i + 1].start_byte
+  /// and they must not overlap. That is, the following must hold for all:
+  ///
+  /// `i < count - 1`: `ranges[i].end_byte <= ranges[i + 1].start_byte`
   ///
   /// If this requirement is not satisfied, the operation will fail, the ranges
   /// will not be assigned, and this function will return `false`. On success,
@@ -109,12 +110,12 @@ class TreeSitter {
   bool ts_parser_set_included_ranges(
     ffi.Pointer<TSParser> self,
     ffi.Pointer<TSRange> ranges,
-    int length,
+    int count,
   ) {
     return _ts_parser_set_included_ranges(
       self,
       ranges,
-      length,
+      count,
     );
   }
 
@@ -130,14 +131,14 @@ class TreeSitter {
   ///
   /// The returned pointer is owned by the parser. The caller should not free it
   /// or write to it. The length of the array will be written to the given
-  /// `length` pointer.
+  /// `count` pointer.
   ffi.Pointer<TSRange> ts_parser_included_ranges(
     ffi.Pointer<TSParser> self,
-    ffi.Pointer<ffi.Uint32> length,
+    ffi.Pointer<ffi.Uint32> count,
   ) {
     return _ts_parser_included_ranges(
       self,
-      length,
+      count,
     );
   }
 
@@ -157,35 +158,42 @@ class TreeSitter {
   /// version of this document and the document has since been edited, pass the
   /// previous syntax tree so that the unchanged parts of it can be reused.
   /// This will save time and memory. For this to work correctly, you must have
-  /// already edited the old syntax tree using the `ts_tree_edit` function in a
+  /// already edited the old syntax tree using the [`ts_tree_edit`] function in a
   /// way that exactly matches the source code changes.
   ///
-  /// The `TSInput` parameter lets you specify how to read the text. It has the
+  /// The [`TSInput`] parameter lets you specify how to read the text. It has the
   /// following three fields:
-  /// 1. `read`: A function to retrieve a chunk of text at a given byte offset
+  /// 1. [`read`]: A function to retrieve a chunk of text at a given byte offset
   /// and (row, column) position. The function should return a pointer to the
-  /// text and write its length to the `bytes_read` pointer. The parser does
+  /// text and write its length to the [`bytes_read`] pointer. The parser does
   /// not take ownership of this buffer; it just borrows it until it has
   /// finished reading it. The function should write a zero value to the
-  /// `bytes_read` pointer to indicate the end of the document.
-  /// 2. `payload`: An arbitrary pointer that will be passed to each invocation
-  /// of the `read` function.
-  /// 3. `encoding`: An indication of how the text is encoded. Either
+  /// [`bytes_read`] pointer to indicate the end of the document.
+  /// 2. [`payload`]: An arbitrary pointer that will be passed to each invocation
+  /// of the [`read`] function.
+  /// 3. [`encoding`]: An indication of how the text is encoded. Either
   /// `TSInputEncodingUTF8` or `TSInputEncodingUTF16`.
   ///
   /// This function returns a syntax tree on success, and `NULL` on failure. There
-  /// are three possible reasons for failure:
+  /// are four possible reasons for failure:
   /// 1. The parser does not have a language assigned. Check for this using the
-  /// `ts_parser_language` function.
+  /// [`ts_parser_language`] function.
   /// 2. Parsing was cancelled due to a timeout that was set by an earlier call to
-  /// the `ts_parser_set_timeout_micros` function. You can resume parsing from
-  /// where the parser left out by calling `ts_parser_parse` again with the
+  /// the [`ts_parser_set_timeout_micros`] function. You can resume parsing from
+  /// where the parser left out by calling [`ts_parser_parse`] again with the
   /// same arguments. Or you can start parsing from scratch by first calling
-  /// `ts_parser_reset`.
+  /// [`ts_parser_reset`].
   /// 3. Parsing was cancelled using a cancellation flag that was set by an
-  /// earlier call to `ts_parser_set_cancellation_flag`. You can resume parsing
-  /// from where the parser left out by calling `ts_parser_parse` again with
+  /// earlier call to [`ts_parser_set_cancellation_flag`]. You can resume parsing
+  /// from where the parser left out by calling [`ts_parser_parse`] again with
   /// the same arguments.
+  /// 4. Parsing was cancelled due to the progress callback returning true. This callback
+  /// is passed in [`ts_parser_parse_with_options`] inside the [`TSParseOptions`] struct.
+  ///
+  /// [`read`]: TSInput::read
+  /// [`payload`]: TSInput::payload
+  /// [`encoding`]: TSInput::encoding
+  /// [`bytes_read`]: TSInput::read
   ffi.Pointer<TSTree> ts_parser_parse(
     ffi.Pointer<TSParser> self,
     ffi.Pointer<TSTree> old_tree,
@@ -206,8 +214,39 @@ class TreeSitter {
       ffi.Pointer<TSTree> Function(
           ffi.Pointer<TSParser>, ffi.Pointer<TSTree>, TSInput)>();
 
+  /// Use the parser to parse some source code and create a syntax tree, with some options.
+  ///
+  /// See [`ts_parser_parse`] for more details.
+  ///
+  /// See [`TSParseOptions`] for more details on the options.
+  ffi.Pointer<TSTree> ts_parser_parse_with_options(
+    ffi.Pointer<TSParser> self,
+    ffi.Pointer<TSTree> old_tree,
+    TSInput input,
+    TSParseOptions parse_options,
+  ) {
+    return _ts_parser_parse_with_options(
+      self,
+      old_tree,
+      input,
+      parse_options,
+    );
+  }
+
+  late final _ts_parser_parse_with_optionsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSTree> Function(
+              ffi.Pointer<TSParser>,
+              ffi.Pointer<TSTree>,
+              TSInput,
+              TSParseOptions)>>('ts_parser_parse_with_options');
+  late final _ts_parser_parse_with_options =
+      _ts_parser_parse_with_optionsPtr.asFunction<
+          ffi.Pointer<TSTree> Function(ffi.Pointer<TSParser>,
+              ffi.Pointer<TSTree>, TSInput, TSParseOptions)>();
+
   /// Use the parser to parse some source code stored in one contiguous buffer.
-  /// The first two parameters are the same as in the `ts_parser_parse` function
+  /// The first two parameters are the same as in the [`ts_parser_parse`] function
   /// above. The second two parameters indicate the location of the buffer and its
   /// length in bytes.
   ffi.Pointer<TSTree> ts_parser_parse_string(
@@ -237,21 +276,21 @@ class TreeSitter {
 
   /// Use the parser to parse some source code stored in one contiguous buffer with
   /// a given encoding. The first four parameters work the same as in the
-  /// `ts_parser_parse_string` method above. The final parameter indicates whether
+  /// [`ts_parser_parse_string`] method above. The final parameter indicates whether
   /// the text is encoded as UTF8 or UTF16.
   ffi.Pointer<TSTree> ts_parser_parse_string_encoding(
     ffi.Pointer<TSParser> self,
     ffi.Pointer<TSTree> old_tree,
     ffi.Pointer<ffi.Char> string,
     int length,
-    int encoding,
+    TSInputEncoding encoding,
   ) {
     return _ts_parser_parse_string_encoding(
       self,
       old_tree,
       string,
       length,
-      encoding,
+      encoding.value,
     );
   }
 
@@ -262,7 +301,7 @@ class TreeSitter {
               ffi.Pointer<TSTree>,
               ffi.Pointer<ffi.Char>,
               ffi.Uint32,
-              ffi.Int32)>>('ts_parser_parse_string_encoding');
+              ffi.UnsignedInt)>>('ts_parser_parse_string_encoding');
   late final _ts_parser_parse_string_encoding =
       _ts_parser_parse_string_encodingPtr.asFunction<
           ffi.Pointer<TSTree> Function(ffi.Pointer<TSParser>,
@@ -272,9 +311,9 @@ class TreeSitter {
   ///
   /// If the parser previously failed because of a timeout or a cancellation, then
   /// by default, it will resume where it left off on the next call to
-  /// `ts_parser_parse` or other parsing functions. If you don't want to resume,
+  /// [`ts_parser_parse`] or other parsing functions. If you don't want to resume,
   /// and instead intend to use this parser to parse some other document, you must
-  /// call `ts_parser_reset` first.
+  /// call [`ts_parser_reset`] first.
   void ts_parser_reset(
     ffi.Pointer<TSParser> self,
   ) {
@@ -289,18 +328,20 @@ class TreeSitter {
   late final _ts_parser_reset =
       _ts_parser_resetPtr.asFunction<void Function(ffi.Pointer<TSParser>)>();
 
+  /// @deprecated use [`ts_parser_parse_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
   /// Set the maximum duration in microseconds that parsing should be allowed to
   /// take before halting.
   ///
   /// If parsing takes longer than this, it will halt early, returning NULL.
-  /// See `ts_parser_parse` for more information.
+  /// See [`ts_parser_parse`] for more information.
   void ts_parser_set_timeout_micros(
     ffi.Pointer<TSParser> self,
-    int timeout,
+    int timeout_micros,
   ) {
     return _ts_parser_set_timeout_micros(
       self,
-      timeout,
+      timeout_micros,
     );
   }
 
@@ -311,6 +352,8 @@ class TreeSitter {
   late final _ts_parser_set_timeout_micros = _ts_parser_set_timeout_microsPtr
       .asFunction<void Function(ffi.Pointer<TSParser>, int)>();
 
+  /// @deprecated use [`ts_parser_parse_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
   /// Get the duration in microseconds that parsing is allowed to take.
   int ts_parser_timeout_micros(
     ffi.Pointer<TSParser> self,
@@ -326,11 +369,13 @@ class TreeSitter {
   late final _ts_parser_timeout_micros = _ts_parser_timeout_microsPtr
       .asFunction<int Function(ffi.Pointer<TSParser>)>();
 
+  /// @deprecated use [`ts_parser_parse_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
   /// Set the parser's current cancellation flag pointer.
   ///
   /// If a non-null pointer is assigned, then the parser will periodically read
   /// from this pointer during parsing. If it reads a non-zero value, it will
-  /// halt early, returning NULL. See `ts_parser_parse` for more information.
+  /// halt early, returning NULL. See [`ts_parser_parse`] for more information.
   void ts_parser_set_cancellation_flag(
     ffi.Pointer<TSParser> self,
     ffi.Pointer<ffi.Size> flag,
@@ -349,6 +394,8 @@ class TreeSitter {
       _ts_parser_set_cancellation_flagPtr.asFunction<
           void Function(ffi.Pointer<TSParser>, ffi.Pointer<ffi.Size>)>();
 
+  /// @deprecated use [`ts_parser_parse_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
   /// Get the parser's current cancellation flag pointer.
   ffi.Pointer<ffi.Size> ts_parser_cancellation_flag(
     ffi.Pointer<TSParser> self,
@@ -408,11 +455,11 @@ class TreeSitter {
   /// SVG output. You can turn off this logging by passing a negative number.
   void ts_parser_print_dot_graphs(
     ffi.Pointer<TSParser> self,
-    int file,
+    int fd,
   ) {
     return _ts_parser_print_dot_graphs(
       self,
-      file,
+      fd,
     );
   }
 
@@ -436,9 +483,8 @@ class TreeSitter {
   }
 
   late final _ts_tree_copyPtr = _lookup<
-          ffi
-          .NativeFunction<ffi.Pointer<TSTree> Function(ffi.Pointer<TSTree>)>>(
-      'ts_tree_copy');
+      ffi.NativeFunction<
+          ffi.Pointer<TSTree> Function(ffi.Pointer<TSTree>)>>('ts_tree_copy');
   late final _ts_tree_copy = _ts_tree_copyPtr
       .asFunction<ffi.Pointer<TSTree> Function(ffi.Pointer<TSTree>)>();
 
@@ -477,12 +523,12 @@ class TreeSitter {
   TSNode ts_tree_root_node_with_offset(
     ffi.Pointer<TSTree> self,
     int offset_bytes,
-    TSPoint offset_point,
+    TSPoint offset_extent,
   ) {
     return _ts_tree_root_node_with_offset(
       self,
       offset_bytes,
-      offset_point,
+      offset_extent,
     );
   }
 
@@ -495,10 +541,10 @@ class TreeSitter {
 
   /// Get the language that was used to parse the syntax tree.
   ffi.Pointer<TSLanguage> ts_tree_language(
-    ffi.Pointer<TSTree> arg0,
+    ffi.Pointer<TSTree> self,
   ) {
     return _ts_tree_language(
-      arg0,
+      self,
     );
   }
 
@@ -513,11 +559,11 @@ class TreeSitter {
   ///
   /// The returned pointer must be freed by the caller.
   ffi.Pointer<TSRange> ts_tree_included_ranges(
-    ffi.Pointer<TSTree> arg0,
+    ffi.Pointer<TSTree> self,
     ffi.Pointer<ffi.Uint32> length,
   ) {
     return _ts_tree_included_ranges(
-      arg0,
+      self,
       length,
     );
   }
@@ -557,9 +603,16 @@ class TreeSitter {
   ///
   /// For this to work correctly, the old syntax tree must have been edited such
   /// that its ranges match up to the new tree. Generally, you'll want to call
-  /// this function right after calling one of the `ts_parser_parse` functions.
+  /// this function right after calling one of the [`ts_parser_parse`] functions.
   /// You need to pass the old tree that was passed to parse, as well as the new
   /// tree that was returned from that function.
+  ///
+  /// The returned ranges indicate areas where the hierarchical structure of syntax
+  /// nodes (from root to leaf) has changed between the old and new trees. Characters
+  /// outside these ranges have identical ancestor nodes in both trees.
+  ///
+  /// Note that the returned ranges may be slightly larger than the exact changed areas,
+  /// but Tree-sitter attempts to make them as small as possible.
   ///
   /// The returned array is allocated using `malloc` and the caller is responsible
   /// for freeing it using `free`. The length of the array will be written to the
@@ -589,11 +642,11 @@ class TreeSitter {
 
   /// Write a DOT graph describing the syntax tree to the given file.
   void ts_tree_print_dot_graph(
-    ffi.Pointer<TSTree> arg0,
+    ffi.Pointer<TSTree> self,
     int file_descriptor,
   ) {
     return _ts_tree_print_dot_graph(
-      arg0,
+      self,
       file_descriptor,
     );
   }
@@ -606,10 +659,10 @@ class TreeSitter {
 
   /// Get the node's type as a null-terminated string.
   ffi.Pointer<ffi.Char> ts_node_type(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_type(
-      arg0,
+      self,
     );
   }
 
@@ -621,10 +674,10 @@ class TreeSitter {
 
   /// Get the node's type as a numerical id.
   int ts_node_symbol(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_symbol(
-      arg0,
+      self,
     );
   }
 
@@ -633,12 +686,60 @@ class TreeSitter {
   late final _ts_node_symbol =
       _ts_node_symbolPtr.asFunction<int Function(TSNode)>();
 
+  /// Get the node's language.
+  ffi.Pointer<TSLanguage> ts_node_language(
+    TSNode self,
+  ) {
+    return _ts_node_language(
+      self,
+    );
+  }
+
+  late final _ts_node_languagePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<TSLanguage> Function(TSNode)>>(
+          'ts_node_language');
+  late final _ts_node_language = _ts_node_languagePtr
+      .asFunction<ffi.Pointer<TSLanguage> Function(TSNode)>();
+
+  /// Get the node's type as it appears in the grammar ignoring aliases as a
+  /// null-terminated string.
+  ffi.Pointer<ffi.Char> ts_node_grammar_type(
+    TSNode self,
+  ) {
+    return _ts_node_grammar_type(
+      self,
+    );
+  }
+
+  late final _ts_node_grammar_typePtr =
+      _lookup<ffi.NativeFunction<ffi.Pointer<ffi.Char> Function(TSNode)>>(
+          'ts_node_grammar_type');
+  late final _ts_node_grammar_type = _ts_node_grammar_typePtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(TSNode)>();
+
+  /// Get the node's type as a numerical id as it appears in the grammar ignoring
+  /// aliases. This should be used in [`ts_language_next_state`] instead of
+  /// [`ts_node_symbol`].
+  int ts_node_grammar_symbol(
+    TSNode self,
+  ) {
+    return _ts_node_grammar_symbol(
+      self,
+    );
+  }
+
+  late final _ts_node_grammar_symbolPtr =
+      _lookup<ffi.NativeFunction<TSSymbol Function(TSNode)>>(
+          'ts_node_grammar_symbol');
+  late final _ts_node_grammar_symbol =
+      _ts_node_grammar_symbolPtr.asFunction<int Function(TSNode)>();
+
   /// Get the node's start byte.
   int ts_node_start_byte(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_start_byte(
-      arg0,
+      self,
     );
   }
 
@@ -650,10 +751,10 @@ class TreeSitter {
 
   /// Get the node's start position in terms of rows and columns.
   TSPoint ts_node_start_point(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_start_point(
-      arg0,
+      self,
     );
   }
 
@@ -665,10 +766,10 @@ class TreeSitter {
 
   /// Get the node's end byte.
   int ts_node_end_byte(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_end_byte(
-      arg0,
+      self,
     );
   }
 
@@ -680,10 +781,10 @@ class TreeSitter {
 
   /// Get the node's end position in terms of rows and columns.
   TSPoint ts_node_end_point(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_end_point(
-      arg0,
+      self,
     );
   }
 
@@ -698,10 +799,10 @@ class TreeSitter {
   /// This string is allocated with `malloc` and the caller is responsible for
   /// freeing it using `free`.
   ffi.Pointer<ffi.Char> ts_node_string(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_string(
-      arg0,
+      self,
     );
   }
 
@@ -711,14 +812,14 @@ class TreeSitter {
   late final _ts_node_string =
       _ts_node_stringPtr.asFunction<ffi.Pointer<ffi.Char> Function(TSNode)>();
 
-  /// Check if the node is null. Functions like `ts_node_child` and
-  /// `ts_node_next_sibling` will return a null node to indicate that no such node
+  /// Check if the node is null. Functions like [`ts_node_child`] and
+  /// [`ts_node_next_sibling`] will return a null node to indicate that no such node
   /// was found.
   bool ts_node_is_null(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_is_null(
-      arg0,
+      self,
     );
   }
 
@@ -731,10 +832,10 @@ class TreeSitter {
   /// grammar, whereas *anonymous* nodes correspond to string literals in the
   /// grammar.
   bool ts_node_is_named(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_is_named(
-      arg0,
+      self,
     );
   }
 
@@ -747,10 +848,10 @@ class TreeSitter {
   /// Check if the node is *missing*. Missing nodes are inserted by the parser in
   /// order to recover from certain kinds of syntax errors.
   bool ts_node_is_missing(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_is_missing(
-      arg0,
+      self,
     );
   }
 
@@ -763,10 +864,10 @@ class TreeSitter {
   /// Check if the node is *extra*. Extra nodes represent things like comments,
   /// which are not required the grammar, but can appear anywhere.
   bool ts_node_is_extra(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_is_extra(
-      arg0,
+      self,
     );
   }
 
@@ -778,10 +879,10 @@ class TreeSitter {
 
   /// Check if a syntax node has been edited.
   bool ts_node_has_changes(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_has_changes(
-      arg0,
+      self,
     );
   }
 
@@ -793,10 +894,10 @@ class TreeSitter {
 
   /// Check if the node is a syntax error or contains any syntax errors.
   bool ts_node_has_error(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_has_error(
-      arg0,
+      self,
     );
   }
 
@@ -806,12 +907,59 @@ class TreeSitter {
   late final _ts_node_has_error =
       _ts_node_has_errorPtr.asFunction<bool Function(TSNode)>();
 
+  /// Check if the node is a syntax error.
+  bool ts_node_is_error(
+    TSNode self,
+  ) {
+    return _ts_node_is_error(
+      self,
+    );
+  }
+
+  late final _ts_node_is_errorPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(TSNode)>>(
+          'ts_node_is_error');
+  late final _ts_node_is_error =
+      _ts_node_is_errorPtr.asFunction<bool Function(TSNode)>();
+
+  /// Get this node's parse state.
+  int ts_node_parse_state(
+    TSNode self,
+  ) {
+    return _ts_node_parse_state(
+      self,
+    );
+  }
+
+  late final _ts_node_parse_statePtr =
+      _lookup<ffi.NativeFunction<TSStateId Function(TSNode)>>(
+          'ts_node_parse_state');
+  late final _ts_node_parse_state =
+      _ts_node_parse_statePtr.asFunction<int Function(TSNode)>();
+
+  /// Get the parse state after this node.
+  int ts_node_next_parse_state(
+    TSNode self,
+  ) {
+    return _ts_node_next_parse_state(
+      self,
+    );
+  }
+
+  late final _ts_node_next_parse_statePtr =
+      _lookup<ffi.NativeFunction<TSStateId Function(TSNode)>>(
+          'ts_node_next_parse_state');
+  late final _ts_node_next_parse_state =
+      _ts_node_next_parse_statePtr.asFunction<int Function(TSNode)>();
+
   /// Get the node's immediate parent.
+  /// Prefer [`ts_node_child_with_descendant`] for
+  /// iterating over the node's ancestors.
   TSNode ts_node_parent(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_parent(
-      arg0,
+      self,
     );
   }
 
@@ -820,15 +968,34 @@ class TreeSitter {
   late final _ts_node_parent =
       _ts_node_parentPtr.asFunction<TSNode Function(TSNode)>();
 
+  /// Get the node that contains `descendant`.
+  ///
+  /// Note that this can return `descendant` itself.
+  TSNode ts_node_child_with_descendant(
+    TSNode self,
+    TSNode descendant,
+  ) {
+    return _ts_node_child_with_descendant(
+      self,
+      descendant,
+    );
+  }
+
+  late final _ts_node_child_with_descendantPtr =
+      _lookup<ffi.NativeFunction<TSNode Function(TSNode, TSNode)>>(
+          'ts_node_child_with_descendant');
+  late final _ts_node_child_with_descendant = _ts_node_child_with_descendantPtr
+      .asFunction<TSNode Function(TSNode, TSNode)>();
+
   /// Get the node's child at the given index, where zero represents the first
   /// child.
   TSNode ts_node_child(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int child_index,
   ) {
     return _ts_node_child(
-      arg0,
-      arg1,
+      self,
+      child_index,
     );
   }
 
@@ -841,12 +1008,12 @@ class TreeSitter {
   /// Get the field name for node's child at the given index, where zero represents
   /// the first child. Returns NULL, if no field is found.
   ffi.Pointer<ffi.Char> ts_node_field_name_for_child(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int child_index,
   ) {
     return _ts_node_field_name_for_child(
-      arg0,
-      arg1,
+      self,
+      child_index,
     );
   }
 
@@ -857,12 +1024,32 @@ class TreeSitter {
   late final _ts_node_field_name_for_child = _ts_node_field_name_for_childPtr
       .asFunction<ffi.Pointer<ffi.Char> Function(TSNode, int)>();
 
+  /// Get the field name for node's named child at the given index, where zero
+  /// represents the first named child. Returns NULL, if no field is found.
+  ffi.Pointer<ffi.Char> ts_node_field_name_for_named_child(
+    TSNode self,
+    int named_child_index,
+  ) {
+    return _ts_node_field_name_for_named_child(
+      self,
+      named_child_index,
+    );
+  }
+
+  late final _ts_node_field_name_for_named_childPtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Pointer<ffi.Char> Function(TSNode, ffi.Uint32)>>(
+      'ts_node_field_name_for_named_child');
+  late final _ts_node_field_name_for_named_child =
+      _ts_node_field_name_for_named_childPtr
+          .asFunction<ffi.Pointer<ffi.Char> Function(TSNode, int)>();
+
   /// Get the node's number of children.
   int ts_node_child_count(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_child_count(
-      arg0,
+      self,
     );
   }
 
@@ -874,14 +1061,14 @@ class TreeSitter {
 
   /// Get the node's *named* child at the given index.
   ///
-  /// See also `ts_node_is_named`.
+  /// See also [`ts_node_is_named`].
   TSNode ts_node_named_child(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int child_index,
   ) {
     return _ts_node_named_child(
-      arg0,
-      arg1,
+      self,
+      child_index,
     );
   }
 
@@ -893,12 +1080,12 @@ class TreeSitter {
 
   /// Get the node's number of *named* children.
   ///
-  /// See also `ts_node_is_named`.
+  /// See also [`ts_node_is_named`].
   int ts_node_named_child_count(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_named_child_count(
-      arg0,
+      self,
     );
   }
 
@@ -911,13 +1098,13 @@ class TreeSitter {
   /// Get the node's child with the given field name.
   TSNode ts_node_child_by_field_name(
     TSNode self,
-    ffi.Pointer<ffi.Char> field_name,
-    int field_name_length,
+    ffi.Pointer<ffi.Char> name,
+    int name_length,
   ) {
     return _ts_node_child_by_field_name(
       self,
-      field_name,
-      field_name_length,
+      name,
+      name_length,
     );
   }
 
@@ -931,14 +1118,14 @@ class TreeSitter {
   /// Get the node's child with the given numerical field id.
   ///
   /// You can convert a field name to an id using the
-  /// `ts_language_field_id_for_name` function.
+  /// [`ts_language_field_id_for_name`] function.
   TSNode ts_node_child_by_field_id(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int field_id,
   ) {
     return _ts_node_child_by_field_id(
-      arg0,
-      arg1,
+      self,
+      field_id,
     );
   }
 
@@ -950,10 +1137,10 @@ class TreeSitter {
 
   /// Get the node's next / previous sibling.
   TSNode ts_node_next_sibling(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_next_sibling(
-      arg0,
+      self,
     );
   }
 
@@ -964,10 +1151,10 @@ class TreeSitter {
       _ts_node_next_siblingPtr.asFunction<TSNode Function(TSNode)>();
 
   TSNode ts_node_prev_sibling(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_prev_sibling(
-      arg0,
+      self,
     );
   }
 
@@ -979,10 +1166,10 @@ class TreeSitter {
 
   /// Get the node's next / previous *named* sibling.
   TSNode ts_node_next_named_sibling(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_next_named_sibling(
-      arg0,
+      self,
     );
   }
 
@@ -993,10 +1180,10 @@ class TreeSitter {
       _ts_node_next_named_siblingPtr.asFunction<TSNode Function(TSNode)>();
 
   TSNode ts_node_prev_named_sibling(
-    TSNode arg0,
+    TSNode self,
   ) {
     return _ts_node_prev_named_sibling(
-      arg0,
+      self,
     );
   }
 
@@ -1006,14 +1193,14 @@ class TreeSitter {
   late final _ts_node_prev_named_sibling =
       _ts_node_prev_named_siblingPtr.asFunction<TSNode Function(TSNode)>();
 
-  /// Get the node's first child that extends beyond the given byte offset.
+  /// Get the node's first child that contains or starts after the given byte offset.
   TSNode ts_node_first_child_for_byte(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int byte,
   ) {
     return _ts_node_first_child_for_byte(
-      arg0,
-      arg1,
+      self,
+      byte,
     );
   }
 
@@ -1023,14 +1210,14 @@ class TreeSitter {
   late final _ts_node_first_child_for_byte = _ts_node_first_child_for_bytePtr
       .asFunction<TSNode Function(TSNode, int)>();
 
-  /// Get the node's first named child that extends beyond the given byte offset.
+  /// Get the node's first named child that contains or starts after the given byte offset.
   TSNode ts_node_first_named_child_for_byte(
-    TSNode arg0,
-    int arg1,
+    TSNode self,
+    int byte,
   ) {
     return _ts_node_first_named_child_for_byte(
-      arg0,
-      arg1,
+      self,
+      byte,
     );
   }
 
@@ -1041,17 +1228,32 @@ class TreeSitter {
       _ts_node_first_named_child_for_bytePtr
           .asFunction<TSNode Function(TSNode, int)>();
 
+  /// Get the node's number of descendants, including one for the node itself.
+  int ts_node_descendant_count(
+    TSNode self,
+  ) {
+    return _ts_node_descendant_count(
+      self,
+    );
+  }
+
+  late final _ts_node_descendant_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(TSNode)>>(
+          'ts_node_descendant_count');
+  late final _ts_node_descendant_count =
+      _ts_node_descendant_countPtr.asFunction<int Function(TSNode)>();
+
   /// Get the smallest node within this node that spans the given range of bytes
   /// or (row, column) positions.
   TSNode ts_node_descendant_for_byte_range(
-    TSNode arg0,
-    int arg1,
-    int arg2,
+    TSNode self,
+    int start,
+    int end,
   ) {
     return _ts_node_descendant_for_byte_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start,
+      end,
     );
   }
 
@@ -1063,14 +1265,14 @@ class TreeSitter {
           .asFunction<TSNode Function(TSNode, int, int)>();
 
   TSNode ts_node_descendant_for_point_range(
-    TSNode arg0,
-    TSPoint arg1,
-    TSPoint arg2,
+    TSNode self,
+    TSPoint start,
+    TSPoint end,
   ) {
     return _ts_node_descendant_for_point_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start,
+      end,
     );
   }
 
@@ -1084,14 +1286,14 @@ class TreeSitter {
   /// Get the smallest named node within this node that spans the given range of
   /// bytes or (row, column) positions.
   TSNode ts_node_named_descendant_for_byte_range(
-    TSNode arg0,
-    int arg1,
-    int arg2,
+    TSNode self,
+    int start,
+    int end,
   ) {
     return _ts_node_named_descendant_for_byte_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start,
+      end,
     );
   }
 
@@ -1103,14 +1305,14 @@ class TreeSitter {
           .asFunction<TSNode Function(TSNode, int, int)>();
 
   TSNode ts_node_named_descendant_for_point_range(
-    TSNode arg0,
-    TSPoint arg1,
-    TSPoint arg2,
+    TSNode self,
+    TSPoint start,
+    TSPoint end,
   ) {
     return _ts_node_named_descendant_for_point_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start,
+      end,
     );
   }
 
@@ -1124,17 +1326,17 @@ class TreeSitter {
   /// Edit the node to keep it in-sync with source code that has been edited.
   ///
   /// This function is only rarely needed. When you edit a syntax tree with the
-  /// `ts_tree_edit` function, all of the nodes that you retrieve from the tree
-  /// afterward will already reflect the edit. You only need to use `ts_node_edit`
-  /// when you have a `TSNode` instance that you want to keep and continue to use
+  /// [`ts_tree_edit`] function, all of the nodes that you retrieve from the tree
+  /// afterward will already reflect the edit. You only need to use [`ts_node_edit`]
+  /// when you have a [`TSNode`] instance that you want to keep and continue to use
   /// after an edit.
   void ts_node_edit(
-    ffi.Pointer<TSNode> arg0,
-    ffi.Pointer<TSInputEdit> arg1,
+    ffi.Pointer<TSNode> self,
+    ffi.Pointer<TSInputEdit> edit,
   ) {
     return _ts_node_edit(
-      arg0,
-      arg1,
+      self,
+      edit,
     );
   }
 
@@ -1147,12 +1349,12 @@ class TreeSitter {
 
   /// Check if two nodes are identical.
   bool ts_node_eq(
-    TSNode arg0,
-    TSNode arg1,
+    TSNode self,
+    TSNode other,
   ) {
     return _ts_node_eq(
-      arg0,
-      arg1,
+      self,
+      other,
     );
   }
 
@@ -1165,13 +1367,16 @@ class TreeSitter {
   /// Create a new tree cursor starting from the given node.
   ///
   /// A tree cursor allows you to walk a syntax tree more efficiently than is
-  /// possible using the `TSNode` functions. It is a mutable object that is always
+  /// possible using the [`TSNode`] functions. It is a mutable object that is always
   /// on a certain syntax node, and can be moved imperatively to different nodes.
+  ///
+  /// Note that the given node is considered the root of the cursor,
+  /// and the cursor cannot walk outside this node.
   TSTreeCursor ts_tree_cursor_new(
-    TSNode arg0,
+    TSNode node,
   ) {
     return _ts_tree_cursor_new(
-      arg0,
+      node,
     );
   }
 
@@ -1183,10 +1388,10 @@ class TreeSitter {
 
   /// Delete a tree cursor, freeing all of the memory that it used.
   void ts_tree_cursor_delete(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_delete(
-      arg0,
+      self,
     );
   }
 
@@ -1196,14 +1401,15 @@ class TreeSitter {
   late final _ts_tree_cursor_delete = _ts_tree_cursor_deletePtr
       .asFunction<void Function(ffi.Pointer<TSTreeCursor>)>();
 
-  /// Re-initialize a tree cursor to start at a different node.
+  /// Re-initialize a tree cursor to start at the original node that the cursor was
+  /// constructed with.
   void ts_tree_cursor_reset(
-    ffi.Pointer<TSTreeCursor> arg0,
-    TSNode arg1,
+    ffi.Pointer<TSTreeCursor> self,
+    TSNode node,
   ) {
     return _ts_tree_cursor_reset(
-      arg0,
-      arg1,
+      self,
+      node,
     );
   }
 
@@ -1214,12 +1420,33 @@ class TreeSitter {
   late final _ts_tree_cursor_reset = _ts_tree_cursor_resetPtr
       .asFunction<void Function(ffi.Pointer<TSTreeCursor>, TSNode)>();
 
+  /// Re-initialize a tree cursor to the same position as another cursor.
+  ///
+  /// Unlike [`ts_tree_cursor_reset`], this will not lose parent information and
+  /// allows reusing already created cursors.
+  void ts_tree_cursor_reset_to(
+    ffi.Pointer<TSTreeCursor> dst,
+    ffi.Pointer<TSTreeCursor> src,
+  ) {
+    return _ts_tree_cursor_reset_to(
+      dst,
+      src,
+    );
+  }
+
+  late final _ts_tree_cursor_reset_toPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<TSTreeCursor>,
+              ffi.Pointer<TSTreeCursor>)>>('ts_tree_cursor_reset_to');
+  late final _ts_tree_cursor_reset_to = _ts_tree_cursor_reset_toPtr.asFunction<
+      void Function(ffi.Pointer<TSTreeCursor>, ffi.Pointer<TSTreeCursor>)>();
+
   /// Get the tree cursor's current node.
   TSNode ts_tree_cursor_current_node(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_current_node(
-      arg0,
+      self,
     );
   }
 
@@ -1232,12 +1459,12 @@ class TreeSitter {
   /// Get the field name of the tree cursor's current node.
   ///
   /// This returns `NULL` if the current node doesn't have a field.
-  /// See also `ts_node_child_by_field_name`.
+  /// See also [`ts_node_child_by_field_name`].
   ffi.Pointer<ffi.Char> ts_tree_cursor_current_field_name(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_current_field_name(
-      arg0,
+      self,
     );
   }
 
@@ -1252,12 +1479,12 @@ class TreeSitter {
   /// Get the field id of the tree cursor's current node.
   ///
   /// This returns zero if the current node doesn't have a field.
-  /// See also `ts_node_child_by_field_id`, `ts_language_field_id_for_name`.
+  /// See also [`ts_node_child_by_field_id`], [`ts_language_field_id_for_name`].
   int ts_tree_cursor_current_field_id(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_current_field_id(
-      arg0,
+      self,
     );
   }
 
@@ -1272,11 +1499,14 @@ class TreeSitter {
   ///
   /// This returns `true` if the cursor successfully moved, and returns `false`
   /// if there was no parent node (the cursor was already on the root node).
+  ///
+  /// Note that the node the cursor was constructed with is considered the root
+  /// of the cursor, and the cursor cannot walk outside this node.
   bool ts_tree_cursor_goto_parent(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_goto_parent(
-      arg0,
+      self,
     );
   }
 
@@ -1290,11 +1520,14 @@ class TreeSitter {
   ///
   /// This returns `true` if the cursor successfully moved, and returns `false`
   /// if there was no next sibling node.
+  ///
+  /// Note that the node the cursor was constructed with is considered the root
+  /// of the cursor, and the cursor cannot walk outside this node.
   bool ts_tree_cursor_goto_next_sibling(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_goto_next_sibling(
-      arg0,
+      self,
     );
   }
 
@@ -1305,15 +1538,41 @@ class TreeSitter {
       _ts_tree_cursor_goto_next_siblingPtr
           .asFunction<bool Function(ffi.Pointer<TSTreeCursor>)>();
 
+  /// Move the cursor to the previous sibling of its current node.
+  ///
+  /// This returns `true` if the cursor successfully moved, and returns `false` if
+  /// there was no previous sibling node.
+  ///
+  /// Note, that this function may be slower than
+  /// [`ts_tree_cursor_goto_next_sibling`] due to how node positions are stored. In
+  /// the worst case, this will need to iterate through all the children up to the
+  /// previous sibling node to recalculate its position. Also note that the node the cursor
+  /// was constructed with is considered the root of the cursor, and the cursor cannot
+  /// walk outside this node.
+  bool ts_tree_cursor_goto_previous_sibling(
+    ffi.Pointer<TSTreeCursor> self,
+  ) {
+    return _ts_tree_cursor_goto_previous_sibling(
+      self,
+    );
+  }
+
+  late final _ts_tree_cursor_goto_previous_siblingPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSTreeCursor>)>>(
+          'ts_tree_cursor_goto_previous_sibling');
+  late final _ts_tree_cursor_goto_previous_sibling =
+      _ts_tree_cursor_goto_previous_siblingPtr
+          .asFunction<bool Function(ffi.Pointer<TSTreeCursor>)>();
+
   /// Move the cursor to the first child of its current node.
   ///
   /// This returns `true` if the cursor successfully moved, and returns `false`
   /// if there were no children.
   bool ts_tree_cursor_goto_first_child(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> self,
   ) {
     return _ts_tree_cursor_goto_first_child(
-      arg0,
+      self,
     );
   }
 
@@ -1324,18 +1583,95 @@ class TreeSitter {
       _ts_tree_cursor_goto_first_childPtr
           .asFunction<bool Function(ffi.Pointer<TSTreeCursor>)>();
 
-  /// Move the cursor to the first child of its current node that extends beyond
+  /// Move the cursor to the last child of its current node.
+  ///
+  /// This returns `true` if the cursor successfully moved, and returns `false` if
+  /// there were no children.
+  ///
+  /// Note that this function may be slower than [`ts_tree_cursor_goto_first_child`]
+  /// because it needs to iterate through all the children to compute the child's
+  /// position.
+  bool ts_tree_cursor_goto_last_child(
+    ffi.Pointer<TSTreeCursor> self,
+  ) {
+    return _ts_tree_cursor_goto_last_child(
+      self,
+    );
+  }
+
+  late final _ts_tree_cursor_goto_last_childPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSTreeCursor>)>>(
+          'ts_tree_cursor_goto_last_child');
+  late final _ts_tree_cursor_goto_last_child =
+      _ts_tree_cursor_goto_last_childPtr
+          .asFunction<bool Function(ffi.Pointer<TSTreeCursor>)>();
+
+  /// Move the cursor to the node that is the nth descendant of
+  /// the original node that the cursor was constructed with, where
+  /// zero represents the original node itself.
+  void ts_tree_cursor_goto_descendant(
+    ffi.Pointer<TSTreeCursor> self,
+    int goal_descendant_index,
+  ) {
+    return _ts_tree_cursor_goto_descendant(
+      self,
+      goal_descendant_index,
+    );
+  }
+
+  late final _ts_tree_cursor_goto_descendantPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<TSTreeCursor>,
+              ffi.Uint32)>>('ts_tree_cursor_goto_descendant');
+  late final _ts_tree_cursor_goto_descendant =
+      _ts_tree_cursor_goto_descendantPtr
+          .asFunction<void Function(ffi.Pointer<TSTreeCursor>, int)>();
+
+  /// Get the index of the cursor's current node out of all of the
+  /// descendants of the original node that the cursor was constructed with.
+  int ts_tree_cursor_current_descendant_index(
+    ffi.Pointer<TSTreeCursor> self,
+  ) {
+    return _ts_tree_cursor_current_descendant_index(
+      self,
+    );
+  }
+
+  late final _ts_tree_cursor_current_descendant_indexPtr = _lookup<
+          ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSTreeCursor>)>>(
+      'ts_tree_cursor_current_descendant_index');
+  late final _ts_tree_cursor_current_descendant_index =
+      _ts_tree_cursor_current_descendant_indexPtr
+          .asFunction<int Function(ffi.Pointer<TSTreeCursor>)>();
+
+  /// Get the depth of the cursor's current node relative to the original
+  /// node that the cursor was constructed with.
+  int ts_tree_cursor_current_depth(
+    ffi.Pointer<TSTreeCursor> self,
+  ) {
+    return _ts_tree_cursor_current_depth(
+      self,
+    );
+  }
+
+  late final _ts_tree_cursor_current_depthPtr = _lookup<
+          ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSTreeCursor>)>>(
+      'ts_tree_cursor_current_depth');
+  late final _ts_tree_cursor_current_depth = _ts_tree_cursor_current_depthPtr
+      .asFunction<int Function(ffi.Pointer<TSTreeCursor>)>();
+
+  /// Move the cursor to the first child of its current node that contains or starts after
   /// the given byte offset or point.
   ///
   /// This returns the index of the child node if one was found, and returns -1
   /// if no such child was found.
   int ts_tree_cursor_goto_first_child_for_byte(
-    ffi.Pointer<TSTreeCursor> arg0,
-    int arg1,
+    ffi.Pointer<TSTreeCursor> self,
+    int goal_byte,
   ) {
     return _ts_tree_cursor_goto_first_child_for_byte(
-      arg0,
-      arg1,
+      self,
+      goal_byte,
     );
   }
 
@@ -1348,12 +1684,12 @@ class TreeSitter {
           .asFunction<int Function(ffi.Pointer<TSTreeCursor>, int)>();
 
   int ts_tree_cursor_goto_first_child_for_point(
-    ffi.Pointer<TSTreeCursor> arg0,
-    TSPoint arg1,
+    ffi.Pointer<TSTreeCursor> self,
+    TSPoint goal_point,
   ) {
     return _ts_tree_cursor_goto_first_child_for_point(
-      arg0,
-      arg1,
+      self,
+      goal_point,
     );
   }
 
@@ -1366,10 +1702,10 @@ class TreeSitter {
           .asFunction<int Function(ffi.Pointer<TSTreeCursor>, TSPoint)>();
 
   TSTreeCursor ts_tree_cursor_copy(
-    ffi.Pointer<TSTreeCursor> arg0,
+    ffi.Pointer<TSTreeCursor> cursor,
   ) {
     return _ts_tree_cursor_copy(
-      arg0,
+      cursor,
     );
   }
 
@@ -1383,7 +1719,7 @@ class TreeSitter {
   /// patterns. The query is associated with a particular language, and can
   /// only be run on syntax nodes parsed with that language.
   ///
-  /// If all of the given patterns are valid, this returns a `TSQuery`.
+  /// If all of the given patterns are valid, this returns a [`TSQuery`].
   /// If a pattern is invalid, this returns `NULL`, and provides two pieces
   /// of information about the problem:
   /// 1. The byte offset of the error is written to the `error_offset` parameter.
@@ -1393,7 +1729,7 @@ class TreeSitter {
     ffi.Pointer<ffi.Char> source,
     int source_len,
     ffi.Pointer<ffi.Uint32> error_offset,
-    ffi.Pointer<ffi.Int32> error_type,
+    ffi.Pointer<ffi.UnsignedInt> error_type,
   ) {
     return _ts_query_new(
       language,
@@ -1411,21 +1747,21 @@ class TreeSitter {
               ffi.Pointer<ffi.Char>,
               ffi.Uint32,
               ffi.Pointer<ffi.Uint32>,
-              ffi.Pointer<ffi.Int32>)>>('ts_query_new');
+              ffi.Pointer<ffi.UnsignedInt>)>>('ts_query_new');
   late final _ts_query_new = _ts_query_newPtr.asFunction<
       ffi.Pointer<TSQuery> Function(
           ffi.Pointer<TSLanguage>,
           ffi.Pointer<ffi.Char>,
           int,
           ffi.Pointer<ffi.Uint32>,
-          ffi.Pointer<ffi.Int32>)>();
+          ffi.Pointer<ffi.UnsignedInt>)>();
 
   /// Delete a query, freeing all of the memory that it used.
   void ts_query_delete(
-    ffi.Pointer<TSQuery> arg0,
+    ffi.Pointer<TSQuery> self,
   ) {
     return _ts_query_delete(
-      arg0,
+      self,
     );
   }
 
@@ -1437,10 +1773,10 @@ class TreeSitter {
 
   /// Get the number of patterns, captures, or string literals in the query.
   int ts_query_pattern_count(
-    ffi.Pointer<TSQuery> arg0,
+    ffi.Pointer<TSQuery> self,
   ) {
     return _ts_query_pattern_count(
-      arg0,
+      self,
     );
   }
 
@@ -1451,10 +1787,10 @@ class TreeSitter {
       .asFunction<int Function(ffi.Pointer<TSQuery>)>();
 
   int ts_query_capture_count(
-    ffi.Pointer<TSQuery> arg0,
+    ffi.Pointer<TSQuery> self,
   ) {
     return _ts_query_capture_count(
-      arg0,
+      self,
     );
   }
 
@@ -1465,10 +1801,10 @@ class TreeSitter {
       .asFunction<int Function(ffi.Pointer<TSQuery>)>();
 
   int ts_query_string_count(
-    ffi.Pointer<TSQuery> arg0,
+    ffi.Pointer<TSQuery> self,
   ) {
     return _ts_query_string_count(
-      arg0,
+      self,
     );
   }
 
@@ -1483,12 +1819,12 @@ class TreeSitter {
   /// This can be useful when combining queries by concatenating their source
   /// code strings.
   int ts_query_start_byte_for_pattern(
-    ffi.Pointer<TSQuery> arg0,
-    int arg1,
+    ffi.Pointer<TSQuery> self,
+    int pattern_index,
   ) {
     return _ts_query_start_byte_for_pattern(
-      arg0,
-      arg1,
+      self,
+      pattern_index,
     );
   }
 
@@ -1500,6 +1836,27 @@ class TreeSitter {
       _ts_query_start_byte_for_patternPtr
           .asFunction<int Function(ffi.Pointer<TSQuery>, int)>();
 
+  /// Get the byte offset where the given pattern ends in the query's source.
+  ///
+  /// This can be useful when combining queries by concatenating their source
+  /// code strings.
+  int ts_query_end_byte_for_pattern(
+    ffi.Pointer<TSQuery> self,
+    int pattern_index,
+  ) {
+    return _ts_query_end_byte_for_pattern(
+      self,
+      pattern_index,
+    );
+  }
+
+  late final _ts_query_end_byte_for_patternPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Uint32 Function(ffi.Pointer<TSQuery>,
+              ffi.Uint32)>>('ts_query_end_byte_for_pattern');
+  late final _ts_query_end_byte_for_pattern = _ts_query_end_byte_for_patternPtr
+      .asFunction<int Function(ffi.Pointer<TSQuery>, int)>();
+
   /// Get all of the predicates for the given pattern in the query.
   ///
   /// The predicates are represented as a single array of steps. There are three
@@ -1507,22 +1864,22 @@ class TreeSitter {
   /// the `type` field:
   /// - `TSQueryPredicateStepTypeCapture` - Steps with this type represent names
   /// of captures. Their `value_id` can be used with the
-  /// `ts_query_capture_name_for_id` function to obtain the name of the capture.
+  /// [`ts_query_capture_name_for_id`] function to obtain the name of the capture.
   /// - `TSQueryPredicateStepTypeString` - Steps with this type represent literal
   /// strings. Their `value_id` can be used with the
-  /// `ts_query_string_value_for_id` function to obtain their string value.
+  /// [`ts_query_string_value_for_id`] function to obtain their string value.
   /// - `TSQueryPredicateStepTypeDone` - Steps with this type are *sentinels*
   /// that represent the end of an individual predicate. If a pattern has two
   /// predicates, then there will be two steps with this `type` in the array.
   ffi.Pointer<TSQueryPredicateStep> ts_query_predicates_for_pattern(
     ffi.Pointer<TSQuery> self,
     int pattern_index,
-    ffi.Pointer<ffi.Uint32> length,
+    ffi.Pointer<ffi.Uint32> step_count,
   ) {
     return _ts_query_predicates_for_pattern(
       self,
       pattern_index,
-      length,
+      step_count,
     );
   }
 
@@ -1593,13 +1950,13 @@ class TreeSitter {
   /// query's string literals. Each capture and string is associated with a
   /// numeric id based on the order that it appeared in the query's source.
   ffi.Pointer<ffi.Char> ts_query_capture_name_for_id(
-    ffi.Pointer<TSQuery> arg0,
-    int id,
+    ffi.Pointer<TSQuery> self,
+    int index,
     ffi.Pointer<ffi.Uint32> length,
   ) {
     return _ts_query_capture_name_for_id(
-      arg0,
-      id,
+      self,
+      index,
       length,
     );
   }
@@ -1615,34 +1972,34 @@ class TreeSitter {
 
   /// Get the quantifier of the query's captures. Each capture is * associated
   /// with a numeric id based on the order that it appeared in the query's source.
-  int ts_query_capture_quantifier_for_id(
-    ffi.Pointer<TSQuery> arg0,
-    int pattern_id,
-    int capture_id,
+  TSQuantifier ts_query_capture_quantifier_for_id(
+    ffi.Pointer<TSQuery> self,
+    int pattern_index,
+    int capture_index,
   ) {
-    return _ts_query_capture_quantifier_for_id(
-      arg0,
-      pattern_id,
-      capture_id,
-    );
+    return TSQuantifier.fromValue(_ts_query_capture_quantifier_for_id(
+      self,
+      pattern_index,
+      capture_index,
+    ));
   }
 
   late final _ts_query_capture_quantifier_for_idPtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(ffi.Pointer<TSQuery>, ffi.Uint32,
+          ffi.UnsignedInt Function(ffi.Pointer<TSQuery>, ffi.Uint32,
               ffi.Uint32)>>('ts_query_capture_quantifier_for_id');
   late final _ts_query_capture_quantifier_for_id =
       _ts_query_capture_quantifier_for_idPtr
           .asFunction<int Function(ffi.Pointer<TSQuery>, int, int)>();
 
   ffi.Pointer<ffi.Char> ts_query_string_value_for_id(
-    ffi.Pointer<TSQuery> arg0,
-    int id,
+    ffi.Pointer<TSQuery> self,
+    int index,
     ffi.Pointer<ffi.Uint32> length,
   ) {
     return _ts_query_string_value_for_id(
-      arg0,
-      id,
+      self,
+      index,
       length,
     );
   }
@@ -1662,14 +2019,14 @@ class TreeSitter {
   /// any resource usage associated with recording the capture. Currently, there
   /// is no way to undo this.
   void ts_query_disable_capture(
-    ffi.Pointer<TSQuery> arg0,
-    ffi.Pointer<ffi.Char> arg1,
-    int arg2,
+    ffi.Pointer<TSQuery> self,
+    ffi.Pointer<ffi.Char> name,
+    int length,
   ) {
     return _ts_query_disable_capture(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      name,
+      length,
     );
   }
 
@@ -1686,12 +2043,12 @@ class TreeSitter {
   /// This prevents the pattern from matching and removes most of the overhead
   /// associated with the pattern. Currently, there is no way to undo this.
   void ts_query_disable_pattern(
-    ffi.Pointer<TSQuery> arg0,
-    int arg1,
+    ffi.Pointer<TSQuery> self,
+    int pattern_index,
   ) {
     return _ts_query_disable_pattern(
-      arg0,
-      arg1,
+      self,
+      pattern_index,
     );
   }
 
@@ -1705,23 +2062,23 @@ class TreeSitter {
   /// Create a new cursor for executing a given query.
   ///
   /// The cursor stores the state that is needed to iteratively search
-  /// for matches. To use the query cursor, first call `ts_query_cursor_exec`
+  /// for matches. To use the query cursor, first call [`ts_query_cursor_exec`]
   /// to start running a given query on a given syntax node. Then, there are
   /// two options for consuming the results of the query:
-  /// 1. Repeatedly call `ts_query_cursor_next_match` to iterate over all of the
+  /// 1. Repeatedly call [`ts_query_cursor_next_match`] to iterate over all of the
   /// *matches* in the order that they were found. Each match contains the
   /// index of the pattern that matched, and an array of captures. Because
   /// multiple patterns can match the same set of nodes, one match may contain
   /// captures that appear *before* some of the captures from a previous match.
-  /// 2. Repeatedly call `ts_query_cursor_next_capture` to iterate over all of the
+  /// 2. Repeatedly call [`ts_query_cursor_next_capture`] to iterate over all of the
   /// individual *captures* in the order that they appear. This is useful if
   /// don't care about which pattern matched, and just want a single ordered
   /// sequence of captures.
   ///
   /// If you don't care about consuming all of the results, you can stop calling
-  /// `ts_query_cursor_next_match` or `ts_query_cursor_next_capture` at any point.
+  /// [`ts_query_cursor_next_match`] or [`ts_query_cursor_next_capture`] at any point.
   /// You can then start executing another query on another node by calling
-  /// `ts_query_cursor_exec` again.
+  /// [`ts_query_cursor_exec`] again.
   ffi.Pointer<TSQueryCursor> ts_query_cursor_new() {
     return _ts_query_cursor_new();
   }
@@ -1734,10 +2091,10 @@ class TreeSitter {
 
   /// Delete a query cursor, freeing all of the memory that it used.
   void ts_query_cursor_delete(
-    ffi.Pointer<TSQueryCursor> arg0,
+    ffi.Pointer<TSQueryCursor> self,
   ) {
     return _ts_query_cursor_delete(
-      arg0,
+      self,
     );
   }
 
@@ -1749,14 +2106,14 @@ class TreeSitter {
 
   /// Start running a given query on a given node.
   void ts_query_cursor_exec(
-    ffi.Pointer<TSQueryCursor> arg0,
-    ffi.Pointer<TSQuery> arg1,
-    TSNode arg2,
+    ffi.Pointer<TSQueryCursor> self,
+    ffi.Pointer<TSQuery> query,
+    TSNode node,
   ) {
     return _ts_query_cursor_exec(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      query,
+      node,
     );
   }
 
@@ -1768,6 +2125,34 @@ class TreeSitter {
       void Function(
           ffi.Pointer<TSQueryCursor>, ffi.Pointer<TSQuery>, TSNode)>();
 
+  /// Start running a given query on a given node, with some options.
+  void ts_query_cursor_exec_with_options(
+    ffi.Pointer<TSQueryCursor> self,
+    ffi.Pointer<TSQuery> query,
+    TSNode node,
+    ffi.Pointer<TSQueryCursorOptions> query_options,
+  ) {
+    return _ts_query_cursor_exec_with_options(
+      self,
+      query,
+      node,
+      query_options,
+    );
+  }
+
+  late final _ts_query_cursor_exec_with_optionsPtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Void Function(
+                  ffi.Pointer<TSQueryCursor>,
+                  ffi.Pointer<TSQuery>,
+                  TSNode,
+                  ffi.Pointer<TSQueryCursorOptions>)>>(
+      'ts_query_cursor_exec_with_options');
+  late final _ts_query_cursor_exec_with_options =
+      _ts_query_cursor_exec_with_optionsPtr.asFunction<
+          void Function(ffi.Pointer<TSQueryCursor>, ffi.Pointer<TSQuery>,
+              TSNode, ffi.Pointer<TSQueryCursorOptions>)>();
+
   /// Manage the maximum number of in-progress matches allowed by this query
   /// cursor.
   ///
@@ -1778,10 +2163,10 @@ class TreeSitter {
   /// any number of pending matches, dynamically allocating new space for them as
   /// needed as the query is executed.
   bool ts_query_cursor_did_exceed_match_limit(
-    ffi.Pointer<TSQueryCursor> arg0,
+    ffi.Pointer<TSQueryCursor> self,
   ) {
     return _ts_query_cursor_did_exceed_match_limit(
-      arg0,
+      self,
     );
   }
 
@@ -1793,10 +2178,10 @@ class TreeSitter {
           .asFunction<bool Function(ffi.Pointer<TSQueryCursor>)>();
 
   int ts_query_cursor_match_limit(
-    ffi.Pointer<TSQueryCursor> arg0,
+    ffi.Pointer<TSQueryCursor> self,
   ) {
     return _ts_query_cursor_match_limit(
-      arg0,
+      self,
     );
   }
 
@@ -1807,12 +2192,12 @@ class TreeSitter {
       .asFunction<int Function(ffi.Pointer<TSQueryCursor>)>();
 
   void ts_query_cursor_set_match_limit(
-    ffi.Pointer<TSQueryCursor> arg0,
-    int arg1,
+    ffi.Pointer<TSQueryCursor> self,
+    int limit,
   ) {
     return _ts_query_cursor_set_match_limit(
-      arg0,
-      arg1,
+      self,
+      limit,
     );
   }
 
@@ -1824,58 +2209,127 @@ class TreeSitter {
       _ts_query_cursor_set_match_limitPtr
           .asFunction<void Function(ffi.Pointer<TSQueryCursor>, int)>();
 
-  /// Set the range of bytes or (row, column) positions in which the query
-  /// will be executed.
-  void ts_query_cursor_set_byte_range(
-    ffi.Pointer<TSQueryCursor> arg0,
-    int arg1,
-    int arg2,
+  /// @deprecated use [`ts_query_cursor_exec_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
+  /// Set the maximum duration in microseconds that query execution should be allowed to
+  /// take before halting.
+  ///
+  /// If query execution takes longer than this, it will halt early, returning NULL.
+  /// See [`ts_query_cursor_next_match`] or [`ts_query_cursor_next_capture`] for more information.
+  void ts_query_cursor_set_timeout_micros(
+    ffi.Pointer<TSQueryCursor> self,
+    int timeout_micros,
+  ) {
+    return _ts_query_cursor_set_timeout_micros(
+      self,
+      timeout_micros,
+    );
+  }
+
+  late final _ts_query_cursor_set_timeout_microsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<TSQueryCursor>,
+              ffi.Uint64)>>('ts_query_cursor_set_timeout_micros');
+  late final _ts_query_cursor_set_timeout_micros =
+      _ts_query_cursor_set_timeout_microsPtr
+          .asFunction<void Function(ffi.Pointer<TSQueryCursor>, int)>();
+
+  /// @deprecated use [`ts_query_cursor_exec_with_options`] and pass in a callback instead, this will be removed in 0.26.
+  ///
+  /// Get the duration in microseconds that query execution is allowed to take.
+  ///
+  /// This is set via [`ts_query_cursor_set_timeout_micros`].
+  int ts_query_cursor_timeout_micros(
+    ffi.Pointer<TSQueryCursor> self,
+  ) {
+    return _ts_query_cursor_timeout_micros(
+      self,
+    );
+  }
+
+  late final _ts_query_cursor_timeout_microsPtr = _lookup<
+          ffi.NativeFunction<ffi.Uint64 Function(ffi.Pointer<TSQueryCursor>)>>(
+      'ts_query_cursor_timeout_micros');
+  late final _ts_query_cursor_timeout_micros =
+      _ts_query_cursor_timeout_microsPtr
+          .asFunction<int Function(ffi.Pointer<TSQueryCursor>)>();
+
+  /// Set the range of bytes in which the query will be executed.
+  ///
+  /// The query cursor will return matches that intersect with the given point range.
+  /// This means that a match may be returned even if some of its captures fall
+  /// outside the specified range, as long as at least part of the match
+  /// overlaps with the range.
+  ///
+  /// For example, if a query pattern matches a node that spans a larger area
+  /// than the specified range, but part of that node intersects with the range,
+  /// the entire match will be returned.
+  ///
+  /// This will return `false` if the start byte is greater than the end byte, otherwise
+  /// it will return `true`.
+  bool ts_query_cursor_set_byte_range(
+    ffi.Pointer<TSQueryCursor> self,
+    int start_byte,
+    int end_byte,
   ) {
     return _ts_query_cursor_set_byte_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start_byte,
+      end_byte,
     );
   }
 
   late final _ts_query_cursor_set_byte_rangePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<TSQueryCursor>, ffi.Uint32,
+          ffi.Bool Function(ffi.Pointer<TSQueryCursor>, ffi.Uint32,
               ffi.Uint32)>>('ts_query_cursor_set_byte_range');
   late final _ts_query_cursor_set_byte_range =
       _ts_query_cursor_set_byte_rangePtr
-          .asFunction<void Function(ffi.Pointer<TSQueryCursor>, int, int)>();
+          .asFunction<bool Function(ffi.Pointer<TSQueryCursor>, int, int)>();
 
-  void ts_query_cursor_set_point_range(
-    ffi.Pointer<TSQueryCursor> arg0,
-    TSPoint arg1,
-    TSPoint arg2,
+  /// Set the range of (row, column) positions in which the query will be executed.
+  ///
+  /// The query cursor will return matches that intersect with the given point range.
+  /// This means that a match may be returned even if some of its captures fall
+  /// outside the specified range, as long as at least part of the match
+  /// overlaps with the range.
+  ///
+  /// For example, if a query pattern matches a node that spans a larger area
+  /// than the specified range, but part of that node intersects with the range,
+  /// the entire match will be returned.
+  ///
+  /// This will return `false` if the start point is greater than the end point, otherwise
+  /// it will return `true`.
+  bool ts_query_cursor_set_point_range(
+    ffi.Pointer<TSQueryCursor> self,
+    TSPoint start_point,
+    TSPoint end_point,
   ) {
     return _ts_query_cursor_set_point_range(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      start_point,
+      end_point,
     );
   }
 
   late final _ts_query_cursor_set_point_rangePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Void Function(ffi.Pointer<TSQueryCursor>, TSPoint,
+          ffi.Bool Function(ffi.Pointer<TSQueryCursor>, TSPoint,
               TSPoint)>>('ts_query_cursor_set_point_range');
   late final _ts_query_cursor_set_point_range =
       _ts_query_cursor_set_point_rangePtr.asFunction<
-          void Function(ffi.Pointer<TSQueryCursor>, TSPoint, TSPoint)>();
+          bool Function(ffi.Pointer<TSQueryCursor>, TSPoint, TSPoint)>();
 
   /// Advance to the next match of the currently running query.
   ///
   /// If there is a match, write it to `*match` and return `true`.
   /// Otherwise, return `false`.
   bool ts_query_cursor_next_match(
-    ffi.Pointer<TSQueryCursor> arg0,
+    ffi.Pointer<TSQueryCursor> self,
     ffi.Pointer<TSQueryMatch> match,
   ) {
     return _ts_query_cursor_next_match(
-      arg0,
+      self,
       match,
     );
   }
@@ -1890,12 +2344,12 @@ class TreeSitter {
               ffi.Pointer<TSQueryCursor>, ffi.Pointer<TSQueryMatch>)>();
 
   void ts_query_cursor_remove_match(
-    ffi.Pointer<TSQueryCursor> arg0,
-    int id,
+    ffi.Pointer<TSQueryCursor> self,
+    int match_id,
   ) {
     return _ts_query_cursor_remove_match(
-      arg0,
-      id,
+      self,
+      match_id,
     );
   }
 
@@ -1909,14 +2363,14 @@ class TreeSitter {
   /// Advance to the next capture of the currently running query.
   ///
   /// If there is a capture, write its match to `*match` and its index within
-  /// the matche's capture list to `*capture_index`. Otherwise, return `false`.
+  /// the match's capture list to `*capture_index`. Otherwise, return `false`.
   bool ts_query_cursor_next_capture(
-    ffi.Pointer<TSQueryCursor> arg0,
+    ffi.Pointer<TSQueryCursor> self,
     ffi.Pointer<TSQueryMatch> match,
     ffi.Pointer<ffi.Uint32> capture_index,
   ) {
     return _ts_query_cursor_next_capture(
-      arg0,
+      self,
       match,
       capture_index,
     );
@@ -1933,19 +2387,25 @@ class TreeSitter {
           bool Function(ffi.Pointer<TSQueryCursor>, ffi.Pointer<TSQueryMatch>,
               ffi.Pointer<ffi.Uint32>)>();
 
-  /// Set the maximum start depth for a cursor.
+  /// Set the maximum start depth for a query cursor.
   ///
   /// This prevents cursors from exploring children nodes at a certain depth.
   /// Note if a pattern includes many children, then they will still be checked.
   ///
-  /// Set to `0` to remove the maximum start depth.
+  /// The zero max start depth value can be used as a special behavior and
+  /// it helps to destructure a subtree by staying on a node and using captures
+  /// for interested parts. Note that the zero max start depth only limit a search
+  /// depth for a pattern's root node but other nodes that are parts of the pattern
+  /// may be searched at any depth what defined by the pattern structure.
+  ///
+  /// Set to `UINT32_MAX` to remove the maximum start depth.
   void ts_query_cursor_set_max_start_depth(
-    ffi.Pointer<TSQueryCursor> arg0,
-    int arg1,
+    ffi.Pointer<TSQueryCursor> self,
+    int max_start_depth,
   ) {
     return _ts_query_cursor_set_max_start_depth(
-      arg0,
-      arg1,
+      self,
+      max_start_depth,
     );
   }
 
@@ -1957,12 +2417,44 @@ class TreeSitter {
       _ts_query_cursor_set_max_start_depthPtr
           .asFunction<void Function(ffi.Pointer<TSQueryCursor>, int)>();
 
+  /// Get another reference to the given language.
+  ffi.Pointer<TSLanguage> ts_language_copy(
+    ffi.Pointer<TSLanguage> self,
+  ) {
+    return _ts_language_copy(
+      self,
+    );
+  }
+
+  late final _ts_language_copyPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSLanguage> Function(
+              ffi.Pointer<TSLanguage>)>>('ts_language_copy');
+  late final _ts_language_copy = _ts_language_copyPtr
+      .asFunction<ffi.Pointer<TSLanguage> Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Free any dynamically-allocated resources for this language, if
+  /// this is the last reference.
+  void ts_language_delete(
+    ffi.Pointer<TSLanguage> self,
+  ) {
+    return _ts_language_delete(
+      self,
+    );
+  }
+
+  late final _ts_language_deletePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<TSLanguage>)>>(
+          'ts_language_delete');
+  late final _ts_language_delete = _ts_language_deletePtr
+      .asFunction<void Function(ffi.Pointer<TSLanguage>)>();
+
   /// Get the number of distinct node types in the language.
   int ts_language_symbol_count(
-    ffi.Pointer<TSLanguage> arg0,
+    ffi.Pointer<TSLanguage> self,
   ) {
     return _ts_language_symbol_count(
-      arg0,
+      self,
     );
   }
 
@@ -1972,23 +2464,20 @@ class TreeSitter {
   late final _ts_language_symbol_count = _ts_language_symbol_countPtr
       .asFunction<int Function(ffi.Pointer<TSLanguage>)>();
 
-  /// Get a node type string for the given numerical id.
-  ffi.Pointer<ffi.Char> ts_language_symbol_name(
-    ffi.Pointer<TSLanguage> arg0,
-    int arg1,
+  /// Get the number of valid states in this language.
+  int ts_language_state_count(
+    ffi.Pointer<TSLanguage> self,
   ) {
-    return _ts_language_symbol_name(
-      arg0,
-      arg1,
+    return _ts_language_state_count(
+      self,
     );
   }
 
-  late final _ts_language_symbol_namePtr = _lookup<
-      ffi.NativeFunction<
-          ffi.Pointer<ffi.Char> Function(
-              ffi.Pointer<TSLanguage>, TSSymbol)>>('ts_language_symbol_name');
-  late final _ts_language_symbol_name = _ts_language_symbol_namePtr.asFunction<
-      ffi.Pointer<ffi.Char> Function(ffi.Pointer<TSLanguage>, int)>();
+  late final _ts_language_state_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSLanguage>)>>(
+          'ts_language_state_count');
+  late final _ts_language_state_count = _ts_language_state_countPtr
+      .asFunction<int Function(ffi.Pointer<TSLanguage>)>();
 
   /// Get the numerical id for the given node type string.
   int ts_language_symbol_for_name(
@@ -2016,10 +2505,10 @@ class TreeSitter {
 
   /// Get the number of distinct field names in the language.
   int ts_language_field_count(
-    ffi.Pointer<TSLanguage> arg0,
+    ffi.Pointer<TSLanguage> self,
   ) {
     return _ts_language_field_count(
-      arg0,
+      self,
     );
   }
 
@@ -2031,12 +2520,12 @@ class TreeSitter {
 
   /// Get the field name string for the given numerical id.
   ffi.Pointer<ffi.Char> ts_language_field_name_for_id(
-    ffi.Pointer<TSLanguage> arg0,
-    int arg1,
+    ffi.Pointer<TSLanguage> self,
+    int id,
   ) {
     return _ts_language_field_name_for_id(
-      arg0,
-      arg1,
+      self,
+      id,
     );
   }
 
@@ -2050,14 +2539,14 @@ class TreeSitter {
 
   /// Get the numerical id for the given field name string.
   int ts_language_field_id_for_name(
-    ffi.Pointer<TSLanguage> arg0,
-    ffi.Pointer<ffi.Char> arg1,
-    int arg2,
+    ffi.Pointer<TSLanguage> self,
+    ffi.Pointer<ffi.Char> name,
+    int name_length,
   ) {
     return _ts_language_field_id_for_name(
-      arg0,
-      arg1,
-      arg2,
+      self,
+      name,
+      name_length,
     );
   }
 
@@ -2069,37 +2558,99 @@ class TreeSitter {
       _ts_language_field_id_for_namePtr.asFunction<
           int Function(ffi.Pointer<TSLanguage>, ffi.Pointer<ffi.Char>, int)>();
 
+  /// Get a list of all supertype symbols for the language.
+  ffi.Pointer<TSSymbol> ts_language_supertypes(
+    ffi.Pointer<TSLanguage> self,
+    ffi.Pointer<ffi.Uint32> length,
+  ) {
+    return _ts_language_supertypes(
+      self,
+      length,
+    );
+  }
+
+  late final _ts_language_supertypesPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSSymbol> Function(ffi.Pointer<TSLanguage>,
+              ffi.Pointer<ffi.Uint32>)>>('ts_language_supertypes');
+  late final _ts_language_supertypes = _ts_language_supertypesPtr.asFunction<
+      ffi.Pointer<TSSymbol> Function(
+          ffi.Pointer<TSLanguage>, ffi.Pointer<ffi.Uint32>)>();
+
+  /// Get a list of all subtype symbol ids for a given supertype symbol.
+  ///
+  /// See [`ts_language_supertypes`] for fetching all supertype symbols.
+  ffi.Pointer<TSSymbol> ts_language_subtypes(
+    ffi.Pointer<TSLanguage> self,
+    int supertype,
+    ffi.Pointer<ffi.Uint32> length,
+  ) {
+    return _ts_language_subtypes(
+      self,
+      supertype,
+      length,
+    );
+  }
+
+  late final _ts_language_subtypesPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSSymbol> Function(ffi.Pointer<TSLanguage>, TSSymbol,
+              ffi.Pointer<ffi.Uint32>)>>('ts_language_subtypes');
+  late final _ts_language_subtypes = _ts_language_subtypesPtr.asFunction<
+      ffi.Pointer<TSSymbol> Function(
+          ffi.Pointer<TSLanguage>, int, ffi.Pointer<ffi.Uint32>)>();
+
+  /// Get a node type string for the given numerical id.
+  ffi.Pointer<ffi.Char> ts_language_symbol_name(
+    ffi.Pointer<TSLanguage> self,
+    int symbol,
+  ) {
+    return _ts_language_symbol_name(
+      self,
+      symbol,
+    );
+  }
+
+  late final _ts_language_symbol_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              ffi.Pointer<TSLanguage>, TSSymbol)>>('ts_language_symbol_name');
+  late final _ts_language_symbol_name = _ts_language_symbol_namePtr.asFunction<
+      ffi.Pointer<ffi.Char> Function(ffi.Pointer<TSLanguage>, int)>();
+
   /// Check whether the given node type id belongs to named nodes, anonymous nodes,
   /// or a hidden nodes.
   ///
-  /// See also `ts_node_is_named`. Hidden nodes are never returned from the API.
-  int ts_language_symbol_type(
-    ffi.Pointer<TSLanguage> arg0,
-    int arg1,
+  /// See also [`ts_node_is_named`]. Hidden nodes are never returned from the API.
+  TSSymbolType ts_language_symbol_type(
+    ffi.Pointer<TSLanguage> self,
+    DartTSSymbol symbol,
   ) {
-    return _ts_language_symbol_type(
-      arg0,
-      arg1,
-    );
+    return TSSymbolType.fromValue(_ts_language_symbol_type(
+      self,
+      symbol,
+    ));
   }
 
   late final _ts_language_symbol_typePtr = _lookup<
       ffi.NativeFunction<
-          ffi.Int32 Function(
+          ffi.UnsignedInt Function(
               ffi.Pointer<TSLanguage>, TSSymbol)>>('ts_language_symbol_type');
   late final _ts_language_symbol_type = _ts_language_symbol_typePtr
       .asFunction<int Function(ffi.Pointer<TSLanguage>, int)>();
 
+  /// @deprecated use [`ts_language_abi_version`] instead, this will be removed in 0.26.
+  ///
   /// Get the ABI version number for this language. This version number is used
   /// to ensure that languages were generated by a compatible version of
   /// Tree-sitter.
   ///
-  /// See also `ts_parser_set_language`.
+  /// See also [`ts_parser_set_language`].
   int ts_language_version(
-    ffi.Pointer<TSLanguage> arg0,
+    ffi.Pointer<TSLanguage> self,
   ) {
     return _ts_language_version(
-      arg0,
+      self,
     );
   }
 
@@ -2108,6 +2659,392 @@ class TreeSitter {
           'ts_language_version');
   late final _ts_language_version = _ts_language_versionPtr
       .asFunction<int Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Get the ABI version number for this language. This version number is used
+  /// to ensure that languages were generated by a compatible version of
+  /// Tree-sitter.
+  ///
+  /// See also [`ts_parser_set_language`].
+  int ts_language_abi_version(
+    ffi.Pointer<TSLanguage> self,
+  ) {
+    return _ts_language_abi_version(
+      self,
+    );
+  }
+
+  late final _ts_language_abi_versionPtr =
+      _lookup<ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSLanguage>)>>(
+          'ts_language_abi_version');
+  late final _ts_language_abi_version = _ts_language_abi_versionPtr
+      .asFunction<int Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Get the metadata for this language. This information is generated by the
+  /// CLI, and relies on the language author providing the correct metadata in
+  /// the language's `tree-sitter.json` file.
+  ///
+  /// See also [`TSMetadata`].
+  ffi.Pointer<TSLanguageMetadata> ts_language_metadata(
+    ffi.Pointer<TSLanguage> self,
+  ) {
+    return _ts_language_metadata(
+      self,
+    );
+  }
+
+  late final _ts_language_metadataPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSLanguageMetadata> Function(
+              ffi.Pointer<TSLanguage>)>>('ts_language_metadata');
+  late final _ts_language_metadata = _ts_language_metadataPtr.asFunction<
+      ffi.Pointer<TSLanguageMetadata> Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Get the next parse state. Combine this with lookahead iterators to generate
+  /// completion suggestions or valid symbols in error nodes. Use
+  /// [`ts_node_grammar_symbol`] for valid symbols.
+  int ts_language_next_state(
+    ffi.Pointer<TSLanguage> self,
+    int state,
+    int symbol,
+  ) {
+    return _ts_language_next_state(
+      self,
+      state,
+      symbol,
+    );
+  }
+
+  late final _ts_language_next_statePtr = _lookup<
+      ffi.NativeFunction<
+          TSStateId Function(ffi.Pointer<TSLanguage>, TSStateId,
+              TSSymbol)>>('ts_language_next_state');
+  late final _ts_language_next_state = _ts_language_next_statePtr
+      .asFunction<int Function(ffi.Pointer<TSLanguage>, int, int)>();
+
+  /// Get the name of this language. This returns `NULL` in older parsers.
+  ffi.Pointer<ffi.Char> ts_language_name(
+    ffi.Pointer<TSLanguage> self,
+  ) {
+    return _ts_language_name(
+      self,
+    );
+  }
+
+  late final _ts_language_namePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<ffi.Char> Function(
+              ffi.Pointer<TSLanguage>)>>('ts_language_name');
+  late final _ts_language_name = _ts_language_namePtr
+      .asFunction<ffi.Pointer<ffi.Char> Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Create a new lookahead iterator for the given language and parse state.
+  ///
+  /// This returns `NULL` if state is invalid for the language.
+  ///
+  /// Repeatedly using [`ts_lookahead_iterator_next`] and
+  /// [`ts_lookahead_iterator_current_symbol`] will generate valid symbols in the
+  /// given parse state. Newly created lookahead iterators will contain the `ERROR`
+  /// symbol.
+  ///
+  /// Lookahead iterators can be useful to generate suggestions and improve syntax
+  /// error diagnostics. To get symbols valid in an ERROR node, use the lookahead
+  /// iterator on its first leaf node state. For `MISSING` nodes, a lookahead
+  /// iterator created on the previous non-extra leaf node may be appropriate.
+  ffi.Pointer<TSLookaheadIterator> ts_lookahead_iterator_new(
+    ffi.Pointer<TSLanguage> self,
+    int state,
+  ) {
+    return _ts_lookahead_iterator_new(
+      self,
+      state,
+    );
+  }
+
+  late final _ts_lookahead_iterator_newPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSLookaheadIterator> Function(ffi.Pointer<TSLanguage>,
+              TSStateId)>>('ts_lookahead_iterator_new');
+  late final _ts_lookahead_iterator_new =
+      _ts_lookahead_iterator_newPtr.asFunction<
+          ffi.Pointer<TSLookaheadIterator> Function(
+              ffi.Pointer<TSLanguage>, int)>();
+
+  /// Delete a lookahead iterator freeing all the memory used.
+  void ts_lookahead_iterator_delete(
+    ffi.Pointer<TSLookaheadIterator> self,
+  ) {
+    return _ts_lookahead_iterator_delete(
+      self,
+    );
+  }
+
+  late final _ts_lookahead_iterator_deletePtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Void Function(ffi.Pointer<TSLookaheadIterator>)>>(
+      'ts_lookahead_iterator_delete');
+  late final _ts_lookahead_iterator_delete = _ts_lookahead_iterator_deletePtr
+      .asFunction<void Function(ffi.Pointer<TSLookaheadIterator>)>();
+
+  /// Reset the lookahead iterator to another state.
+  ///
+  /// This returns `true` if the iterator was reset to the given state and `false`
+  /// otherwise.
+  bool ts_lookahead_iterator_reset_state(
+    ffi.Pointer<TSLookaheadIterator> self,
+    int state,
+  ) {
+    return _ts_lookahead_iterator_reset_state(
+      self,
+      state,
+    );
+  }
+
+  late final _ts_lookahead_iterator_reset_statePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(ffi.Pointer<TSLookaheadIterator>,
+              TSStateId)>>('ts_lookahead_iterator_reset_state');
+  late final _ts_lookahead_iterator_reset_state =
+      _ts_lookahead_iterator_reset_statePtr
+          .asFunction<bool Function(ffi.Pointer<TSLookaheadIterator>, int)>();
+
+  /// Reset the lookahead iterator.
+  ///
+  /// This returns `true` if the language was set successfully and `false`
+  /// otherwise.
+  bool ts_lookahead_iterator_reset(
+    ffi.Pointer<TSLookaheadIterator> self,
+    ffi.Pointer<TSLanguage> language,
+    int state,
+  ) {
+    return _ts_lookahead_iterator_reset(
+      self,
+      language,
+      state,
+    );
+  }
+
+  late final _ts_lookahead_iterator_resetPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<TSLookaheadIterator>,
+              ffi.Pointer<TSLanguage>,
+              TSStateId)>>('ts_lookahead_iterator_reset');
+  late final _ts_lookahead_iterator_reset =
+      _ts_lookahead_iterator_resetPtr.asFunction<
+          bool Function(ffi.Pointer<TSLookaheadIterator>,
+              ffi.Pointer<TSLanguage>, int)>();
+
+  /// Get the current language of the lookahead iterator.
+  ffi.Pointer<TSLanguage> ts_lookahead_iterator_language(
+    ffi.Pointer<TSLookaheadIterator> self,
+  ) {
+    return _ts_lookahead_iterator_language(
+      self,
+    );
+  }
+
+  late final _ts_lookahead_iterator_languagePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<TSLanguage> Function(
+                  ffi.Pointer<TSLookaheadIterator>)>>(
+      'ts_lookahead_iterator_language');
+  late final _ts_lookahead_iterator_language =
+      _ts_lookahead_iterator_languagePtr.asFunction<
+          ffi.Pointer<TSLanguage> Function(ffi.Pointer<TSLookaheadIterator>)>();
+
+  /// Advance the lookahead iterator to the next symbol.
+  ///
+  /// This returns `true` if there is a new symbol and `false` otherwise.
+  bool ts_lookahead_iterator_next(
+    ffi.Pointer<TSLookaheadIterator> self,
+  ) {
+    return _ts_lookahead_iterator_next(
+      self,
+    );
+  }
+
+  late final _ts_lookahead_iterator_nextPtr = _lookup<
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLookaheadIterator>)>>(
+      'ts_lookahead_iterator_next');
+  late final _ts_lookahead_iterator_next = _ts_lookahead_iterator_nextPtr
+      .asFunction<bool Function(ffi.Pointer<TSLookaheadIterator>)>();
+
+  /// Get the current symbol of the lookahead iterator;
+  int ts_lookahead_iterator_current_symbol(
+    ffi.Pointer<TSLookaheadIterator> self,
+  ) {
+    return _ts_lookahead_iterator_current_symbol(
+      self,
+    );
+  }
+
+  late final _ts_lookahead_iterator_current_symbolPtr = _lookup<
+          ffi
+          .NativeFunction<TSSymbol Function(ffi.Pointer<TSLookaheadIterator>)>>(
+      'ts_lookahead_iterator_current_symbol');
+  late final _ts_lookahead_iterator_current_symbol =
+      _ts_lookahead_iterator_current_symbolPtr
+          .asFunction<int Function(ffi.Pointer<TSLookaheadIterator>)>();
+
+  /// Get the current symbol type of the lookahead iterator as a null terminated
+  /// string.
+  ffi.Pointer<ffi.Char> ts_lookahead_iterator_current_symbol_name(
+    ffi.Pointer<TSLookaheadIterator> self,
+  ) {
+    return _ts_lookahead_iterator_current_symbol_name(
+      self,
+    );
+  }
+
+  late final _ts_lookahead_iterator_current_symbol_namePtr = _lookup<
+          ffi.NativeFunction<
+              ffi.Pointer<ffi.Char> Function(
+                  ffi.Pointer<TSLookaheadIterator>)>>(
+      'ts_lookahead_iterator_current_symbol_name');
+  late final _ts_lookahead_iterator_current_symbol_name =
+      _ts_lookahead_iterator_current_symbol_namePtr.asFunction<
+          ffi.Pointer<ffi.Char> Function(ffi.Pointer<TSLookaheadIterator>)>();
+
+  /// Create a Wasm store.
+  ffi.Pointer<TSWasmStore> ts_wasm_store_new(
+    ffi.Pointer<TSWasmEngine> engine,
+    ffi.Pointer<TSWasmError> error,
+  ) {
+    return _ts_wasm_store_new(
+      engine,
+      error,
+    );
+  }
+
+  late final _ts_wasm_store_newPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSWasmStore> Function(ffi.Pointer<TSWasmEngine>,
+              ffi.Pointer<TSWasmError>)>>('ts_wasm_store_new');
+  late final _ts_wasm_store_new = _ts_wasm_store_newPtr.asFunction<
+      ffi.Pointer<TSWasmStore> Function(
+          ffi.Pointer<TSWasmEngine>, ffi.Pointer<TSWasmError>)>();
+
+  /// Free the memory associated with the given Wasm store.
+  void ts_wasm_store_delete(
+    ffi.Pointer<TSWasmStore> arg0,
+  ) {
+    return _ts_wasm_store_delete(
+      arg0,
+    );
+  }
+
+  late final _ts_wasm_store_deletePtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<TSWasmStore>)>>(
+          'ts_wasm_store_delete');
+  late final _ts_wasm_store_delete = _ts_wasm_store_deletePtr
+      .asFunction<void Function(ffi.Pointer<TSWasmStore>)>();
+
+  /// Create a language from a buffer of Wasm. The resulting language behaves
+  /// like any other Tree-sitter language, except that in order to use it with
+  /// a parser, that parser must have a Wasm store. Note that the language
+  /// can be used with any Wasm store, it doesn't need to be the same store that
+  /// was used to originally load it.
+  ffi.Pointer<TSLanguage> ts_wasm_store_load_language(
+    ffi.Pointer<TSWasmStore> arg0,
+    ffi.Pointer<ffi.Char> name,
+    ffi.Pointer<ffi.Char> wasm,
+    int wasm_len,
+    ffi.Pointer<TSWasmError> error,
+  ) {
+    return _ts_wasm_store_load_language(
+      arg0,
+      name,
+      wasm,
+      wasm_len,
+      error,
+    );
+  }
+
+  late final _ts_wasm_store_load_languagePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSLanguage> Function(
+              ffi.Pointer<TSWasmStore>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Uint32,
+              ffi.Pointer<TSWasmError>)>>('ts_wasm_store_load_language');
+  late final _ts_wasm_store_load_language =
+      _ts_wasm_store_load_languagePtr.asFunction<
+          ffi.Pointer<TSLanguage> Function(
+              ffi.Pointer<TSWasmStore>,
+              ffi.Pointer<ffi.Char>,
+              ffi.Pointer<ffi.Char>,
+              int,
+              ffi.Pointer<TSWasmError>)>();
+
+  /// Get the number of languages instantiated in the given wasm store.
+  int ts_wasm_store_language_count(
+    ffi.Pointer<TSWasmStore> arg0,
+  ) {
+    return _ts_wasm_store_language_count(
+      arg0,
+    );
+  }
+
+  late final _ts_wasm_store_language_countPtr =
+      _lookup<ffi.NativeFunction<ffi.Size Function(ffi.Pointer<TSWasmStore>)>>(
+          'ts_wasm_store_language_count');
+  late final _ts_wasm_store_language_count = _ts_wasm_store_language_countPtr
+      .asFunction<int Function(ffi.Pointer<TSWasmStore>)>();
+
+  /// Check if the language came from a Wasm module. If so, then in order to use
+  /// this language with a Parser, that parser must have a Wasm store assigned.
+  bool ts_language_is_wasm(
+    ffi.Pointer<TSLanguage> arg0,
+  ) {
+    return _ts_language_is_wasm(
+      arg0,
+    );
+  }
+
+  late final _ts_language_is_wasmPtr =
+      _lookup<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSLanguage>)>>(
+          'ts_language_is_wasm');
+  late final _ts_language_is_wasm = _ts_language_is_wasmPtr
+      .asFunction<bool Function(ffi.Pointer<TSLanguage>)>();
+
+  /// Assign the given Wasm store to the parser. A parser must have a Wasm store
+  /// in order to use Wasm languages.
+  void ts_parser_set_wasm_store(
+    ffi.Pointer<TSParser> arg0,
+    ffi.Pointer<TSWasmStore> arg1,
+  ) {
+    return _ts_parser_set_wasm_store(
+      arg0,
+      arg1,
+    );
+  }
+
+  late final _ts_parser_set_wasm_storePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<TSParser>,
+              ffi.Pointer<TSWasmStore>)>>('ts_parser_set_wasm_store');
+  late final _ts_parser_set_wasm_store =
+      _ts_parser_set_wasm_storePtr.asFunction<
+          void Function(ffi.Pointer<TSParser>, ffi.Pointer<TSWasmStore>)>();
+
+  /// Remove the parser's current Wasm store and return it. This returns NULL if
+  /// the parser doesn't have a Wasm store.
+  ffi.Pointer<TSWasmStore> ts_parser_take_wasm_store(
+    ffi.Pointer<TSParser> arg0,
+  ) {
+    return _ts_parser_take_wasm_store(
+      arg0,
+    );
+  }
+
+  late final _ts_parser_take_wasm_storePtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Pointer<TSWasmStore> Function(
+              ffi.Pointer<TSParser>)>>('ts_parser_take_wasm_store');
+  late final _ts_parser_take_wasm_store = _ts_parser_take_wasm_storePtr
+      .asFunction<ffi.Pointer<TSWasmStore> Function(ffi.Pointer<TSParser>)>();
 
   /// Set the allocation functions used by the library.
   ///
@@ -2194,6 +3131,14 @@ class _SymbolAddresses {
       get ts_query_cursor_delete => _library._ts_query_cursor_deletePtr;
 }
 
+/// /
+typedef TSStateId = ffi.Uint16;
+typedef DartTSStateId = int;
+typedef TSSymbol = ffi.Uint16;
+typedef DartTSSymbol = int;
+typedef TSFieldId = ffi.Uint16;
+typedef DartTSFieldId = int;
+
 final class TSLanguage extends ffi.Opaque {}
 
 final class TSParser extends ffi.Opaque {}
@@ -2204,15 +3149,51 @@ final class TSQuery extends ffi.Opaque {}
 
 final class TSQueryCursor extends ffi.Opaque {}
 
-abstract class TSInputEncoding {
-  static const int TSInputEncodingUTF8 = 0;
-  static const int TSInputEncodingUTF16 = 1;
+final class TSLookaheadIterator extends ffi.Opaque {}
+
+typedef DecodeFunctionFunction = ffi.Uint32 Function(
+    ffi.Pointer<ffi.Uint8> string,
+    ffi.Uint32 length,
+    ffi.Pointer<ffi.Int32> code_point);
+typedef DartDecodeFunctionFunction = int Function(ffi.Pointer<ffi.Uint8> string,
+    int length, ffi.Pointer<ffi.Int32> code_point);
+typedef DecodeFunction
+    = ffi.Pointer<ffi.NativeFunction<DecodeFunctionFunction>>;
+
+enum TSInputEncoding {
+  TSInputEncodingUTF8(0),
+  TSInputEncodingUTF16LE(1),
+  TSInputEncodingUTF16BE(2),
+  TSInputEncodingCustom(3);
+
+  final int value;
+  const TSInputEncoding(this.value);
+
+  static TSInputEncoding fromValue(int value) => switch (value) {
+        0 => TSInputEncodingUTF8,
+        1 => TSInputEncodingUTF16LE,
+        2 => TSInputEncodingUTF16BE,
+        3 => TSInputEncodingCustom,
+        _ => throw ArgumentError('Unknown value for TSInputEncoding: $value'),
+      };
 }
 
-abstract class TSSymbolType {
-  static const int TSSymbolTypeRegular = 0;
-  static const int TSSymbolTypeAnonymous = 1;
-  static const int TSSymbolTypeAuxiliary = 2;
+enum TSSymbolType {
+  TSSymbolTypeRegular(0),
+  TSSymbolTypeAnonymous(1),
+  TSSymbolTypeSupertype(2),
+  TSSymbolTypeAuxiliary(3);
+
+  final int value;
+  const TSSymbolType(this.value);
+
+  static TSSymbolType fromValue(int value) => switch (value) {
+        0 => TSSymbolTypeRegular,
+        1 => TSSymbolTypeAnonymous,
+        2 => TSSymbolTypeSupertype,
+        3 => TSSymbolTypeAuxiliary,
+        _ => throw ArgumentError('Unknown value for TSSymbolType: $value'),
+      };
 }
 
 final class TSPoint extends ffi.Struct {
@@ -2246,13 +3227,45 @@ final class TSInput extends ffi.Struct {
               TSPoint position,
               ffi.Pointer<ffi.Uint32> bytes_read)>> read;
 
-  @ffi.Int32()
-  external int encoding;
+  @ffi.UnsignedInt()
+  external int encodingAsInt;
+
+  TSInputEncoding get encoding => TSInputEncoding.fromValue(encodingAsInt);
+
+  external DecodeFunction decode;
 }
 
-abstract class TSLogType {
-  static const int TSLogTypeParse = 0;
-  static const int TSLogTypeLex = 1;
+final class TSParseState extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> payload;
+
+  @ffi.Uint32()
+  external int current_byte_offset;
+
+  @ffi.Bool()
+  external bool has_error;
+}
+
+final class TSParseOptions extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> payload;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSParseState> state)>>
+      progress_callback;
+}
+
+enum TSLogType {
+  TSLogTypeParse(0),
+  TSLogTypeLex(1);
+
+  final int value;
+  const TSLogType(this.value);
+
+  static TSLogType fromValue(int value) => switch (value) {
+        0 => TSLogTypeParse,
+        1 => TSLogTypeLex,
+        _ => throw ArgumentError('Unknown value for TSLogType: $value'),
+      };
 }
 
 final class TSLogger extends ffi.Struct {
@@ -2260,8 +3273,8 @@ final class TSLogger extends ffi.Struct {
 
   external ffi.Pointer<
       ffi.NativeFunction<
-          ffi.Void Function(
-              ffi.Pointer<ffi.Void>, ffi.Int32, ffi.Pointer<ffi.Char>)>> log;
+          ffi.Void Function(ffi.Pointer<ffi.Void> payload,
+              ffi.UnsignedInt log_type, ffi.Pointer<ffi.Char> buffer)>> log;
 }
 
 final class TSInputEdit extends ffi.Struct {
@@ -2295,7 +3308,7 @@ final class TSTreeCursor extends ffi.Struct {
 
   external ffi.Pointer<ffi.Void> id;
 
-  @ffi.Array.multi([2])
+  @ffi.Array.multi([3])
   external ffi.Array<ffi.Uint32> context;
 }
 
@@ -2306,12 +3319,24 @@ final class TSQueryCapture extends ffi.Struct {
   external int index;
 }
 
-abstract class TSQuantifier {
-  static const int TSQuantifierZero = 0;
-  static const int TSQuantifierZeroOrOne = 1;
-  static const int TSQuantifierZeroOrMore = 2;
-  static const int TSQuantifierOne = 3;
-  static const int TSQuantifierOneOrMore = 4;
+enum TSQuantifier {
+  TSQuantifierZero(0),
+  TSQuantifierZeroOrOne(1),
+  TSQuantifierZeroOrMore(2),
+  TSQuantifierOne(3),
+  TSQuantifierOneOrMore(4);
+
+  final int value;
+  const TSQuantifier(this.value);
+
+  static TSQuantifier fromValue(int value) => switch (value) {
+        0 => TSQuantifierZero,
+        1 => TSQuantifierZeroOrOne,
+        2 => TSQuantifierZeroOrMore,
+        3 => TSQuantifierOne,
+        4 => TSQuantifierOneOrMore,
+        _ => throw ArgumentError('Unknown value for TSQuantifier: $value'),
+      };
 }
 
 final class TSQueryMatch extends ffi.Struct {
@@ -2327,34 +3352,127 @@ final class TSQueryMatch extends ffi.Struct {
   external ffi.Pointer<TSQueryCapture> captures;
 }
 
-abstract class TSQueryPredicateStepType {
-  static const int TSQueryPredicateStepTypeDone = 0;
-  static const int TSQueryPredicateStepTypeCapture = 1;
-  static const int TSQueryPredicateStepTypeString = 2;
+enum TSQueryPredicateStepType {
+  TSQueryPredicateStepTypeDone(0),
+  TSQueryPredicateStepTypeCapture(1),
+  TSQueryPredicateStepTypeString(2);
+
+  final int value;
+  const TSQueryPredicateStepType(this.value);
+
+  static TSQueryPredicateStepType fromValue(int value) => switch (value) {
+        0 => TSQueryPredicateStepTypeDone,
+        1 => TSQueryPredicateStepTypeCapture,
+        2 => TSQueryPredicateStepTypeString,
+        _ => throw ArgumentError(
+            'Unknown value for TSQueryPredicateStepType: $value'),
+      };
 }
 
 final class TSQueryPredicateStep extends ffi.Struct {
-  @ffi.Int32()
-  external int type;
+  @ffi.UnsignedInt()
+  external int typeAsInt;
+
+  TSQueryPredicateStepType get type =>
+      TSQueryPredicateStepType.fromValue(typeAsInt);
 
   @ffi.Uint32()
   external int value_id;
 }
 
-abstract class TSQueryError {
-  static const int TSQueryErrorNone = 0;
-  static const int TSQueryErrorSyntax = 1;
-  static const int TSQueryErrorNodeType = 2;
-  static const int TSQueryErrorField = 3;
-  static const int TSQueryErrorCapture = 4;
-  static const int TSQueryErrorStructure = 5;
-  static const int TSQueryErrorLanguage = 6;
+enum TSQueryError {
+  TSQueryErrorNone(0),
+  TSQueryErrorSyntax(1),
+  TSQueryErrorNodeType(2),
+  TSQueryErrorField(3),
+  TSQueryErrorCapture(4),
+  TSQueryErrorStructure(5),
+  TSQueryErrorLanguage(6);
+
+  final int value;
+  const TSQueryError(this.value);
+
+  static TSQueryError fromValue(int value) => switch (value) {
+        0 => TSQueryErrorNone,
+        1 => TSQueryErrorSyntax,
+        2 => TSQueryErrorNodeType,
+        3 => TSQueryErrorField,
+        4 => TSQueryErrorCapture,
+        5 => TSQueryErrorStructure,
+        6 => TSQueryErrorLanguage,
+        _ => throw ArgumentError('Unknown value for TSQueryError: $value'),
+      };
 }
 
-/// /
-typedef TSSymbol = ffi.Uint16;
-typedef TSFieldId = ffi.Uint16;
+final class TSQueryCursorState extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> payload;
 
-const int TREE_SITTER_LANGUAGE_VERSION = 14;
+  @ffi.Uint32()
+  external int current_byte_offset;
+}
+
+final class TSQueryCursorOptions extends ffi.Struct {
+  external ffi.Pointer<ffi.Void> payload;
+
+  external ffi.Pointer<
+          ffi.NativeFunction<
+              ffi.Bool Function(ffi.Pointer<TSQueryCursorState> state)>>
+      progress_callback;
+}
+
+/// The metadata associated with a language.
+///
+/// Currently, this metadata can be used to check the [Semantic Version](https://semver.org/)
+/// of the language. This version information should be used to signal if a given parser might
+/// be incompatible with existing queries when upgrading between major versions, or minor versions
+/// if it's in zerover.
+final class TSLanguageMetadata extends ffi.Struct {
+  @ffi.Uint8()
+  external int major_version;
+
+  @ffi.Uint8()
+  external int minor_version;
+
+  @ffi.Uint8()
+  external int patch_version;
+}
+
+final class wasm_engine_t extends ffi.Opaque {}
+
+/// /
+typedef TSWasmEngine = wasm_engine_t;
+
+final class TSWasmStore extends ffi.Opaque {}
+
+enum TSWasmErrorKind {
+  TSWasmErrorKindNone(0),
+  TSWasmErrorKindParse(1),
+  TSWasmErrorKindCompile(2),
+  TSWasmErrorKindInstantiate(3),
+  TSWasmErrorKindAllocate(4);
+
+  final int value;
+  const TSWasmErrorKind(this.value);
+
+  static TSWasmErrorKind fromValue(int value) => switch (value) {
+        0 => TSWasmErrorKindNone,
+        1 => TSWasmErrorKindParse,
+        2 => TSWasmErrorKindCompile,
+        3 => TSWasmErrorKindInstantiate,
+        4 => TSWasmErrorKindAllocate,
+        _ => throw ArgumentError('Unknown value for TSWasmErrorKind: $value'),
+      };
+}
+
+final class TSWasmError extends ffi.Struct {
+  @ffi.UnsignedInt()
+  external int kindAsInt;
+
+  TSWasmErrorKind get kind => TSWasmErrorKind.fromValue(kindAsInt);
+
+  external ffi.Pointer<ffi.Char> message;
+}
+
+const int TREE_SITTER_LANGUAGE_VERSION = 15;
 
 const int TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION = 13;

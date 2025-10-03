@@ -1,3 +1,6 @@
+## 0.2.0
+- Update dependencies, and latest version of TreeSitter C bindings.
+
 ## 0.1.2
 - Fix issue with string encoding length
 

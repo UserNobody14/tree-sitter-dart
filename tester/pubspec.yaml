@@ -1,9 +1,9 @@
 name: tree_sitter_dart_tester
 environment:
-  sdk: '>=3.0.0-0 <3.2.0'
+  sdk: '>=3.3.0 <4.0.0'
 dependencies:
-  glob: ^2.1.1
-  path: ^1.8.3 
+  glob: ^2.1.3
+  path: ^1.9.1 
 
 dev_dependencies:
-  dcli: ^2.1.0
+  dcli: ^7.1.1

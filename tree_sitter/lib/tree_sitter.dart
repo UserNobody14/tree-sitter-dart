@@ -4,8 +4,8 @@
 library;
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:ffi' as ffi;
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -82,8 +82,8 @@ base class Parser implements Finalizable {
       return Tree(treeSitterApi.ts_parser_parse_string(
           parser, nullptr, pProgram.cast(), len));
     } else {
-      return Tree(treeSitterApi.ts_parser_parse_string_encoding(
-          parser, nullptr, pProgram.cast(), len, encoding));
+      return Tree(treeSitterApi.ts_parser_parse_string_encoding(parser, nullptr,
+          pProgram.cast(), len, TSInputEncoding.values[encoding]));
     }
   }
 
@@ -164,7 +164,7 @@ base class Query implements Finalizable {
     final (pSource, len) = source.toNativeUtf8Len();
     using((alloc) {
       final errorOffset = alloc<Uint32>(1);
-      final errorType = alloc<Int32>(1);
+      final errorType = alloc<UnsignedInt>(1);
       query = treeSitterApi.ts_query_new(
           language, pSource.cast(), len, errorOffset, errorType);
       if (query == nullptr) {
@@ -178,7 +178,9 @@ base class Query implements Finalizable {
 }
 
 extension TSApiIntX on int {
-  String get queryError => switch (this) {
+  String get queryError => switch (this < TSQueryError.values.length
+          ? TSQueryError.values[this]
+          : null) {
         TSQueryError.TSQueryErrorNone => 'TSQueryErrorNone',
         TSQueryError.TSQueryErrorSyntax => 'TSQueryErrorSyntax',
         TSQueryError.TSQueryErrorNodeType => 'TSQueryErrorNodeType',
@@ -189,7 +191,10 @@ extension TSApiIntX on int {
         _ => 'Unknown error code $this'
       };
 
-  String get queryPredicateStepType => switch (this) {
+  String get queryPredicateStepType =>
+      switch (this < TSQueryPredicateStepType.values.length
+          ? TSQueryPredicateStepType.values[this]
+          : null) {
         TSQueryPredicateStepType.TSQueryPredicateStepTypeCapture =>
           'TSQueryPredicateStepTypeCapture',
         TSQueryPredicateStepType.TSQueryPredicateStepTypeString =>
@@ -199,7 +204,9 @@ extension TSApiIntX on int {
         _ => 'Unknown predicate step type $this'
       };
 
-  String get quantifier => switch (this) {
+  String get quantifier => switch (this < TSQuantifier.values.length
+          ? TSQuantifier.values[this]
+          : null) {
         TSQuantifier.TSQuantifierZero => 'TSQuantifierZero',
         TSQuantifier.TSQuantifierZeroOrOne => 'TSQuantifierZeroOrOne',
         TSQuantifier.TSQuantifierZeroOrMore => 'TSQuantifierZeroOrMore',
@@ -208,20 +215,26 @@ extension TSApiIntX on int {
         _ => 'Unknown predicate step type $this'
       };
 
-  String get symbolType => switch (this) {
+  String get symbolType => switch (this < TSSymbolType.values.length
+          ? TSSymbolType.values[this]
+          : null) {
         TSSymbolType.TSSymbolTypeRegular => 'TSSymbolTypeRegular',
         TSSymbolType.TSSymbolTypeAnonymous => 'TSSymbolTypeAnonymous',
         TSSymbolType.TSSymbolTypeAuxiliary => 'TSSymbolTypeAuxiliary',
         _ => 'Unknown symbol type $this'
       };
 
-  String get inputEncoding => switch (this) {
+  String get inputEncoding => switch (this < TSInputEncoding.values.length
+          ? TSInputEncoding.values[this]
+          : null) {
         TSInputEncoding.TSInputEncodingUTF8 => 'TSInputEncodingUTF8',
-        TSInputEncoding.TSInputEncodingUTF16 => 'TSInputEncodingUTF16',
+        TSInputEncoding.TSInputEncodingUTF16BE => 'TSInputEncodingUTF16BE',
+        TSInputEncoding.TSInputEncodingUTF16LE => 'TSInputEncodingUTF16LE',
         _ => 'Unknown input encoding $this'
       };
 
-  String get logType => switch (this) {
+  String get logType =>
+      switch (this < TSLogType.values.length ? TSLogType.values[this] : null) {
         TSLogType.TSLogTypeParse => 'TSLogTypeParse',
         TSLogType.TSLogTypeLex => 'TSLogTypeLex',
         _ => 'Unknown log type $this'

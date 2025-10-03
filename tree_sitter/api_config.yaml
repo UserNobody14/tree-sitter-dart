@@ -14,3 +14,4 @@ functions:
       - 'ts_tree_cursor_delete'
       - 'ts_query_delete'
       - 'ts_query_cursor_delete'
+silence-enum-warning: true
