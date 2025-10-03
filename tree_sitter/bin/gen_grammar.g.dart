@@ -6,7 +6,7 @@ part of 'gen_grammar.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Type _$$_TypeFromJson(Map<String, dynamic> json) => _$_Type(
+_Type _$TypeFromJson(Map<String, dynamic> json) => _Type(
       type: json['type'] as String,
       named: json['named'] as bool,
       fields: (json['fields'] as Map<String, dynamic>?)?.map(
@@ -22,7 +22,7 @@ _$_Type _$$_TypeFromJson(Map<String, dynamic> json) => _$_Type(
           const [],
     );
 
-Map<String, dynamic> _$$_TypeToJson(_$_Type instance) => <String, dynamic>{
+Map<String, dynamic> _$TypeToJson(_Type instance) => <String, dynamic>{
       'type': instance.type,
       'named': instance.named,
       'fields': instance.fields,
@@ -30,7 +30,7 @@ Map<String, dynamic> _$$_TypeToJson(_$_Type instance) => <String, dynamic>{
       'subtypes': instance.subtypes,
     };
 
-_$_Field _$$_FieldFromJson(Map<String, dynamic> json) => _$_Field(
+_Field _$FieldFromJson(Map<String, dynamic> json) => _Field(
       multiple: json['multiple'] as bool,
       required: json['required'] as bool,
       types: (json['types'] as List<dynamic>?)
@@ -39,7 +39,7 @@ _$_Field _$$_FieldFromJson(Map<String, dynamic> json) => _$_Field(
           const [],
     );
 
-Map<String, dynamic> _$$_FieldToJson(_$_Field instance) => <String, dynamic>{
+Map<String, dynamic> _$FieldToJson(_Field instance) => <String, dynamic>{
       'multiple': instance.multiple,
       'required': instance.required,
       'types': instance.types,

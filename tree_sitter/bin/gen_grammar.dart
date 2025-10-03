@@ -8,7 +8,7 @@ part 'gen_grammar.freezed.dart';
 part 'gen_grammar.g.dart';
 
 @freezed
-class Type with _$Type {
+abstract class Type with _$Type {
   const factory Type({
     required String type,
     required bool named,
@@ -20,7 +20,7 @@ class Type with _$Type {
 }
 
 @freezed
-class Field with _$Field {
+abstract class Field with _$Field {
   const factory Field({
     required bool multiple,
     required bool required,
