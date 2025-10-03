@@ -58,7 +58,7 @@ base class Parser implements Finalizable {
   late final _language =
       _languagePtr.asFunction<ffi.Pointer<TSLanguage> Function()>()();
 
-  final _finalizer =
+  static final _finalizer =
       NativeFinalizer(treeSitterApi.addresses.ts_parser_delete.cast());
 
   /// Creates a new parser with the given shared library and entry point
@@ -110,7 +110,7 @@ base class Parser implements Finalizable {
 
 final class CancelToken implements Finalizable {
   final Pointer<Size> _token;
-  final _finalizer = NativeFinalizer(free.cast());
+  static final _finalizer = NativeFinalizer(free.cast());
   CancelToken() : _token = calloc<Size>(1) {
     _finalizer.attach(this, _token.cast(), detach: this);
   }
@@ -122,7 +122,7 @@ final class CancelToken implements Finalizable {
 
 base class Tree implements Finalizable {
   final Pointer<TSTree> tree;
-  final _finalizer =
+  static final _finalizer =
       NativeFinalizer(treeSitterApi.addresses.ts_tree_delete.cast());
 
   Tree(this.tree) {
@@ -142,7 +142,7 @@ base class Tree implements Finalizable {
 
 base class TreeCursor implements Finalizable {
   late final Pointer<TSTreeCursor> cursor = malloc<TSTreeCursor>(1);
-  final _finalizer =
+  static final _finalizer =
       NativeFinalizer(treeSitterApi.addresses.ts_tree_cursor_delete.cast());
   final TSNode node;
   TreeCursor(this.node) {
@@ -153,7 +153,7 @@ base class TreeCursor implements Finalizable {
 
 base class Query implements Finalizable {
   late final Pointer<TSQuery> query;
-  final _finalizer =
+  static final _finalizer =
       NativeFinalizer(treeSitterApi.addresses.ts_query_delete.cast());
   Query(this.query) {
     _finalizer.attach(this, query.cast(), detach: this);
@@ -243,8 +243,8 @@ extension TSApiIntX on int {
 
 base class QueryCursor implements Finalizable {
   final Pointer<TSQueryCursor> cursor = treeSitterApi.ts_query_cursor_new();
-  final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_query_delete.cast());
+  static final _finalizer =
+      NativeFinalizer(treeSitterApi.addresses.ts_query_cursor_delete.cast());
   QueryCursor() {
     _finalizer.attach(this, cursor.cast(), detach: this);
   }
