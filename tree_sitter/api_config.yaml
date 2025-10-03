@@ -14,6 +14,7 @@ functions:
       - 'ts_tree_cursor_delete'
       - 'ts_query_delete'
       - 'ts_query_cursor_delete'
+silence-enum-warning: true
 # Configure ffigen to generate @Native annotations (Dart 3.0+)
 # This enables efficient static linking instead of dynamic library loading
 # Note: assetId is omitted to allow fallback to process lookup

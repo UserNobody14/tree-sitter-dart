@@ -4,113 +4,12 @@
 // ignore_for_file: type=lint
 import 'dart:ffi' as ffi;
 
-final class TSLanguage extends ffi.Struct {
-  @ffi.Uint32()
-  external int abi_version;
-
-  @ffi.Uint32()
-  external int symbol_count;
-
-  @ffi.Uint32()
-  external int alias_count;
-
-  @ffi.Uint32()
-  external int token_count;
-
-  @ffi.Uint32()
-  external int external_token_count;
-
-  @ffi.Uint32()
-  external int state_count;
-
-  @ffi.Uint32()
-  external int large_state_count;
-
-  @ffi.Uint32()
-  external int production_id_count;
-
-  @ffi.Uint32()
-  external int field_count;
-
-  @ffi.Uint16()
-  external int max_alias_sequence_length;
-
-  external ffi.Pointer<ffi.Uint16> parse_table;
-
-  external ffi.Pointer<ffi.Uint16> small_parse_table;
-
-  external ffi.Pointer<ffi.Uint32> small_parse_table_map;
-
-  external ffi.Pointer<TSParseActionEntry> parse_actions;
-
-  external ffi.Pointer<ffi.Pointer<ffi.Char>> symbol_names;
-
-  external ffi.Pointer<ffi.Pointer<ffi.Char>> field_names;
-
-  external ffi.Pointer<TSMapSlice> field_map_slices;
-
-  external ffi.Pointer<TSFieldMapEntry> field_map_entries;
-
-  external ffi.Pointer<TSSymbolMetadata> symbol_metadata;
-
-  external ffi.Pointer<TSSymbol> public_symbol_map;
-
-  external ffi.Pointer<ffi.Uint16> alias_map;
-
-  external ffi.Pointer<TSSymbol> alias_sequences;
-
-  external ffi.Pointer<TSLexerMode> lex_modes;
-
-  external ffi.Pointer<
-          ffi
-          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
-      lex_fn;
-
-  external ffi.Pointer<
-          ffi
-          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
-      keyword_lex_fn;
-
-  @TSSymbol()
-  external int keyword_capture_token;
-
-  external UnnamedStruct4 external_scanner;
-
-  external ffi.Pointer<TSStateId> primary_state_ids;
-
-  external ffi.Pointer<ffi.Char> name;
-
-  external ffi.Pointer<TSSymbol> reserved_words;
-
-  @ffi.Uint16()
-  external int max_reserved_word_set_size;
-
-  @ffi.Uint32()
-  external int supertype_count;
-
-  external ffi.Pointer<TSSymbol> supertype_symbols;
-
-  external ffi.Pointer<TSMapSlice> supertype_map_slices;
-
-  external ffi.Pointer<TSSymbol> supertype_map_entries;
-
-  external TSLanguageMetadata metadata;
-}
-
-final class TSParseActionEntry extends ffi.Union {
-  external TSParseAction action;
-
-  external UnnamedStruct3 entry;
-}
-
-final class TSParseAction extends ffi.Union {
-  external UnnamedStruct1 shift;
-
-  external UnnamedStruct2 reduce;
-
-  @ffi.Uint8()
-  external int type;
-}
+typedef TSStateId = ffi.Uint16;
+typedef DartTSStateId = int;
+typedef TSSymbol = ffi.Uint16;
+typedef DartTSSymbol = int;
+typedef TSFieldId = ffi.Uint16;
+typedef DartTSFieldId = int;
 
 final class UnnamedStruct1 extends ffi.Struct {
   @ffi.Uint8()
@@ -125,8 +24,6 @@ final class UnnamedStruct1 extends ffi.Struct {
   @ffi.Bool()
   external bool repetition;
 }
-
-typedef TSStateId = ffi.Uint16;
 
 final class UnnamedStruct2 extends ffi.Struct {
   @ffi.Uint8()
@@ -145,7 +42,14 @@ final class UnnamedStruct2 extends ffi.Struct {
   external int production_id;
 }
 
-typedef TSSymbol = ffi.Uint16;
+final class TSParseAction extends ffi.Union {
+  external UnnamedStruct1 shift;
+
+  external UnnamedStruct2 reduce;
+
+  @ffi.Uint8()
+  external int type;
+}
 
 final class UnnamedStruct3 extends ffi.Struct {
   @ffi.Uint8()
@@ -153,6 +57,12 @@ final class UnnamedStruct3 extends ffi.Struct {
 
   @ffi.Bool()
   external bool reusable;
+}
+
+final class TSParseActionEntry extends ffi.Union {
+  external TSParseAction action;
+
+  external UnnamedStruct3 entry;
 }
 
 final class TSMapSlice extends ffi.Struct {
@@ -173,8 +83,6 @@ final class TSFieldMapEntry extends ffi.Struct {
   @ffi.Bool()
   external bool inherited;
 }
-
-typedef TSFieldId = ffi.Uint16;
 
 final class TSSymbolMetadata extends ffi.Struct {
   @ffi.Bool()
@@ -268,11 +176,115 @@ final class TSLanguageMetadata extends ffi.Struct {
   external int patch_version;
 }
 
-abstract class TSParseActionType {
-  static const int TSParseActionTypeShift = 0;
-  static const int TSParseActionTypeReduce = 1;
-  static const int TSParseActionTypeAccept = 2;
-  static const int TSParseActionTypeRecover = 3;
+final class TSLanguage extends ffi.Struct {
+  @ffi.Uint32()
+  external int abi_version;
+
+  @ffi.Uint32()
+  external int symbol_count;
+
+  @ffi.Uint32()
+  external int alias_count;
+
+  @ffi.Uint32()
+  external int token_count;
+
+  @ffi.Uint32()
+  external int external_token_count;
+
+  @ffi.Uint32()
+  external int state_count;
+
+  @ffi.Uint32()
+  external int large_state_count;
+
+  @ffi.Uint32()
+  external int production_id_count;
+
+  @ffi.Uint32()
+  external int field_count;
+
+  @ffi.Uint16()
+  external int max_alias_sequence_length;
+
+  external ffi.Pointer<ffi.Uint16> parse_table;
+
+  external ffi.Pointer<ffi.Uint16> small_parse_table;
+
+  external ffi.Pointer<ffi.Uint32> small_parse_table_map;
+
+  external ffi.Pointer<TSParseActionEntry> parse_actions;
+
+  external ffi.Pointer<ffi.Pointer<ffi.Char>> symbol_names;
+
+  external ffi.Pointer<ffi.Pointer<ffi.Char>> field_names;
+
+  external ffi.Pointer<TSMapSlice> field_map_slices;
+
+  external ffi.Pointer<TSFieldMapEntry> field_map_entries;
+
+  external ffi.Pointer<TSSymbolMetadata> symbol_metadata;
+
+  external ffi.Pointer<TSSymbol> public_symbol_map;
+
+  external ffi.Pointer<ffi.Uint16> alias_map;
+
+  external ffi.Pointer<TSSymbol> alias_sequences;
+
+  external ffi.Pointer<TSLexerMode> lex_modes;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
+      lex_fn;
+
+  external ffi.Pointer<
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
+      keyword_lex_fn;
+
+  @TSSymbol()
+  external int keyword_capture_token;
+
+  external UnnamedStruct4 external_scanner;
+
+  external ffi.Pointer<TSStateId> primary_state_ids;
+
+  external ffi.Pointer<ffi.Char> name;
+
+  external ffi.Pointer<TSSymbol> reserved_words;
+
+  @ffi.Uint16()
+  external int max_reserved_word_set_size;
+
+  @ffi.Uint32()
+  external int supertype_count;
+
+  external ffi.Pointer<TSSymbol> supertype_symbols;
+
+  external ffi.Pointer<TSMapSlice> supertype_map_slices;
+
+  external ffi.Pointer<TSSymbol> supertype_map_entries;
+
+  external TSLanguageMetadata metadata;
+}
+
+enum TSParseActionType {
+  TSParseActionTypeShift(0),
+  TSParseActionTypeReduce(1),
+  TSParseActionTypeAccept(2),
+  TSParseActionTypeRecover(3);
+
+  final int value;
+  const TSParseActionType(this.value);
+
+  static TSParseActionType fromValue(int value) => switch (value) {
+        0 => TSParseActionTypeShift,
+        1 => TSParseActionTypeReduce,
+        2 => TSParseActionTypeAccept,
+        3 => TSParseActionTypeRecover,
+        _ => throw ArgumentError('Unknown value for TSParseActionType: $value'),
+      };
 }
 
 final class TSLexMode extends ffi.Struct {

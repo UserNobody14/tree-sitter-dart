@@ -4,44 +4,20 @@
 library;
 
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:ffi' as ffi;
-import 'dart:io';
+import 'dart:ffi';
 import 'dart:typed_data';
 
-import 'package:dylib/dylib.dart';
 import 'package:ffi/ffi.dart';
 import 'package:tree_sitter/tree_sitter.dart';
 
+// Import @Native functions - they are now at the top level
+import 'src/generated_bindings.dart' as ts;
 import 'src/parser_generated_bindings.dart' as details;
 import 'src/utils.dart';
 
-export 'src/generated_bindings.dart';
 export 'src/dart_language.dart' show treeSitterDart;
-
-// Import @Native functions - they are now at the top level
-import 'src/generated_bindings.dart' as ts;
-
-/// Exposes the tree sitter C API as a minimal dart ffi wrapper
-/// 
-/// Note: With @Native annotations, this is now a compatibility layer.
-/// The TreeSitter class is kept for API compatibility but methods are called via 'ts.' prefix
-final treeSitterApi = TreeSitterConfig.instance.ffiApi;
-
-/// Configuration of the package to find the correct shared libraries
-final class TreeSitterConfig {
-  static String _dylibLocation =
-      resolveDylibPath('tree-sitter', path: Directory.current.path);
-  late final ffiApi = TreeSitter(DynamicLibrary.open(_dylibLocation));
-
-  /// Sets the path to find the tree sitter shared libraries
-  static void setLibraryPath(String path) {
-    _dylibLocation = path;
-  }
-
-  TreeSitterConfig._();
-  static final instance = TreeSitterConfig._();
-}
+export 'src/generated_bindings.dart';
 
 /// A dart interface to the tree sitter API
 ///
@@ -60,19 +36,17 @@ base class Parser implements Finalizable {
 
   late final ffi.Pointer<TSLanguage> _language;
 
-  final _finalizer =
-      NativeFinalizer(TreeSitter.addresses.ts_parser_delete.cast());
+  final _finalizer = NativeFinalizer(ts.addresses.ts_parser_delete.cast());
 
   /// Creates a new parser with the given shared library and entry point
   ///
   /// Sets up a language for the parser to use based on those parameters
   Parser({required this.sharedLibrary, required this.entryPoint}) {
     final langDylib = DynamicLibrary.open(sharedLibrary!);
-    final languagePtr = langDylib
-        .lookup<ffi.NativeFunction<ffi.Pointer<TSLanguage> Function()>>(
-            entryPoint!);
+    final languagePtr = langDylib.lookup<
+        ffi.NativeFunction<ffi.Pointer<TSLanguage> Function()>>(entryPoint!);
     _language = languagePtr.asFunction<ffi.Pointer<TSLanguage> Function()>()();
-    
+
     _finalizer.attach(this, parser.cast(), detach: this);
     if (!ts.ts_parser_set_language(parser, _language)) {
       throw Exception(
@@ -107,11 +81,11 @@ base class Parser implements Finalizable {
     _contents = program;
     final (pProgram, len) = program.toNativeUtf8Len();
     if (encoding == null) {
-      return Tree(ts.ts_parser_parse_string(
-          parser, nullptr, pProgram.cast(), len));
+      return Tree(
+          ts.ts_parser_parse_string(parser, nullptr, pProgram.cast(), len));
     } else {
-      return Tree(ts.ts_parser_parse_string_encoding(
-          parser, nullptr, pProgram.cast(), len, encoding));
+      return Tree(ts.ts_parser_parse_string_encoding(parser, nullptr,
+          pProgram.cast(), len, TSInputEncoding.values[encoding]));
     }
   }
 
@@ -150,8 +124,7 @@ final class CancelToken implements Finalizable {
 
 base class Tree implements Finalizable {
   final Pointer<TSTree> tree;
-  final _finalizer =
-      NativeFinalizer(TreeSitter.addresses.ts_tree_delete.cast());
+  final _finalizer = NativeFinalizer(ts.addresses.ts_tree_delete.cast());
 
   Tree(this.tree) {
     if (tree == nullptr) {
@@ -170,8 +143,7 @@ base class Tree implements Finalizable {
 
 base class TreeCursor implements Finalizable {
   late final Pointer<TSTreeCursor> cursor = malloc<TSTreeCursor>(1);
-  final _finalizer =
-      NativeFinalizer(TreeSitter.addresses.ts_tree_cursor_delete.cast());
+  final _finalizer = NativeFinalizer(ts.addresses.ts_tree_cursor_delete.cast());
   final TSNode node;
   TreeCursor(this.node) {
     cursor.ref = ts.ts_tree_cursor_new(node);
@@ -181,8 +153,7 @@ base class TreeCursor implements Finalizable {
 
 base class Query implements Finalizable {
   late final Pointer<TSQuery> query;
-  final _finalizer =
-      NativeFinalizer(TreeSitter.addresses.ts_query_delete.cast());
+  final _finalizer = NativeFinalizer(ts.addresses.ts_query_delete.cast());
   Query(this.query) {
     _finalizer.attach(this, query.cast(), detach: this);
   }
@@ -192,7 +163,7 @@ base class Query implements Finalizable {
     final (pSource, len) = source.toNativeUtf8Len();
     using((alloc) {
       final errorOffset = alloc<Uint32>(1);
-      final errorType = alloc<Int32>(1);
+      final errorType = alloc<UnsignedInt>(1);
       query = ts.ts_query_new(
           language, pSource.cast(), len, errorOffset, errorType);
       if (query == nullptr) {
@@ -206,7 +177,9 @@ base class Query implements Finalizable {
 }
 
 extension TSApiIntX on int {
-  String get queryError => switch (this) {
+  String get queryError => switch (this < TSQueryError.values.length
+          ? TSQueryError.values[this]
+          : null) {
         TSQueryError.TSQueryErrorNone => 'TSQueryErrorNone',
         TSQueryError.TSQueryErrorSyntax => 'TSQueryErrorSyntax',
         TSQueryError.TSQueryErrorNodeType => 'TSQueryErrorNodeType',
@@ -217,7 +190,10 @@ extension TSApiIntX on int {
         _ => 'Unknown error code $this'
       };
 
-  String get queryPredicateStepType => switch (this) {
+  String get queryPredicateStepType =>
+      switch (this < TSQueryPredicateStepType.values.length
+          ? TSQueryPredicateStepType.values[this]
+          : null) {
         TSQueryPredicateStepType.TSQueryPredicateStepTypeCapture =>
           'TSQueryPredicateStepTypeCapture',
         TSQueryPredicateStepType.TSQueryPredicateStepTypeString =>
@@ -227,7 +203,9 @@ extension TSApiIntX on int {
         _ => 'Unknown predicate step type $this'
       };
 
-  String get quantifier => switch (this) {
+  String get quantifier => switch (this < TSQuantifier.values.length
+          ? TSQuantifier.values[this]
+          : null) {
         TSQuantifier.TSQuantifierZero => 'TSQuantifierZero',
         TSQuantifier.TSQuantifierZeroOrOne => 'TSQuantifierZeroOrOne',
         TSQuantifier.TSQuantifierZeroOrMore => 'TSQuantifierZeroOrMore',
@@ -236,14 +214,18 @@ extension TSApiIntX on int {
         _ => 'Unknown predicate step type $this'
       };
 
-  String get symbolType => switch (this) {
+  String get symbolType => switch (this < TSSymbolType.values.length
+          ? TSSymbolType.values[this]
+          : null) {
         TSSymbolType.TSSymbolTypeRegular => 'TSSymbolTypeRegular',
         TSSymbolType.TSSymbolTypeAnonymous => 'TSSymbolTypeAnonymous',
         TSSymbolType.TSSymbolTypeAuxiliary => 'TSSymbolTypeAuxiliary',
         _ => 'Unknown symbol type $this'
       };
 
-  String get inputEncoding => switch (this) {
+  String get inputEncoding => switch (this < TSInputEncoding.values.length
+          ? TSInputEncoding.values[this]
+          : null) {
         TSInputEncoding.TSInputEncodingUTF8 => 'TSInputEncodingUTF8',
         TSInputEncoding.TSInputEncodingUTF16LE => 'TSInputEncodingUTF16LE',
         TSInputEncoding.TSInputEncodingUTF16BE => 'TSInputEncodingUTF16BE',
@@ -251,7 +233,9 @@ extension TSApiIntX on int {
         _ => 'Unknown input encoding $this'
       };
 
-  String get logType => switch (this) {
+  String get logType => switch (this < TSInputEncoding.values.length
+          ? TSLogType.values[this]
+          : null) {
         TSLogType.TSLogTypeParse => 'TSLogTypeParse',
         TSLogType.TSLogTypeLex => 'TSLogTypeLex',
         _ => 'Unknown log type $this'
@@ -260,8 +244,7 @@ extension TSApiIntX on int {
 
 base class QueryCursor implements Finalizable {
   final Pointer<TSQueryCursor> cursor = ts.ts_query_cursor_new();
-  final _finalizer =
-      NativeFinalizer(TreeSitter.addresses.ts_query_delete.cast());
+  final _finalizer = NativeFinalizer(ts.addresses.ts_query_delete.cast());
   QueryCursor() {
     _finalizer.attach(this, cursor.cast(), detach: this);
   }
@@ -275,8 +258,7 @@ extension TSNodeX on TSNode {
     return result;
   }
 
-  String get nodeType =>
-      ts.ts_node_type(this).cast<Utf8>().toDartString();
+  String get nodeType => ts.ts_node_type(this).cast<Utf8>().toDartString();
 
   int get symbol => ts.ts_node_symbol(this);
 
@@ -311,15 +293,14 @@ extension TSNodeX on TSNode {
 
   int get childCount => ts.ts_node_child_count(this);
 
-  TSNode namedChild(int childIndex) =>
-      ts.ts_node_named_child(this, childIndex);
+  TSNode namedChild(int childIndex) => ts.ts_node_named_child(this, childIndex);
 
   int get namedChildCount => ts.ts_node_named_child_count(this);
 
   TSNode childByFieldName(String fieldName) {
     final (pFieldName, nameLength) = fieldName.toNativeUtf8Len();
-    final result = ts.ts_node_child_by_field_name(
-        this, pFieldName.cast(), nameLength);
+    final result =
+        ts.ts_node_child_by_field_name(this, pFieldName.cast(), nameLength);
     malloc.free(pFieldName);
     return result;
   }
