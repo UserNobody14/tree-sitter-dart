@@ -2,11 +2,14 @@
   "grammars": [
     {
       "name": "dart",
+      "camel-case-name": "Dart",
       "scope": "source.dart",
       "file-types": ["dart"],
       "highlights": "queries/highlights.scm",
-      "tags": "queries/tags.scm",
-      "injection-regex": "dart"
+      "tags": "queries/tags.scm"
     }
-  ]
+  ],
+  "metadata": {
+    "version": "1.0.0"
+  }
 }
