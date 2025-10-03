@@ -11,23 +11,51 @@ Then set the library location using:
 TreeSitterConfig.setLibraryPath('/path/to/libtree-sitter.so');
 ```
 
-Next create a parser for your language by first creating a dynamic library for your language's grammar.
+## Usage
 
-Then load and use the parser:
+### Option 1: Native Binding (Recommended for Dart 3.0+)
+
+Use the `@Native` annotation binding for efficient static linking:
+
 ```dart
-import 'package:ffi/ffi.dart';
 import 'package:tree_sitter/tree_sitter.dart';
 
 void main() {
-  final parser =
-      Parser(sharedLibrary: 'libdart.dylib', entryPoint: 'tree_sitter_dart');
+  // Use the native binding for the Dart language grammar
+  final parser = Parser.fromLanguage(treeSitterDart());
   final program = "class A {}";
   final tree = parser.parse(program);
   print(tree.root.string);
 }
 ```
 
-You can access other apis via the top level `treeSitterApi` ffi wrapper
+This approach provides:
+- Better performance through static linking
+- Compile-time symbol validation
+- Zero runtime overhead for library loading
+- Simplified deployment
+
+### Option 2: Dynamic Library Loading (Traditional)
+
+Load the language grammar dynamically at runtime:
+
+```dart
+import 'package:dylib/dylib.dart';
+import 'package:tree_sitter/tree_sitter.dart';
+
+void main() {
+  final parser = Parser(
+      sharedLibrary: resolveDylibPath('dart', path: Directory.current.path),
+      entryPoint: 'tree_sitter_dart');
+  final program = "class A {}";
+  final tree = parser.parse(program);
+  print(tree.root.string);
+}
+```
+
+## Advanced Usage
+
+You can access other APIs via the top level `treeSitterApi` ffi wrapper.
 
 Or you can help contribute to an idiomatic dart api on top of the ffi wrapper.
 Many of the apis are started but not complete.

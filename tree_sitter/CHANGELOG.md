@@ -1,3 +1,9 @@
+## 0.1.3 (Unreleased)
+- Added `@Native` annotation support for the Dart language grammar
+- Added `Parser.fromLanguage()` constructor for use with native bindings
+- Added `treeSitterDart()` function for efficient static linking (Dart 3.0+)
+- Updated examples and tests to demonstrate both dynamic and native binding approaches
+
 ## 0.1.2
 - Fix issue with string encoding length
 

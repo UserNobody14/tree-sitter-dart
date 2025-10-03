@@ -1,20 +1,5 @@
 # tree-sitter-dart
-
 This is a tree-sitter grammar written for the dart programming language. We attempt to adhere as closely as possible to the dart language spec. Initially it was started with a copy of the tree-sitter Java grammar which is why there may be a few relics included in here. For the sake of simplifying the syntax tree, many items were made inlined with tree-sitter's "underscore" method of writing rules.
-
-## Language Bindings
-
-This repository provides bindings for multiple languages:
-
-- **C**: See `bindings/c/` for C header files
-- **Dart**: See `bindings/dart/` for Dart Native FFI bindings (requires Dart 3.0+)
-- **Go**: See `bindings/go/` for Go bindings
-- **Node.js**: See `bindings/node/` for Node.js bindings
-- **Python**: See `bindings/python/` for Python bindings
-- **Rust**: See `bindings/rust/` for Rust bindings
-- **Swift**: See `bindings/swift/` for Swift bindings
-
-Each binding directory contains its own README with specific usage instructions.
 
 # Getting Started
 - Go to the project directory

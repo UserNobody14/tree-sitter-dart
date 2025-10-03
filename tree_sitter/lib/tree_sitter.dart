@@ -17,6 +17,7 @@ import 'src/parser_generated_bindings.dart' as details;
 import 'src/utils.dart';
 
 export 'src/generated_bindings.dart';
+export 'src/dart_language.dart' show treeSitterDart;
 
 /// Exposes the tree sitter C API as a minimal dart ffi wrapper
 final treeSitterApi = TreeSitterConfig.instance.ffiApi;
@@ -41,22 +42,17 @@ final class TreeSitterConfig {
 /// - Handles basic parser / language setup
 base class Parser implements Finalizable {
   /// The shared library for the language used by this parser
-  final String sharedLibrary;
+  final String? sharedLibrary;
 
   /// The entry point for the language used by this parser
-  final String entryPoint;
+  final String? entryPoint;
 
   /// The c ffi parser instance
   ///
   /// Automatically disposed by [Parser] using dart's Finalizable support
   late final parser = treeSitterApi.ts_parser_new();
 
-  late final _langDylib = DynamicLibrary.open(sharedLibrary);
-  late final _languagePtr =
-      _langDylib.lookup<ffi.NativeFunction<ffi.Pointer<TSLanguage> Function()>>(
-          entryPoint);
-  late final _language =
-      _languagePtr.asFunction<ffi.Pointer<TSLanguage> Function()>()();
+  late final ffi.Pointer<TSLanguage> _language;
 
   final _finalizer =
       NativeFinalizer(treeSitterApi.addresses.ts_parser_delete.cast());
@@ -65,10 +61,36 @@ base class Parser implements Finalizable {
   ///
   /// Sets up a language for the parser to use based on those parameters
   Parser({required this.sharedLibrary, required this.entryPoint}) {
+    final langDylib = DynamicLibrary.open(sharedLibrary!);
+    final languagePtr = langDylib
+        .lookup<ffi.NativeFunction<ffi.Pointer<TSLanguage> Function()>>(
+            entryPoint!);
+    _language = languagePtr.asFunction<ffi.Pointer<TSLanguage> Function()>()();
+    
     _finalizer.attach(this, parser.cast(), detach: this);
     if (!treeSitterApi.ts_parser_set_language(parser, _language)) {
       throw Exception(
           'Failed to set language using the provided shared library and entry point');
+    }
+  }
+
+  /// Creates a new parser with a native language binding
+  ///
+  /// Uses a language pointer obtained via @Native annotation for efficient
+  /// static linking. This is the preferred method when using Dart 3.0+.
+  ///
+  /// Example:
+  /// ```dart
+  /// final parser = Parser.fromLanguage(treeSitterDart());
+  /// final tree = parser.parse('class A {}');
+  /// ```
+  Parser.fromLanguage(ffi.Pointer<TSLanguage> language)
+      : sharedLibrary = null,
+        entryPoint = null,
+        _language = language {
+    _finalizer.attach(this, parser.cast(), detach: this);
+    if (!treeSitterApi.ts_parser_set_language(parser, _language)) {
+      throw Exception('Failed to set language');
     }
   }
 
