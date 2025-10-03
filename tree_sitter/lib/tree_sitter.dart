@@ -19,7 +19,13 @@ import 'src/utils.dart';
 export 'src/generated_bindings.dart';
 export 'src/dart_language.dart' show treeSitterDart;
 
+// Import @Native functions - they are now at the top level
+import 'src/generated_bindings.dart' as ts;
+
 /// Exposes the tree sitter C API as a minimal dart ffi wrapper
+/// 
+/// Note: With @Native annotations, this is now a compatibility layer.
+/// The TreeSitter class is kept for API compatibility but methods are called via 'ts.' prefix
 final treeSitterApi = TreeSitterConfig.instance.ffiApi;
 
 /// Configuration of the package to find the correct shared libraries
@@ -50,12 +56,12 @@ base class Parser implements Finalizable {
   /// The c ffi parser instance
   ///
   /// Automatically disposed by [Parser] using dart's Finalizable support
-  late final parser = treeSitterApi.ts_parser_new();
+  late final parser = ts.ts_parser_new();
 
   late final ffi.Pointer<TSLanguage> _language;
 
   final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_parser_delete.cast());
+      NativeFinalizer(TreeSitter.addresses.ts_parser_delete.cast());
 
   /// Creates a new parser with the given shared library and entry point
   ///
@@ -68,7 +74,7 @@ base class Parser implements Finalizable {
     _language = languagePtr.asFunction<ffi.Pointer<TSLanguage> Function()>()();
     
     _finalizer.attach(this, parser.cast(), detach: this);
-    if (!treeSitterApi.ts_parser_set_language(parser, _language)) {
+    if (!ts.ts_parser_set_language(parser, _language)) {
       throw Exception(
           'Failed to set language using the provided shared library and entry point');
     }
@@ -89,7 +95,7 @@ base class Parser implements Finalizable {
         entryPoint = null,
         _language = language {
     _finalizer.attach(this, parser.cast(), detach: this);
-    if (!treeSitterApi.ts_parser_set_language(parser, _language)) {
+    if (!ts.ts_parser_set_language(parser, _language)) {
       throw Exception('Failed to set language');
     }
   }
@@ -101,10 +107,10 @@ base class Parser implements Finalizable {
     _contents = program;
     final (pProgram, len) = program.toNativeUtf8Len();
     if (encoding == null) {
-      return Tree(treeSitterApi.ts_parser_parse_string(
+      return Tree(ts.ts_parser_parse_string(
           parser, nullptr, pProgram.cast(), len));
     } else {
-      return Tree(treeSitterApi.ts_parser_parse_string_encoding(
+      return Tree(ts.ts_parser_parse_string_encoding(
           parser, nullptr, pProgram.cast(), len, encoding));
     }
   }
@@ -112,17 +118,17 @@ base class Parser implements Finalizable {
   String? _contents;
   List<int> get contents => utf8.encode(_contents ?? '');
 
-  void reset() => treeSitterApi.ts_parser_reset(parser);
+  void reset() => ts.ts_parser_reset(parser);
 
   set timeoutMicros(int timeout) =>
-      treeSitterApi.ts_parser_set_timeout_micros(parser, timeout);
+      ts.ts_parser_set_timeout_micros(parser, timeout);
 
-  int get timeoutMicros => treeSitterApi.ts_parser_timeout_micros(parser);
+  int get timeoutMicros => ts.ts_parser_timeout_micros(parser);
 
   set cancellationFlag(CancelToken flag) =>
-      treeSitterApi.ts_parser_set_cancellation_flag(parser, flag._token);
+      ts.ts_parser_set_cancellation_flag(parser, flag._token);
   CancelToken get cancellationFlag =>
-      CancelToken.fromToken(treeSitterApi.ts_parser_cancellation_flag(parser));
+      CancelToken.fromToken(ts.ts_parser_cancellation_flag(parser));
 
   String getText(TSNode namedChild) {
     final text = contents.sublist(namedChild.startByte, namedChild.endByte);
@@ -145,7 +151,7 @@ final class CancelToken implements Finalizable {
 base class Tree implements Finalizable {
   final Pointer<TSTree> tree;
   final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_tree_delete.cast());
+      NativeFinalizer(TreeSitter.addresses.ts_tree_delete.cast());
 
   Tree(this.tree) {
     if (tree == nullptr) {
@@ -154,21 +160,21 @@ base class Tree implements Finalizable {
     _finalizer.attach(this, tree.cast(), detach: this);
   }
 
-  TSNode get root => treeSitterApi.ts_tree_root_node(tree);
+  TSNode get root => ts.ts_tree_root_node(tree);
 
-  Tree get copy => Tree(treeSitterApi.ts_tree_copy(tree));
+  Tree get copy => Tree(ts.ts_tree_copy(tree));
 
   details.TSLanguage get language =>
-      treeSitterApi.ts_tree_language(tree).cast<details.TSLanguage>().ref;
+      ts.ts_tree_language(tree).cast<details.TSLanguage>().ref;
 }
 
 base class TreeCursor implements Finalizable {
   late final Pointer<TSTreeCursor> cursor = malloc<TSTreeCursor>(1);
   final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_tree_cursor_delete.cast());
+      NativeFinalizer(TreeSitter.addresses.ts_tree_cursor_delete.cast());
   final TSNode node;
   TreeCursor(this.node) {
-    cursor.ref = treeSitterApi.ts_tree_cursor_new(node);
+    cursor.ref = ts.ts_tree_cursor_new(node);
     _finalizer.attach(this, cursor.cast(), detach: this);
   }
 }
@@ -176,7 +182,7 @@ base class TreeCursor implements Finalizable {
 base class Query implements Finalizable {
   late final Pointer<TSQuery> query;
   final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_query_delete.cast());
+      NativeFinalizer(TreeSitter.addresses.ts_query_delete.cast());
   Query(this.query) {
     _finalizer.attach(this, query.cast(), detach: this);
   }
@@ -187,7 +193,7 @@ base class Query implements Finalizable {
     using((alloc) {
       final errorOffset = alloc<Uint32>(1);
       final errorType = alloc<Int32>(1);
-      query = treeSitterApi.ts_query_new(
+      query = ts.ts_query_new(
           language, pSource.cast(), len, errorOffset, errorType);
       if (query == nullptr) {
         final errOff = errorOffset.value;
@@ -239,7 +245,9 @@ extension TSApiIntX on int {
 
   String get inputEncoding => switch (this) {
         TSInputEncoding.TSInputEncodingUTF8 => 'TSInputEncodingUTF8',
-        TSInputEncoding.TSInputEncodingUTF16 => 'TSInputEncodingUTF16',
+        TSInputEncoding.TSInputEncodingUTF16LE => 'TSInputEncodingUTF16LE',
+        TSInputEncoding.TSInputEncodingUTF16BE => 'TSInputEncodingUTF16BE',
+        TSInputEncoding.TSInputEncodingCustom => 'TSInputEncodingCustom',
         _ => 'Unknown input encoding $this'
       };
 
@@ -251,9 +259,9 @@ extension TSApiIntX on int {
 }
 
 base class QueryCursor implements Finalizable {
-  final Pointer<TSQueryCursor> cursor = treeSitterApi.ts_query_cursor_new();
+  final Pointer<TSQueryCursor> cursor = ts.ts_query_cursor_new();
   final _finalizer =
-      NativeFinalizer(treeSitterApi.addresses.ts_query_delete.cast());
+      NativeFinalizer(TreeSitter.addresses.ts_query_delete.cast());
   QueryCursor() {
     _finalizer.attach(this, cursor.cast(), detach: this);
   }
@@ -261,69 +269,69 @@ base class QueryCursor implements Finalizable {
 
 extension TSNodeX on TSNode {
   String get string {
-    final root = treeSitterApi.ts_node_string(this);
+    final root = ts.ts_node_string(this);
     final result = root.cast<Utf8>().toDartString();
     malloc.free(root);
     return result;
   }
 
   String get nodeType =>
-      treeSitterApi.ts_node_type(this).cast<Utf8>().toDartString();
+      ts.ts_node_type(this).cast<Utf8>().toDartString();
 
-  int get symbol => treeSitterApi.ts_node_symbol(this);
+  int get symbol => ts.ts_node_symbol(this);
 
-  int get startByte => treeSitterApi.ts_node_start_byte(this);
+  int get startByte => ts.ts_node_start_byte(this);
 
-  int get endByte => treeSitterApi.ts_node_end_byte(this);
+  int get endByte => ts.ts_node_end_byte(this);
 
-  TSPoint get startPoint => treeSitterApi.ts_node_start_point(this);
+  TSPoint get startPoint => ts.ts_node_start_point(this);
 
-  TSPoint get endPoint => treeSitterApi.ts_node_end_point(this);
+  TSPoint get endPoint => ts.ts_node_end_point(this);
 
-  bool get isNull => treeSitterApi.ts_node_is_null(this);
+  bool get isNull => ts.ts_node_is_null(this);
 
-  bool get isNamed => treeSitterApi.ts_node_is_named(this);
+  bool get isNamed => ts.ts_node_is_named(this);
 
-  bool get isMissing => treeSitterApi.ts_node_is_missing(this);
+  bool get isMissing => ts.ts_node_is_missing(this);
 
-  bool get isExtra => treeSitterApi.ts_node_is_extra(this);
+  bool get isExtra => ts.ts_node_is_extra(this);
 
-  bool get hasChanges => treeSitterApi.ts_node_has_changes(this);
+  bool get hasChanges => ts.ts_node_has_changes(this);
 
-  bool get hasError => treeSitterApi.ts_node_has_error(this);
+  bool get hasError => ts.ts_node_has_error(this);
 
-  TSNode get parent => treeSitterApi.ts_node_parent(this);
+  TSNode get parent => ts.ts_node_parent(this);
 
-  TSNode child(int childIndex) => treeSitterApi.ts_node_child(this, childIndex);
+  TSNode child(int childIndex) => ts.ts_node_child(this, childIndex);
 
-  String fieldNameForChild(int childIndex) => treeSitterApi
+  String fieldNameForChild(int childIndex) => ts
       .ts_node_field_name_for_child(this, childIndex)
       .cast<Utf8>()
       .toDartString();
 
-  int get childCount => treeSitterApi.ts_node_child_count(this);
+  int get childCount => ts.ts_node_child_count(this);
 
   TSNode namedChild(int childIndex) =>
-      treeSitterApi.ts_node_named_child(this, childIndex);
+      ts.ts_node_named_child(this, childIndex);
 
-  int get namedChildCount => treeSitterApi.ts_node_named_child_count(this);
+  int get namedChildCount => ts.ts_node_named_child_count(this);
 
   TSNode childByFieldName(String fieldName) {
     final (pFieldName, nameLength) = fieldName.toNativeUtf8Len();
-    final result = treeSitterApi.ts_node_child_by_field_name(
+    final result = ts.ts_node_child_by_field_name(
         this, pFieldName.cast(), nameLength);
     malloc.free(pFieldName);
     return result;
   }
 
   TSNode childByFieldId(int fieldId) =>
-      treeSitterApi.ts_node_child_by_field_id(this, fieldId);
+      ts.ts_node_child_by_field_id(this, fieldId);
 
-  TSNode get nextSibling => treeSitterApi.ts_node_next_sibling(this);
-  TSNode get prevSibling => treeSitterApi.ts_node_prev_sibling(this);
+  TSNode get nextSibling => ts.ts_node_next_sibling(this);
+  TSNode get prevSibling => ts.ts_node_prev_sibling(this);
 
-  TSNode get nextNamedSibling => treeSitterApi.ts_node_next_named_sibling(this);
-  TSNode get prevNamedSibling => treeSitterApi.ts_node_prev_named_sibling(this);
+  TSNode get nextNamedSibling => ts.ts_node_next_named_sibling(this);
+  TSNode get prevNamedSibling => ts.ts_node_prev_named_sibling(this);
 }
 
 extension on String {

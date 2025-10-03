@@ -3,15 +3,17 @@ description: "C Bindings to the TreeSitter Parser library"
 output: 'lib/src/parser_generated_bindings.dart'
 headers:
   entry-points:
-    - 'tree-sitter/lib/include/tree_sitter/parser.h'
+    - 'tree-sitter/lib/src/parser.h'
   include-directives:
-    - 'tree-sitter/lib/include/tree_sitter/parser.h'
+    - 'tree-sitter/lib/src/parser.h'
 # Configure ffigen to generate @Native annotations (Dart 3.0+)
 # This enables efficient static linking instead of dynamic library loading
+# Note: assetId is omitted to allow fallback to process lookup
 ffi-native:
-  enabled: true
-  asset-id: 'package:tree_sitter/libtree-sitter.so'
 llvm-path:
+  - '/usr/lib/llvm-18'
+  - '/usr/lib/llvm-17'
+  - '/usr/lib/llvm-16'
   - '/usr/lib/llvm-14'
   - '/usr/lib/llvm-11'
   - '/usr/local/opt/llvm'

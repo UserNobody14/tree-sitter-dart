@@ -55,14 +55,28 @@ void main() {
 
 ## Regenerating Bindings
 
-The tree-sitter C API bindings are configured to use `@Native` annotations for better performance. To regenerate the bindings after updating the tree-sitter library:
+The tree-sitter C API bindings are configured to use `@Native` annotations for better performance (Dart 3.0+). To regenerate the bindings after updating the tree-sitter library:
 
 ```bash
+# Make sure the tree-sitter submodule is initialized
+git submodule update --init --recursive
+
+# Build tree-sitter library
+cd tree-sitter && make && cd ..
+
+# Regenerate bindings
 dart run ffigen --config api_config.yaml
 dart run ffigen --config parser_config.yaml
 ```
 
 This will generate updated bindings in `lib/src/generated_bindings.dart` and `lib/src/parser_generated_bindings.dart` with `@Native` annotations enabled.
+
+**Note:** The generated bindings use `@Native` without asset IDs, which means they rely on `DynamicLibrary.process()` for symbol resolution. You'll need to preload the libraries when running tests:
+
+```bash
+export LD_PRELOAD="./libtree-sitter.so:./libdart.so"
+dart test
+```
 
 ## Advanced Usage
 

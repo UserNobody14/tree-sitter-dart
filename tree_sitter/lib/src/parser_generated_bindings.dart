@@ -6,7 +6,7 @@ import 'dart:ffi' as ffi;
 
 final class TSLanguage extends ffi.Struct {
   @ffi.Uint32()
-  external int version;
+  external int abi_version;
 
   @ffi.Uint32()
   external int symbol_count;
@@ -47,7 +47,7 @@ final class TSLanguage extends ffi.Struct {
 
   external ffi.Pointer<ffi.Pointer<ffi.Char>> field_names;
 
-  external ffi.Pointer<TSFieldMapSlice> field_map_slices;
+  external ffi.Pointer<TSMapSlice> field_map_slices;
 
   external ffi.Pointer<TSFieldMapEntry> field_map_entries;
 
@@ -59,15 +59,17 @@ final class TSLanguage extends ffi.Struct {
 
   external ffi.Pointer<TSSymbol> alias_sequences;
 
-  external ffi.Pointer<TSLexMode> lex_modes;
+  external ffi.Pointer<TSLexerMode> lex_modes;
 
   external ffi.Pointer<
-      ffi.NativeFunction<
-          ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>> lex_fn;
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
+      lex_fn;
 
   external ffi.Pointer<
-      ffi.NativeFunction<
-          ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>> keyword_lex_fn;
+          ffi
+          .NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>, TSStateId)>>
+      keyword_lex_fn;
 
   @TSSymbol()
   external int keyword_capture_token;
@@ -75,6 +77,24 @@ final class TSLanguage extends ffi.Struct {
   external UnnamedStruct4 external_scanner;
 
   external ffi.Pointer<TSStateId> primary_state_ids;
+
+  external ffi.Pointer<ffi.Char> name;
+
+  external ffi.Pointer<TSSymbol> reserved_words;
+
+  @ffi.Uint16()
+  external int max_reserved_word_set_size;
+
+  @ffi.Uint32()
+  external int supertype_count;
+
+  external ffi.Pointer<TSSymbol> supertype_symbols;
+
+  external ffi.Pointer<TSMapSlice> supertype_map_slices;
+
+  external ffi.Pointer<TSSymbol> supertype_map_entries;
+
+  external TSLanguageMetadata metadata;
 }
 
 final class TSParseActionEntry extends ffi.Union {
@@ -135,7 +155,7 @@ final class UnnamedStruct3 extends ffi.Struct {
   external bool reusable;
 }
 
-final class TSFieldMapSlice extends ffi.Struct {
+final class TSMapSlice extends ffi.Struct {
   @ffi.Uint16()
   external int index;
 
@@ -167,12 +187,15 @@ final class TSSymbolMetadata extends ffi.Struct {
   external bool supertype;
 }
 
-final class TSLexMode extends ffi.Struct {
+final class TSLexerMode extends ffi.Struct {
   @ffi.Uint16()
   external int lex_state;
 
   @ffi.Uint16()
   external int external_lex_state;
+
+  @ffi.Uint16()
+  external int reserved_word_set_id;
 }
 
 final class TSLexer extends ffi.Struct {
@@ -187,18 +210,23 @@ final class TSLexer extends ffi.Struct {
       advance;
 
   external ffi
-          .Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<TSLexer>)>>
+      .Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<TSLexer>)>>
       mark_end;
 
-  external ffi.Pointer<
-      ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSLexer>)>> get_column;
+  external ffi
+      .Pointer<ffi.NativeFunction<ffi.Uint32 Function(ffi.Pointer<TSLexer>)>>
+      get_column;
 
   external ffi
-          .Pointer<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>)>>
+      .Pointer<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>)>>
       is_at_included_range_start;
 
   external ffi
       .Pointer<ffi.NativeFunction<ffi.Bool Function(ffi.Pointer<TSLexer>)>> eof;
+
+  external ffi.Pointer<
+      ffi.NativeFunction<
+          ffi.Void Function(ffi.Pointer<TSLexer>, ffi.Pointer<ffi.Char>)>> log;
 }
 
 final class UnnamedStruct4 extends ffi.Struct {
@@ -210,7 +238,7 @@ final class UnnamedStruct4 extends ffi.Struct {
       create;
 
   external ffi
-          .Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>
+      .Pointer<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>
       destroy;
 
   external ffi.Pointer<
@@ -229,11 +257,38 @@ final class UnnamedStruct4 extends ffi.Struct {
               ffi.UnsignedInt)>> deserialize;
 }
 
+final class TSLanguageMetadata extends ffi.Struct {
+  @ffi.Uint8()
+  external int major_version;
+
+  @ffi.Uint8()
+  external int minor_version;
+
+  @ffi.Uint8()
+  external int patch_version;
+}
+
 abstract class TSParseActionType {
   static const int TSParseActionTypeShift = 0;
   static const int TSParseActionTypeReduce = 1;
   static const int TSParseActionTypeAccept = 2;
   static const int TSParseActionTypeRecover = 3;
+}
+
+final class TSLexMode extends ffi.Struct {
+  @ffi.Uint16()
+  external int lex_state;
+
+  @ffi.Uint16()
+  external int external_lex_state;
+}
+
+final class TSCharacterRange extends ffi.Struct {
+  @ffi.Int32()
+  external int start;
+
+  @ffi.Int32()
+  external int end;
 }
 
 const int ts_builtin_sym_error = 65535;

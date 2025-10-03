@@ -4,7 +4,7 @@ version: 0.1.2
 repository: https://github.com/UserNobody14/tree-sitter-dart
 
 environment:
-  sdk: ">=3.0.0 <3.4.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   dylib: ^0.3.3
