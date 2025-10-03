@@ -33,7 +33,7 @@
     "node-gyp-build": "^4.8.0"
   },
   "peerDependencies": {
-    "tree-sitter": "^0.21.0"
+    "tree-sitter": "^0.25.0"
   },
   "peerDependenciesMeta": {
     "tree_sitter": {
@@ -43,7 +43,7 @@
   "devDependencies": {
     "node-gyp": "^10.2.0",
     "npm-watch": "^0.13.0",
-    "tree-sitter-cli": "^0.22.6",
+    "tree-sitter-cli": "^0.25.10",
     "prebuildify": "^6.0.0"
   },
   "watch": {
