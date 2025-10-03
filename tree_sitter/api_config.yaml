@@ -14,3 +14,12 @@ functions:
       - 'ts_tree_cursor_delete'
       - 'ts_query_delete'
       - 'ts_query_cursor_delete'
+# Configure ffigen to generate @Native annotations (Dart 3.0+)
+# This enables efficient static linking instead of dynamic library loading
+ffi-native:
+  enabled: true
+  asset-id: 'package:tree_sitter/libtree-sitter.so'
+llvm-path:
+  - '/usr/lib/llvm-14'
+  - '/usr/lib/llvm-11'
+  - '/usr/local/opt/llvm'

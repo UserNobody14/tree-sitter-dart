@@ -53,6 +53,17 @@ void main() {
 }
 ```
 
+## Regenerating Bindings
+
+The tree-sitter C API bindings are configured to use `@Native` annotations for better performance. To regenerate the bindings after updating the tree-sitter library:
+
+```bash
+dart run ffigen --config api_config.yaml
+dart run ffigen --config parser_config.yaml
+```
+
+This will generate updated bindings in `lib/src/generated_bindings.dart` and `lib/src/parser_generated_bindings.dart` with `@Native` annotations enabled.
+
 ## Advanced Usage
 
 You can access other APIs via the top level `treeSitterApi` ffi wrapper.
