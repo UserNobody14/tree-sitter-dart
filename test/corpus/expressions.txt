@@ -908,3 +908,38 @@ main() {
               (conditional_assignable_selector
                 (index_selector
                   (string_literal))))))))
+
+========================================
+set and get as identifiers in expressions
+========================================
+
+void main() {
+  final set = 0;
+  set;
+  final get = 1;
+  get;
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (final_builtin)
+          (identifier)
+          (decimal_integer_literal)))
+      (expression_statement
+        (identifier))
+      (local_variable_declaration
+        (initialized_variable_definition
+          (final_builtin)
+          (identifier)
+          (decimal_integer_literal)))
+      (expression_statement
+        (identifier)))))

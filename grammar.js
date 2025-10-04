@@ -96,6 +96,7 @@ module.exports = grammar({
         [$._record_literal_no_const, $.record_field],
         [$.block, $.set_or_map_literal],
         [$._type_name, $._primary, $.function_signature],
+        [$._primary, $.function_signature],
         [$._primary, $._type_name],
         [$._primary, $._simple_formal_parameter],
         [$._primary, $._type_name, $._function_formal_parameter],
@@ -1070,6 +1071,8 @@ module.exports = grammar({
         _primary: $ => choice(
             $._literal,
             $.identifier,
+            alias($._get, $.identifier),
+            alias($._set, $.identifier),
             $.function_expression,
             $.new_expression,
             $.const_object_expression,
