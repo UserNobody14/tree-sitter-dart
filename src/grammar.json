@@ -3451,6 +3451,24 @@
           "name": "identifier"
         },
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_get"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_set"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
           "type": "SYMBOL",
           "name": "function_expression"
         },
@@ -12318,6 +12336,10 @@
     ],
     [
       "_type_name",
+      "_primary",
+      "function_signature"
+    ],
+    [
       "_primary",
       "function_signature"
     ],

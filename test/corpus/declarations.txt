@@ -650,11 +650,21 @@ class Tree {
               (identifier)
               (ERROR
                 (identifier))
-              (formal_parameter_list))
-            (identifier)
-            (identifier)
-            (identifier)
-            (identifier))
+              (formal_parameter_list)))
+          (expression_statement
+            (assignment_expression
+              (assignable_expression
+                (identifier)
+                (unconditional_assignable_selector
+                  (identifier)))
+              (identifier)))
+          (expression_statement
+            (assignment_expression
+              (assignable_expression
+                (identifier)
+                (unconditional_assignable_selector
+                  (identifier)))
+              (identifier)))
           (return_statement
             (identifier)))))))
 
