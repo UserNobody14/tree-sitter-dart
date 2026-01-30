@@ -77,11 +77,6 @@
 (((identifier) @function (#match? @function "^_?[a-z]"))
  . (selector . (argument_part))) @function
 
-; Annotations
-; --------------------
-(annotation
-  name: (identifier) @attribute)
-
 ; Operators and Tokens
 ; --------------------
 (template_substitution
@@ -243,3 +238,9 @@
 
 (documentation_comment) @comment
 (comment) @comment
+
+; Annotations
+; --------------------
+(annotation
+  "@" @attribute
+  name: (identifier) @attribute)
