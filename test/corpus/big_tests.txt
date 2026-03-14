@@ -727,3 +727,355 @@ Offset getOffsetForCaret() {
                             (selector
                               (unconditional_assignable_selector
                                 (identifier)))))))))))))))
+
+===================
+External Values
+===================
+
+final class _WindowCreationRequest extends Struct {
+  @Bool()
+  external bool hasSize;
+  external _Size contentSize;
+
+  @Int64()
+  external int parentViewId;
+
+  external Pointer<NativeFunction<Void Function()>> onShouldClose;
+  external Pointer<
+    NativeFunction<
+      Pointer<_Rect> Function(
+        Pointer<_Size> childSize,
+        Pointer<_Rect> parentRect,
+        Pointer<_Rect> outputRect,
+      )
+    >
+  >
+  onGetWindowPosition;
+}
+
+---
+
+(program
+      (class_definition
+        (identifier)
+        (superclass
+          (type_identifier))
+        (class_body
+          (annotation
+            (identifier)
+            (arguments))
+          (declaration
+            (type_identifier)
+            (identifier))
+          (declaration
+            (type_identifier)
+            (identifier))
+          (annotation
+            (identifier)
+            (arguments))
+          (declaration
+            (type_identifier)
+            (identifier))
+          (declaration
+            (type_identifier)
+            (type_arguments
+              (type_identifier)
+              (type_arguments
+                (function_type
+                  (type_identifier)
+                  (parameter_type_list))))
+            (identifier))
+          (declaration
+            (type_identifier)
+            (type_arguments
+              (type_identifier)
+              (type_arguments
+                (function_type
+                  (type_identifier)
+                  (type_arguments
+                    (type_identifier))
+                  (parameter_type_list
+                    (normal_parameter_type
+                      (typed_identifier
+                        (type_identifier)
+                        (type_arguments
+                          (type_identifier))
+                        (identifier)))
+                    (normal_parameter_type
+                      (typed_identifier
+                        (type_identifier)
+                        (type_arguments
+                          (type_identifier))
+                        (identifier)))
+                    (normal_parameter_type
+                      (typed_identifier
+                        (type_identifier)
+                        (type_arguments
+                          (type_identifier))
+                        (identifier)))))))
+            (identifier)))))
+
+
+===================
+Null-Aware Element
+===================
+
+class _CupertinoListTileState extends State<CupertinoListTile> {
+  bool _tapped = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final Widget child = ConstrainedBox(
+      child: Row(
+        children: <Widget>[
+          ?widget.trailing,
+        ],
+      ),
+    );
+  }
+}
+
+---
+
+(program
+      (class_definition
+        (identifier)
+        (superclass
+          (type_identifier)
+          (type_arguments
+            (type_identifier)))
+        (class_body
+          (declaration
+            (type_identifier)
+            (initialized_identifier_list
+              (initialized_identifier
+                (identifier)
+                (false))))
+          (annotation
+            (identifier))
+          (method_signature
+            (function_signature
+              (type_identifier)
+              (identifier)
+              (formal_parameter_list
+                (formal_parameter
+                  (type_identifier)
+                  (identifier)))))
+          (function_body
+            (block
+              (local_variable_declaration
+                (initialized_variable_definition
+                  (final_builtin)
+                  (type_identifier)
+                  (identifier)
+                  (identifier)
+                  (selector
+                    (argument_part
+                      (arguments
+                        (named_argument
+                          (label
+                            (identifier))
+                          (identifier)
+                          (selector
+                            (argument_part
+                              (arguments
+                                (named_argument
+                                  (label
+                                    (identifier))
+                                  (list_literal
+                                    (type_arguments
+                                      (type_identifier))
+                                    (identifier)
+                                    (selector
+                                      (unconditional_assignable_selector
+                                        (identifier)))))))))))))))))))
+
+
+==================
+Object pattern (no parameters)
+==================
+
+String _getTransitionsString(PageTransitionsBuilder pageTransitionsBuilder) {
+  return switch (pageTransitionsBuilder) {
+    PredictiveBackPageTransitionsBuilder() => '_PredictiveBackSharedElementPageTransition',
+    PredictiveBackFullscreenPageTransitionsBuilder() => '_PredictiveBackFullscreenPageTransition',
+    _ => throw UnsupportedError('Unsupported subclass of PageTransitionsBuilder'),
+  };
+}
+
+---
+
+(program
+      (function_signature
+        (type_identifier)
+        (identifier)
+        (formal_parameter_list
+          (formal_parameter
+            (type_identifier)
+            (identifier))))
+      (function_body
+        (block
+          (return_statement
+            (switch_expression
+              (parenthesized_expression
+                (identifier))
+              (switch_expression_case
+                (object_pattern
+                  (type_identifier))
+                (string_literal))
+              (switch_expression_case
+                (object_pattern
+                  (type_identifier))
+                (string_literal))
+              (switch_expression_case
+                (constant_pattern
+                  (identifier))
+                (throw_expression
+                  (identifier)
+                  (selector
+                    (argument_part
+                      (arguments
+                        (argument
+                          (string_literal))))))))))))
+
+===============
+Null aware map element
+===============
+
+class Hello {
+  @mustCallSuper
+  Map<String, Object?> toJsonMap(DiagnosticsSerializationDelegate delegate) {
+    var result = <String, Object?>{};
+    assert(() {
+      final bool hasChildren = getChildren().isNotEmpty;
+      result = {
+        'description': toDescription(),
+        'name': ?name,
+        if (!showSeparator) 'showSeparator': showSeparator,
+        if (level != DiagnosticLevel.info) 'level': level.name,
+        if (!showName) 'showName': showName,
+        'emptyBodyDescription': ?emptyBodyDescription,
+        ...delegate.additionalNodeProperties(this),
+      };
+      return true;
+    }());
+    return result;
+  }
+}
+
+---
+
+(program
+      (class_definition
+        (identifier)
+        (class_body
+          (annotation
+            (identifier))
+          (method_signature
+            (function_signature
+              (type_identifier)
+              (type_arguments
+                (type_identifier)
+                (type_identifier)
+                (nullable_type))
+              (identifier)
+              (formal_parameter_list
+                (formal_parameter
+                  (type_identifier)
+                  (identifier)))))
+          (function_body
+            (block
+              (local_variable_declaration
+                (initialized_variable_definition
+                  (inferred_type)
+                  (identifier)
+                  (set_or_map_literal
+                    (type_arguments
+                      (type_identifier)
+                      (type_identifier)
+                      (nullable_type)))))
+              (assert_statement
+                (assertion
+                  (assert_builtin)
+                  (assertion_arguments
+                    (function_expression
+                      (formal_parameter_list)
+                      (function_expression_body
+                        (block
+                          (local_variable_declaration
+                            (initialized_variable_definition
+                              (final_builtin)
+                              (type_identifier)
+                              (identifier)
+                              (identifier)
+                              (selector
+                                (argument_part
+                                  (arguments)))
+                              (selector
+                                (unconditional_assignable_selector
+                                  (identifier)))))
+                          (expression_statement
+                            (assignment_expression
+                              (assignable_expression
+                                (identifier))
+                              (set_or_map_literal
+                                (pair
+                                  (string_literal)
+                                  (identifier)
+                                  (selector
+                                    (argument_part
+                                      (arguments))))
+                                (pair
+                                  (string_literal)
+                                  (identifier))
+                                (if_element
+                                  (unary_expression
+                                    (prefix_operator
+                                      (negation_operator))
+                                    (identifier))
+                                  (pair
+                                    (string_literal)
+                                    (identifier)))
+                                (if_element
+                                  (equality_expression
+                                    (identifier)
+                                    (equality_operator)
+                                    (identifier)
+                                    (selector
+                                      (unconditional_assignable_selector
+                                        (identifier))))
+                                  (pair
+                                    (string_literal)
+                                    (identifier)
+                                    (selector
+                                      (unconditional_assignable_selector
+                                        (identifier)))))
+                                (if_element
+                                  (unary_expression
+                                    (prefix_operator
+                                      (negation_operator))
+                                    (identifier))
+                                  (pair
+                                    (string_literal)
+                                    (identifier)))
+                                (pair
+                                  (string_literal)
+                                  (identifier))
+                                (spread_element
+                                  (identifier)
+                                  (selector
+                                    (unconditional_assignable_selector
+                                      (identifier)))
+                                  (selector
+                                    (argument_part
+                                      (arguments
+                                        (argument
+                                          (this)))))))))
+                          (return_statement
+                            (true)))))
+                    (selector
+                      (argument_part
+                        (arguments))))))
+              (return_statement
+                (identifier)))))))
+

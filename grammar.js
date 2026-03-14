@@ -506,7 +506,7 @@ module.exports = grammar({
         pair: $ => seq(
             field('key', $._expression),
             ':',
-            field('value', $._expression)
+            field('value', seq(optional('?'), $._expression))
         ),
         // pair_or_element: $ => seq(
         //     field('key', $._expression),
@@ -519,7 +519,7 @@ module.exports = grammar({
         // ),
 
         _element: $ => choice(
-            $._expression,
+            seq(optional('?'), $._expression),
             $.pair,
             $.spread_element,
             $.if_element,
@@ -1113,7 +1113,7 @@ module.exports = grammar({
         )),
 
         constructor_tearoff: $ => prec.right(seq(
-          $._type_name, optional($.type_arguments), '.', $._new_builtin,
+            $._type_name, optional($.type_arguments), '.', $._new_builtin,
         )),
 
         arguments: $ => seq('(', optional($._argument_list), ')'),
@@ -1287,10 +1287,10 @@ module.exports = grammar({
             'switch',
             field('condition', $.parenthesized_expression),
             field('body',
-             seq('{',
-               commaSep1TrailingComma($.switch_expression_case),
-            '}'
-            ))
+                seq('{',
+                    commaSep1TrailingComma($.switch_expression_case),
+                    '}'
+                ))
         ),
 
         switch_expression_case: $ => seq($._guarded_pattern, '=>', $._expression),
@@ -1306,11 +1306,11 @@ module.exports = grammar({
         _logical_or_pattern: $ => seq($._logical_and_pattern, repeat(seq($.logical_or_operator, $._logical_and_pattern))),
         _logical_and_pattern: $ => seq($._relational_pattern, repeat(seq($.logical_and_operator, $._relational_pattern))),
         _relational_pattern: $ =>
-        prec(DART_PREC.Relational, choice(
+            prec(DART_PREC.Relational, choice(
                 seq(choice($.relational_operator, $.equality_operator), $._real_expression),
                 $._unary_pattern,
             )
-        ),
+            ),
 
         _unary_pattern: $ => choice(
             $.cast_pattern,
@@ -1367,7 +1367,7 @@ module.exports = grammar({
 
         _pattern_field: $ => seq(optional(seq(optional($.identifier), ':')), $._pattern),
 
-        object_pattern: $ => seq($._type_name, optional($.type_arguments), '(', commaSep1TrailingComma($._pattern_field), ')'),
+        object_pattern: $ => seq($._type_name, optional($.type_arguments), '(', commaSepTrailingComma($._pattern_field), ')'),
 
         pattern_variable_declaration: $ => seq(choice($.final_builtin, $.inferred_type), $._outer_pattern, '=', $._expression),
 
@@ -1377,12 +1377,12 @@ module.exports = grammar({
 
         switch_block: $ => seq(
             '{',
-                repeat($.switch_statement_case),
-                optional($.switch_statement_default),
+            repeat($.switch_statement_case),
+            optional($.switch_statement_default),
             '}'
         ),
 
-        switch_statement_case: $ =>  seq(
+        switch_statement_case: $ => seq(
             repeat($.label), $.case_builtin, $._guarded_pattern, ':', repeat($._statement),
         ),
 
@@ -1476,14 +1476,14 @@ module.exports = grammar({
 
         if_element: $ => prec.right(seq(
             'if',
-            '(', $._expression, optional(seq('case', $._guarded_pattern)) , ')',
+            '(', $._expression, optional(seq('case', $._guarded_pattern)), ')',
             field('consequence', $._element),
             optional(seq('else', field('alternative', $._element)))
         )),
 
         if_statement: $ => prec.right(seq(
             'if',
-            '(', $._expression, optional(seq('case', $._guarded_pattern)) , ')',
+            '(', $._expression, optional(seq('case', $._guarded_pattern)), ')',
             field('consequence', $._statement),
             optional(seq('else', field('alternative', $._statement)))
         )),
@@ -1664,10 +1664,10 @@ module.exports = grammar({
 
         enum_body: $ => seq(
             '{',
-              commaSep1TrailingComma($.enum_constant),
-              optional(
+            commaSep1TrailingComma($.enum_constant),
+            optional(
                 seq(';', repeat(seq(optional($._metadata), $._class_member_definition)))
-              ),
+            ),
             '}'
         ),
 
@@ -1678,13 +1678,13 @@ module.exports = grammar({
                 optional($.argument_part),
             ),
             seq(
-            optional($._metadata),
-            field('name', $.identifier),
-            optional($.type_arguments),
-            '.',
-            choice($.identifier, $._new_builtin),
-            $.arguments,
-        )),
+                optional($._metadata),
+                field('name', $.identifier),
+                optional($.type_arguments),
+                '.',
+                choice($.identifier, $._new_builtin),
+                $.arguments,
+            )),
 
         type_alias: $ => choice(
             seq(
@@ -1767,7 +1767,7 @@ module.exports = grammar({
             choice(alias(
                 $.identifier,
                 $.type_identifier),
-             $.nullable_type
+                $.nullable_type
             ),
             // This is a comment
             // comment with a link made in https://github.com/flutter/flutter/pull/48547
@@ -1930,6 +1930,11 @@ module.exports = grammar({
                 optional($._external_and_static),
                 $.function_signature,
             ),
+            seq(
+                $._external_and_static,
+                $._type,
+                $.identifier
+            ),
             // TODO: This should only work with native?
             seq(
                 $._static,
@@ -2088,7 +2093,7 @@ module.exports = grammar({
         initializer_list_entry: $ => choice(
             seq($.super, $.arguments),
             seq($.super,
-              seq('.', choice($.identifier, $._new_builtin), $.arguments),
+                seq('.', choice($.identifier, $._new_builtin), $.arguments),
             ),
             $.field_initializer,
             $.assertion
@@ -2342,9 +2347,9 @@ module.exports = grammar({
 
         record_type: $ => choice(
             seq('(', ')'),
-            seq('(', commaSep1($.record_type_field), ',', '{' , commaSep1TrailingComma($.record_type_named_field), '}', ')'),
+            seq('(', commaSep1($.record_type_field), ',', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
             seq('(', commaSep1TrailingComma($.record_type_field), ')'),
-            seq('(','{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
+            seq('(', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
         ),
 
         record_type_field: $ => seq(
@@ -2673,7 +2678,7 @@ module.exports = grammar({
 
         _identifier_or_new: $ => choice($.identifier, $._new_builtin),
 
-        qualified: $ =>choice(
+        qualified: $ => choice(
             seq($._type_name, '.', $._identifier_or_new),
             seq($._type_name, '.', $._type_name, '.', $._identifier_or_new),
         ),
@@ -2904,8 +2909,8 @@ function commaSepTrailingComma(rule) {
     return optional(commaSep1TrailingComma(rule))
 }
 
-function pureBinaryRun(rule, separator, precedence){
-   return prec.left(
+function pureBinaryRun(rule, separator, precedence) {
+    return prec.left(
         precedence,
         choice(
             sep2(
