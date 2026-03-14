@@ -1085,12 +1085,22 @@ module.exports = grammar({
             ),
             $.constructor_tearoff,
             $.switch_expression,
+            $.dot_shorthand,
             // $.object_creation_expression,
             // $.field_access,
             // $.array_access,
             // $.method_invocation,
             // $.method_reference,
         ),
+
+
+        // Dart 3.10 dot shorthands: .identifier or .new, optionally followed by
+        // type arguments and arguments. The context type provides the prefix.
+        // e.g. Color c = .red;  ButtonStyle s = .fromSeed(Colors.blue);
+        dot_shorthand: $ => prec.right(seq(
+            '.',
+            choice($.identifier, $._new_builtin),
+        )),
 
 
         parenthesized_expression: $ => seq('(', $._expression, ')'),

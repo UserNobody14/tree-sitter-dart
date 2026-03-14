@@ -1,0 +1,212 @@
+==================================
+dot shorthand - static member access
+==================================
+
+void main() {
+  Color c = .red;
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (type_identifier)
+          (identifier)
+          (dot_shorthand
+            (identifier)))))))
+
+==================================
+dot shorthand - named constructor call
+==================================
+
+void main() {
+  Color c = .fromRGB(255, 0, 0);
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (type_identifier)
+          (identifier)
+          (dot_shorthand
+            (identifier))
+          (selector
+            (argument_part
+              (arguments
+                (argument
+                  (decimal_integer_literal))
+                (argument
+                  (decimal_integer_literal))
+                (argument
+                  (decimal_integer_literal))))))))))
+
+==================================
+dot shorthand - default constructor call
+==================================
+
+void main() {
+  Color c = .new(255);
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (type_identifier)
+          (identifier)
+          (dot_shorthand)
+          (selector
+            (argument_part
+              (arguments
+                (argument
+                  (decimal_integer_literal))))))))))
+
+==================================
+dot shorthand - chained member access
+==================================
+
+void main() {
+  Color c = .red.withOpacity(0.5);
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (type_identifier)
+          (identifier)
+          (dot_shorthand
+            (identifier))
+          (selector
+            (unconditional_assignable_selector
+              (identifier)))
+          (selector
+            (argument_part
+              (arguments
+                (argument
+                  (decimal_floating_point_literal))))))))))
+
+==================================
+dot shorthand - as named argument
+==================================
+
+main() {
+  foo(color: .red);
+}
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (named_argument
+                (label
+                  (identifier))
+                (dot_shorthand
+                  (identifier))))))))))
+
+==================================
+dot shorthand - with type arguments
+==================================
+
+void main() {
+  var list = .from<int>([1, 2, 3]);
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (inferred_type)
+          (identifier)
+          (dot_shorthand
+            (identifier))
+          (selector
+            (argument_part
+              (type_arguments
+                (type_identifier))
+              (arguments
+                (argument
+                  (list_literal
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)
+                    (decimal_integer_literal)))))))))))
+
+==================================
+dot shorthand - in switch expression
+==================================
+
+void main() {
+  Color c = switch (x) { 1 => .red, _ => .blue };
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (type_identifier)
+          (identifier)
+          (switch_expression
+            (parenthesized_expression
+              (identifier))
+            (switch_expression_case
+              (constant_pattern
+                (decimal_integer_literal))
+              (dot_shorthand
+                (identifier)))
+            (switch_expression_case
+              (constant_pattern
+                (identifier))
+              (dot_shorthand
+                (identifier)))))))))

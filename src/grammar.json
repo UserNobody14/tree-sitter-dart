@@ -3508,8 +3508,38 @@
         {
           "type": "SYMBOL",
           "name": "switch_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "dot_shorthand"
         }
       ]
+    },
+    "dot_shorthand": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "STRING",
+            "value": "."
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_new_builtin"
+              }
+            ]
+          }
+        ]
+      }
     },
     "parenthesized_expression": {
       "type": "SEQ",
