@@ -2205,7 +2205,11 @@ module.exports = grammar({
             optional($._metadata),
             optional($._covariant),
             $._final_const_var_or_type,
-            field('name', $.identifier)
+            field('name', choice(
+                $.identifier,
+                alias($._get, $.identifier),
+                alias($._set, $.identifier),
+            ))
         ),
 
         // Types
@@ -2612,7 +2616,11 @@ module.exports = grammar({
                 optional(
                     $._covariant
                 ),
-                $.identifier
+                choice(
+                    $.identifier,
+                    alias($._get, $.identifier),
+                    alias($._set, $.identifier),
+                )
             )
         ),
 

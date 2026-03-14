@@ -619,7 +619,7 @@ class MyClass {
                 (function_body (block)))))
 
 ======================================
-Get and set identifiers (ERROR)
+Get and set identifiers
 ======================================
 
 class Tree {
@@ -644,13 +644,14 @@ class Tree {
           (formal_parameter_list)))
       (function_body
         (block
-          (ERROR
-            (function_signature
+          (local_variable_declaration
+            (initialized_variable_definition
               (type_identifier)
               (identifier)
-              (ERROR
-                (identifier))
-              (formal_parameter_list)))
+              (identifier)
+              (selector
+                (argument_part
+                  (arguments)))))
           (expression_statement
             (assignment_expression
               (assignable_expression

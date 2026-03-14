@@ -943,3 +943,68 @@ void main() {
           (decimal_integer_literal)))
       (expression_statement
         (identifier)))))
+
+========================================
+get and set as lambda parameter names
+========================================
+
+void main() {
+  f((get) => get());
+  f((set) => set());
+  f((get) async => get());
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (function_expression
+                  (formal_parameter_list
+                    (formal_parameter
+                      (identifier)))
+                  (function_expression_body
+                    (identifier)
+                    (selector
+                      (argument_part
+                        (arguments))))))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (function_expression
+                  (formal_parameter_list
+                    (formal_parameter
+                      (identifier)))
+                  (function_expression_body
+                    (identifier)
+                    (selector
+                      (argument_part
+                        (arguments))))))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (function_expression
+                  (formal_parameter_list
+                    (formal_parameter
+                      (identifier)))
+                  (function_expression_body
+                    (identifier)
+                    (selector
+                      (argument_part
+                        (arguments)))))))))))))

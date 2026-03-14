@@ -35,7 +35,6 @@
     "finally"
     "for"
     "Function"
-    "get"
     "hide"
     "if"
     "implements"
@@ -53,7 +52,6 @@
     "required"
     "return"
     "sealed"
-    "set"
     "show"
     "static"
     "super"
@@ -155,8 +153,10 @@
 (function_signature
   name: (identifier) @function)
 (getter_signature
+  "get" @keyword
   (identifier) @function)
 (setter_signature
+  "set" @keyword
   name: (identifier) @function)
 
 ((scoped_identifier
