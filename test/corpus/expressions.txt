@@ -945,6 +945,34 @@ void main() {
         (identifier)))))
 
 ========================================
+set and get as typed field names
+========================================
+
+class C {
+  int set = 0;
+  String get = 'foo';
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (declaration
+        (type_identifier)
+        (initialized_identifier_list
+          (initialized_identifier
+            (identifier)
+            (decimal_integer_literal))))
+      (declaration
+        (type_identifier)
+        (initialized_identifier_list
+          (initialized_identifier
+            (identifier)
+            (string_literal)))))))
+
+========================================
 get and set as lambda parameter names
 ========================================
 

@@ -96,6 +96,8 @@ module.exports = grammar({
         [$._record_literal_no_const, $.record_field],
         [$._record_literal_no_const, $.record_type],
         [$._record_literal_no_const, $._strict_formal_parameter_list],
+        [$.getter_signature, $.function_signature, $._var_or_type],
+        [$.setter_signature, $.function_signature, $._var_or_type],
         [$.block, $.set_or_map_literal],
         [$._type_name, $._primary, $.function_signature],
         [$._primary, $.function_signature],
@@ -2062,8 +2064,16 @@ module.exports = grammar({
         initialized_identifier_list: $ => commaSep1(
             $.initialized_identifier
         ),
+        // Per Dart spec, `get` and `set` are built-in identifiers and may be
+        // used as ordinary identifiers (e.g. as a field name or local
+        // variable). The `_declared_identifier` rule already aliases them;
+        // mirror that here so `int set = 0;` and `var get = ...;` parse.
         initialized_identifier: $ => seq(
-            $.identifier,
+            choice(
+                $.identifier,
+                alias($._get, $.identifier),
+                alias($._set, $.identifier),
+            ),
             optional(seq(
                 '=',
                 $._expression

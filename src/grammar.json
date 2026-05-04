@@ -9049,8 +9049,31 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_get"
+              },
+              "named": true,
+              "value": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_set"
+              },
+              "named": true,
+              "value": "identifier"
+            }
+          ]
         },
         {
           "type": "CHOICE",
@@ -12554,6 +12577,16 @@
     [
       "_record_literal_no_const",
       "_strict_formal_parameter_list"
+    ],
+    [
+      "getter_signature",
+      "function_signature",
+      "_var_or_type"
+    ],
+    [
+      "setter_signature",
+      "function_signature",
+      "_var_or_type"
     ],
     [
       "block",
