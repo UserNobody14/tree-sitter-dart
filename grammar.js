@@ -2080,6 +2080,18 @@ module.exports = grammar({
                 $._var_or_type,
                 $.initialized_identifier_list
             ),
+            // External instance fields (Dart 3 / static interop): per the
+            // language spec a class member may be declared with the
+            // `external` modifier together with `final`/`covariant`. The
+            // unmodified `external <type> <id>` form is already handled by
+            // the `_external_and_static + _type + identifier` rule above.
+            seq(
+                $._external,
+                choice(
+                    seq($.final_builtin, optional($._type), $.identifier_list),
+                    seq($._covariant, $._var_or_type, $.identifier_list)
+                )
+            ),
             // Abstract instance fields (Dart 3): per the language spec, an
             // instance field in an abstract class may be declared without an
             // initializer, with the modifier `abstract`. The field has no
