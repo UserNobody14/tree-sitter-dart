@@ -591,6 +591,9 @@ module.exports = grammar({
             seq(
                 '(',
                 choice(
+                    // `(label: expr,)` — single named field with mandatory
+                    // trailing comma to disambiguate from a labeled paren-expr.
+                    seq($.label, $._expression, ','),
                     seq($.label, $._expression),
                     seq($._expression, ','),
                     commaSep2TrailingComma($.record_field),
