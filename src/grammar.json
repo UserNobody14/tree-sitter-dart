@@ -9257,6 +9257,15 @@
               },
               "named": true,
               "value": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_operator"
+              },
+              "named": true,
+              "value": "identifier"
             }
           ]
         },
@@ -10206,6 +10215,15 @@
                 "content": {
                   "type": "SYMBOL",
                   "name": "_set"
+                },
+                "named": true,
+                "value": "identifier"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_operator"
                 },
                 "named": true,
                 "value": "identifier"
@@ -12650,8 +12668,40 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_get"
+              },
+              "named": true,
+              "value": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_set"
+              },
+              "named": true,
+              "value": "identifier"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_function_builtin_identifier"
+              },
+              "named": true,
+              "value": "identifier"
+            }
+          ]
         },
         {
           "type": "STRING",
@@ -12771,6 +12821,10 @@
     [
       "setter_signature",
       "function_signature",
+      "_var_or_type"
+    ],
+    [
+      "operator_signature",
       "_var_or_type"
     ],
     [

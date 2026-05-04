@@ -98,6 +98,7 @@ module.exports = grammar({
         [$._record_literal_no_const, $._strict_formal_parameter_list],
         [$.getter_signature, $.function_signature, $._var_or_type],
         [$.setter_signature, $.function_signature, $._var_or_type],
+        [$.operator_signature, $._var_or_type],
         [$._primary, $._type_not_void_not_function, $._function_type_tail],
         [$._primary, $._function_type_tail],
         [$.block, $.set_or_map_literal],
@@ -2103,15 +2104,17 @@ module.exports = grammar({
         initialized_identifier_list: $ => commaSep1(
             $.initialized_identifier
         ),
-        // Per Dart spec, `get` and `set` are built-in identifiers and may be
-        // used as ordinary identifiers (e.g. as a field name or local
-        // variable). The `_declared_identifier` rule already aliases them;
-        // mirror that here so `int set = 0;` and `var get = ...;` parse.
+        // Per Dart spec, `get`, `set`, and `operator` are built-in
+        // identifiers and may be used as ordinary identifiers (e.g. as a
+        // field name or local variable). The `_declared_identifier` rule
+        // aliases the same set; mirror that here so `int set = 0;`,
+        // `var get = ...;`, and `String operator;` parse.
         initialized_identifier: $ => seq(
             choice(
                 $.identifier,
                 alias($._get, $.identifier),
                 alias($._set, $.identifier),
+                alias($._operator, $.identifier),
             ),
             optional(seq(
                 '=',
@@ -2302,6 +2305,7 @@ module.exports = grammar({
                 $.identifier,
                 alias($._get, $.identifier),
                 alias($._set, $.identifier),
+                alias($._operator, $.identifier),
             ))
         ),
 
@@ -2925,7 +2929,17 @@ module.exports = grammar({
             'super',
         ),
 
-        label: $ => seq($.identifier, ':'),
+        // Per Dart spec, built-in identifiers may appear as labels
+        // (e.g. as the key of a named argument: `f(get: x, set: y)`).
+        label: $ => seq(
+            choice(
+                $.identifier,
+                alias($._get, $.identifier),
+                alias($._set, $.identifier),
+                alias($._function_builtin_identifier, $.identifier),
+            ),
+            ':'
+        ),
 
         _semicolon: $ => token(';'),
 
