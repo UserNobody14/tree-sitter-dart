@@ -1071,13 +1071,23 @@ module.exports = grammar({
                 $.identifier
             )
         ),
-        const_object_expression: $ => seq(
-            $.const_builtin,
-            $._type_not_void,
-            optional(
-                $._dot_identifier
+        const_object_expression: $ => choice(
+            seq(
+                $.const_builtin,
+                $._type_not_void,
+                optional(
+                    $._dot_identifier
+                ),
+                $.arguments
             ),
-            $.arguments
+            // Dart 3.10 allows `const` with a dot-shorthand constructor
+            // invocation: `const .new(...)` / `const .named(...)`. The
+            // receiver type is inferred from the context type.
+            seq(
+                $.const_builtin,
+                $.dot_shorthand,
+                $.arguments,
+            ),
         ),
 
 
@@ -1357,6 +1367,12 @@ module.exports = grammar({
             $.identifier,
             $.qualified,
             $.const_object_expression,
+            // Dart 3.10 dot-shorthand may appear as a constant pattern
+            // (e.g. `case .red:`, `case .new():`, `case .fromRGB(1,2,3):`).
+            // The context type of the matched value supplies the receiver
+            // type. The `const` form (`const .new(...)` / `const .named(...)`)
+            // is reached via `const_object_expression` above.
+            seq($.dot_shorthand, optional(seq(optional($.type_arguments), $.arguments))),
             seq($.const_builtin, optional($.type_arguments), '[', commaSep1TrailingComma($._element), ']'),
             seq($.const_builtin, optional($.type_arguments), '{', commaSep1TrailingComma($._element), '}'),
             seq($.const_builtin, '(', $._expression, ')'),

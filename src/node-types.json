@@ -2714,6 +2714,10 @@
           "named": true
         },
         {
+          "type": "dot_shorthand",
+          "named": true
+        },
+        {
           "type": "function_type",
           "named": true
         },
@@ -2777,6 +2781,10 @@
         },
         {
           "type": "additive_expression",
+          "named": true
+        },
+        {
+          "type": "arguments",
           "named": true
         },
         {

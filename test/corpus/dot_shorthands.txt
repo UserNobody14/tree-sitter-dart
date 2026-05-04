@@ -210,3 +210,86 @@ void main() {
                 (identifier))
               (dot_shorthand
                 (identifier)))))))))
+
+==================================
+dot shorthand - in case pattern
+==================================
+
+void main() {
+  switch (c) {
+    case .red:
+      print('r');
+    case .new():
+      print('n');
+  }
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (switch_statement
+        (parenthesized_expression
+          (identifier))
+        (switch_block
+          (switch_statement_case
+            (case_builtin)
+            (constant_pattern
+              (dot_shorthand
+                (identifier)))
+            (expression_statement
+              (identifier)
+              (selector
+                (argument_part
+                  (arguments
+                    (argument
+                      (string_literal)))))))
+          (switch_statement_case
+            (case_builtin)
+            (constant_pattern
+              (dot_shorthand)
+              (arguments))
+            (expression_statement
+              (identifier)
+              (selector
+                (argument_part
+                  (arguments
+                    (argument
+                      (string_literal))))))))))))
+
+==================================
+dot shorthand - const constructor
+==================================
+
+const Box a = const .new();
+const Box b = const .named(1);
+
+---
+
+(program
+  (const_builtin)
+  (type_identifier)
+  (static_final_declaration_list
+    (static_final_declaration
+      (identifier)
+      (const_object_expression
+        (const_builtin)
+        (dot_shorthand)
+        (arguments))))
+  (const_builtin)
+  (type_identifier)
+  (static_final_declaration_list
+    (static_final_declaration
+      (identifier)
+      (const_object_expression
+        (const_builtin)
+        (dot_shorthand
+          (identifier))
+        (arguments
+          (argument
+            (decimal_integer_literal)))))))
