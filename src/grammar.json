@@ -9686,14 +9686,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_real_expression"
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "SYMBOL",
-            "name": "cascade_section"
-          }
+          "name": "_expression"
         }
       ]
     },

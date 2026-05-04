@@ -2201,11 +2201,10 @@ module.exports = grammar({
             optional(seq($.this, '.')),
             $.identifier,
             '=',
-            // $.conditional_expression,
-            $._real_expression,
-            repeat(
-                $.cascade_section
-            )
+            // Per Dart spec the field initializer's right-hand side is a
+            // full expression (including compound assignments like `??=`),
+            // not just a conditional expression.
+            $._expression
         ),
 
         // constructor_signature: $ => seq(
