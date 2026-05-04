@@ -12400,8 +12400,16 @@
           "value": "library"
         },
         {
-          "type": "SYMBOL",
-          "name": "dotted_identifier_list"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "dotted_identifier_list"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",

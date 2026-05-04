@@ -2796,7 +2796,9 @@ module.exports = grammar({
 
         script_tag: $ => seq('#!', /.+/, '\n'),
 
-        library_name: $ => seq(optional($._metadata), 'library', $.dotted_identifier_list, $._semicolon),
+        // Dart 2.19+ allows the unnamed library directive `library;` to
+        // attach a doc comment / annotation to a library file without a name.
+        library_name: $ => seq(optional($._metadata), 'library', optional($.dotted_identifier_list), $._semicolon),
 
         dotted_identifier_list: $ => sep1($.identifier, '.'),
 
