@@ -521,8 +521,12 @@ module.exports = grammar({
             '}'
         ),
 
+        // Per Dart 3 (null-aware elements), a map literal entry may use `?`
+        // before the key, the value, or both, e.g. `?key: value`,
+        // `key: ?value`, `?key: ?value`. Each `?` causes the entry to be
+        // omitted when the corresponding sub-expression is `null`.
         pair: $ => seq(
-            field('key', $._expression),
+            field('key', seq(optional('?'), $._expression)),
             ':',
             field('value', seq(optional('?'), $._expression))
         ),
