@@ -47,7 +47,6 @@
     "mixin"
     "new"
     "on"
-    "operator"
     "part"
     "required"
     "return"
@@ -158,6 +157,8 @@
 (setter_signature
   "set" @keyword
   name: (identifier) @function)
+(operator_signature
+  "operator" @keyword)
 
 ((scoped_identifier
   scope: (identifier) @type
