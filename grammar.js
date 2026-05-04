@@ -1583,7 +1583,7 @@ module.exports = grammar({
                     )
                 ),),
                 field('condition', optional($._expression)), $._semicolon,
-                commaSep(field('update', $._expression)),
+                commaSepTrailingComma(field('update', $._expression)),
             ),
             seq(
                 choice($.final_builtin, $.inferred_type),
