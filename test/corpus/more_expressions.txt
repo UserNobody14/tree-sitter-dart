@@ -604,3 +604,88 @@ Box<Integer> integerBox = new Box<>();
     (initialized_identifier (identifier)
       (new_expression (type_identifier) (type_arguments) (arguments)))))
 
+
+
+==================================
+labeled while statement with break
+==================================
+
+main() { label: while (true) { break label; } }
+
+---
+
+(program
+  (function_signature
+    name: (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (labeled_statement
+        (identifier)
+        (while_statement
+          condition: (parenthesized_expression (true))
+          body: (block
+            (break_statement
+              (break_builtin)
+              (identifier))))))))
+
+==================================
+labeled outer loop with labeled break
+==================================
+
+main() {
+  outer: for (var i = 0; i < 10; i++) {
+    for (var j = 0; j < 10; j++) {
+      if (j == 5) break outer;
+    }
+  }
+}
+
+---
+
+(program
+  (function_signature
+    name: (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (labeled_statement
+        (identifier)
+        (for_statement
+          (for_loop_parts
+            init: (local_variable_declaration
+              (initialized_variable_definition
+                (inferred_type)
+                name: (identifier)
+                value: (decimal_integer_literal)))
+            condition: (relational_expression
+              (identifier)
+              (relational_operator)
+              (decimal_integer_literal))
+            update: (postfix_expression
+              (assignable_expression (identifier))
+              (postfix_operator (increment_operator))))
+          body: (block
+            (for_statement
+              (for_loop_parts
+                init: (local_variable_declaration
+                  (initialized_variable_definition
+                    (inferred_type)
+                    name: (identifier)
+                    value: (decimal_integer_literal)))
+                condition: (relational_expression
+                  (identifier)
+                  (relational_operator)
+                  (decimal_integer_literal))
+                update: (postfix_expression
+                  (assignable_expression (identifier))
+                  (postfix_operator (increment_operator))))
+              body: (block
+                (if_statement
+                  (equality_expression
+                    (identifier)
+                    (equality_operator)
+                    (decimal_integer_literal))
+                  consequence: (break_statement
+                    (break_builtin)
+                    (identifier))))))))))) 

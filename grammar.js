@@ -1343,7 +1343,7 @@ module.exports = grammar({
             $.expression_statement,
             $.empty_statement,
             $.assert_statement,
-            // $.labeled_statement,
+            $.labeled_statement,
         ),
 
         local_function_declaration: $ => seq(
@@ -1364,9 +1364,14 @@ module.exports = grammar({
         // `if (cond) ;` or as a no-op body.
         empty_statement: $ => ';',
 
-        labeled_statement: $ => seq(
+        // `prec(1, ...)` ensures tree-sitter resolves an `identifier ':'
+        // statement' prefix as a labeled_statement rather than dropping
+        // the label into an ERROR node. Without this disambiguation,
+        // `label: while (true) { break label; }` parses as ERROR(label)
+        // followed by an unlabeled while_statement.
+        labeled_statement: $ => prec(1, seq(
             $.identifier, ':', $._statement
-        ),
+        )),
 
         assert_statement: $ => seq($.assertion, ';'),
 
