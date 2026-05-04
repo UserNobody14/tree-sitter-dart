@@ -301,8 +301,26 @@ module.exports = grammar({
         ),
 
         /****This is the symbol literals from section 16.8 (Page 99) of the dart specification****************/
-        symbol_literal: $ => seq('#', $.identifier),
-        //symbol literal can also be an operator?
+        // Dart symbols accept a dotted identifier list (e.g. `#foo.bar.baz`)
+        // or a single operator (e.g. `#+`, `#==`). See Dart language spec
+        // section 'Symbols'.
+        symbol_literal: $ => prec.right(seq(
+            '#',
+            choice(
+                sep1($.identifier, '.'),
+                $.equality_operator,
+                $.relational_operator,
+                $.shift_operator,
+                $.additive_operator,
+                $.multiplicative_operator,
+                '~',
+                '|',
+                '&',
+                '^',
+                '[]',
+                '[]=',
+            ),
+        )),
 
         /**************************************************************************************************
         *********************************Numeric Literals**************************************************
