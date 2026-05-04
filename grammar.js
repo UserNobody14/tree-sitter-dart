@@ -1285,6 +1285,7 @@ module.exports = grammar({
             $.yield_statement,
             $.yield_each_statement,
             $.expression_statement,
+            $.empty_statement,
             $.assert_statement,
             // $.labeled_statement,
         ),
@@ -1302,6 +1303,10 @@ module.exports = grammar({
             $._expression,
             $._semicolon
         ),
+
+        // Per Dart spec, `;` alone is the empty (null) statement, e.g.
+        // `if (cond) ;` or as a no-op body.
+        empty_statement: $ => ';',
 
         labeled_statement: $ => seq(
             $.identifier, ':', $._statement

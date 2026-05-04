@@ -4384,6 +4384,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "empty_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "assert_statement"
         }
       ]
@@ -4441,6 +4445,10 @@
           "name": "_semicolon"
         }
       ]
+    },
+    "empty_statement": {
+      "type": "STRING",
+      "value": ";"
     },
     "labeled_statement": {
       "type": "SEQ",
