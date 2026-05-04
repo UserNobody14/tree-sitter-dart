@@ -259,6 +259,17 @@ module.exports = grammar({
                 choice($._type, $.inferred_type),
                 $.initialized_identifier_list,
                 $._semicolon
+            ),
+            // Top-level external variable declaration (Dart 3 / static
+            // interop, e.g. `@JS() external _DdLogs? DD_LOGS;`).
+            seq(
+                optional($._metadata),
+                $._external_builtin,
+                choice(
+                    seq($.final_builtin, optional($._type), $.identifier_list),
+                    seq(optional($._late_builtin), $._var_or_type, $.identifier_list)
+                ),
+                $._semicolon
             )
         ),
 
@@ -2062,6 +2073,21 @@ module.exports = grammar({
                 optional($._late_builtin),
                 $._var_or_type,
                 $.initialized_identifier_list
+            ),
+            // Abstract instance fields (Dart 3): per the language spec, an
+            // instance field in an abstract class may be declared without an
+            // initializer, with the modifier `abstract`. The field has no
+            // implementation; subclasses must provide a concrete
+            // getter/setter. Supports `abstract final <type>? <ids>`,
+            // `abstract covariant <type>? <ids>`, and the bare
+            // `abstract <type> <ids>` form.
+            seq(
+                $.abstract,
+                choice(
+                    seq($.final_builtin, optional($._type), $.identifier_list),
+                    seq($._covariant, $._var_or_type, $.identifier_list),
+                    seq($._var_or_type, $.identifier_list)
+                )
             )
             //    TODO: add in the 'late' keyword from the informal draft spec:
             //    |static late final〈type〉?〈initializedIdentifierList〉

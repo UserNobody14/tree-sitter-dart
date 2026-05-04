@@ -3117,6 +3117,10 @@
       "required": true,
       "types": [
         {
+          "type": "abstract",
+          "named": true
+        },
+        {
           "type": "const_builtin",
           "named": true
         },
@@ -10626,6 +10630,10 @@
         },
         {
           "type": "getter_signature",
+          "named": true
+        },
+        {
+          "type": "identifier_list",
           "named": true
         },
         {
