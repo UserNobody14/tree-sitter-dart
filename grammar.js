@@ -94,6 +94,8 @@ module.exports = grammar({
 
     conflicts: $ => [
         [$._record_literal_no_const, $.record_field],
+        [$._record_literal_no_const, $.record_type],
+        [$._record_literal_no_const, $._strict_formal_parameter_list],
         [$.block, $.set_or_map_literal],
         [$._type_name, $._primary, $.function_signature],
         [$._primary, $.function_signature],
@@ -538,14 +540,25 @@ module.exports = grammar({
             $._record_literal_no_const,
         ),
 
-        _record_literal_no_const: $ => seq(
-            '(',
-            choice(
-                seq($.label, $._expression),
-                seq($._expression, ','),
-                commaSep2TrailingComma($.record_field),
+        // Per Dart spec (Records, recordLiteral): a record literal may be
+        // the empty record `()` (zero positional, zero named fields), a
+        // single-named-field record `(name: e)`, a single-positional record
+        // requiring a trailing comma `(e,)`, or two-or-more comma-separated
+        // record fields. Disambiguates against parenthesized_expression which
+        // matches `(e)` (no trailing comma, exactly one expression). The empty
+        // form gets a negative dynamic precedence so the parser prefers the
+        // existing `arguments`/type-arguments path (`f<T>()`) when ambiguous.
+        _record_literal_no_const: $ => choice(
+            prec.dynamic(-1, seq('(', ')')),
+            seq(
+                '(',
+                choice(
+                    seq($.label, $._expression),
+                    seq($._expression, ','),
+                    commaSep2TrailingComma($.record_field),
+                ),
+                ')'
             ),
-            ')'
         ),
 
         record_field: $ => seq(optional($.label), $._expression),

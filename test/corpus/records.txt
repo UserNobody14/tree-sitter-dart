@@ -93,6 +93,21 @@ final e = (1, 2,);
             (record_field
               (decimal_integer_literal))))))
 
+==================================
+Empty record literal
+==================================
+
+final empty = ();
+
+---
+
+(program
+  (final_builtin)
+  (static_final_declaration_list
+    (static_final_declaration
+      (identifier)
+      (record_literal))))
+
 ======================================================
 Records in function and class bounds, and local types
 ======================================================
