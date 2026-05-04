@@ -2012,7 +2012,15 @@ module.exports = grammar({
             seq(
                 $._external_and_static,
                 $._type,
-                $.identifier
+                // Allow built-in identifiers (`get`, `set`, `operator`) as
+                // the declared name — used by `dart:ffi` Struct fields like
+                // `external SomeType get;` (`colibri_stateless` etc.).
+                choice(
+                    $.identifier,
+                    alias($._get, $.identifier),
+                    alias($._set, $.identifier),
+                    alias($._operator, $.identifier),
+                )
             ),
             // TODO: This should only work with native?
             seq(
