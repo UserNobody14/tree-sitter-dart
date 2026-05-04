@@ -98,6 +98,8 @@ module.exports = grammar({
         [$._record_literal_no_const, $._strict_formal_parameter_list],
         [$.getter_signature, $.function_signature, $._var_or_type],
         [$.setter_signature, $.function_signature, $._var_or_type],
+        [$._primary, $._type_not_void_not_function, $._function_type_tail],
+        [$._primary, $._function_type_tail],
         [$.block, $.set_or_map_literal],
         [$._type_name, $._primary, $.function_signature],
         [$._primary, $.function_signature],
@@ -681,7 +683,14 @@ module.exports = grammar({
             seq($._primary, $._assignable_selector_part), // dart issue?
             seq($.super, $.unconditional_assignable_selector),
             seq($.constructor_invocation, $._assignable_selector_part),
-            $.identifier
+            // Per Dart spec, `get`, `set`, and `Function` are built-in
+            // identifiers and may appear on the left-hand side of an
+            // assignment when used as a field or local variable name
+            // (e.g. `set = expr;`).
+            $.identifier,
+            alias($._get, $.identifier),
+            alias($._set, $.identifier),
+            alias($._function_builtin_identifier, $.identifier),
         ),
         _assignable_selector_part: $ => seq(
             repeat($.selector),
@@ -1098,6 +1107,10 @@ module.exports = grammar({
             $.identifier,
             alias($._get, $.identifier),
             alias($._set, $.identifier),
+            // Per Dart spec, `Function` is a built-in identifier and may
+            // appear as an ordinary identifier (e.g. `Function.apply(...)`,
+            // referring to the `Function` class).
+            alias($._function_builtin_identifier, $.identifier),
             $.function_expression,
             $.new_expression,
             $.const_object_expression,

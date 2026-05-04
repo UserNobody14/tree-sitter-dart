@@ -2207,6 +2207,33 @@
         {
           "type": "SYMBOL",
           "name": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_get"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_set"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_function_builtin_identifier"
+          },
+          "named": true,
+          "value": "identifier"
         }
       ]
     },
@@ -3542,6 +3569,15 @@
           "content": {
             "type": "SYMBOL",
             "name": "_set"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_function_builtin_identifier"
           },
           "named": true,
           "value": "identifier"
@@ -12587,6 +12623,15 @@
       "setter_signature",
       "function_signature",
       "_var_or_type"
+    ],
+    [
+      "_primary",
+      "_type_not_void_not_function",
+      "_function_type_tail"
+    ],
+    [
+      "_primary",
+      "_function_type_tail"
     ],
     [
       "block",
