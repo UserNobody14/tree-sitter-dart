@@ -1185,7 +1185,13 @@ module.exports = grammar({
             seq(
                 choice('..', '?..'),
                 $.cascade_selector,
-                repeat($.argument_part),
+                // After the selector, allow argument parts and `!` null
+                // assertions interleaved before the subsequent subsections
+                // begin (e.g. `.._parent!.onChildrenChanged(...)`).
+                repeat(choice(
+                    $.argument_part,
+                    $._exclamation_operator,
+                )),
                 repeat(
                     $._cascade_subsection
                 ),
@@ -1198,9 +1204,17 @@ module.exports = grammar({
         // prec.left(
         // DART_PREC.Cascade,
         // ),
+        // After the cascade selector, allow chained selectors (assignable
+        // selectors `.x` / `?.x` / `[i]`, the postfix `!` null assertion,
+        // and argument parts) — matches the general `selector` form used in
+        // non-cascade method chains. Without `!`, code like
+        // `obj.._parent!.onChildrenChanged(...)` fails to parse.
         _cascade_subsection: $ => seq(
             $._assignable_selector,
-            repeat($.argument_part)
+            repeat(choice(
+                $.argument_part,
+                $._exclamation_operator,
+            ))
         ),
         _cascade_assignment_section: $ => seq(
             $._assignment_operator,

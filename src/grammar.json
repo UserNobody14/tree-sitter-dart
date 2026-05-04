@@ -3992,8 +3992,17 @@
           {
             "type": "REPEAT",
             "content": {
-              "type": "SYMBOL",
-              "name": "argument_part"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "argument_part"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_exclamation_operator"
+                }
+              ]
             }
           },
           {
@@ -4028,8 +4037,17 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "argument_part"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "argument_part"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_exclamation_operator"
+              }
+            ]
           }
         }
       ]
