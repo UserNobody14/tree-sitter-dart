@@ -329,3 +329,268 @@ void bar2((int $4, {bool b}) r) {}
             (identifier))))
       (function_body
         (block)))
+
+=================================================
+Annotated record-return method (class)
+=================================================
+
+class Counter {
+  @override
+  (int, int) update(int msg) {}
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (annotation
+        (identifier))
+      (method_signature
+        (function_signature
+          (record_type
+            (record_type_field
+              (type_identifier))
+            (record_type_field
+              (type_identifier)))
+          (identifier)
+          (formal_parameter_list
+            (formal_parameter
+              (type_identifier)
+              (identifier)))))
+      (function_body
+        (block)))))
+
+=================================================
+Annotated record-return method variants (class)
+=================================================
+
+class M {
+  @override
+  ({int x, String y}) get pos => (x: 1, y: "a");
+
+  @override
+  static (int, double) tally() {}
+
+  @override
+  (List<int>, void Function())? doStuff() => null;
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (annotation
+        (identifier))
+      (method_signature
+        (getter_signature
+          (record_type
+            (record_type_named_field
+              (typed_identifier
+                (type_identifier)
+                (identifier)))
+            (record_type_named_field
+              (typed_identifier
+                (type_identifier)
+                (identifier))))
+          (identifier)))
+      (function_body
+        (record_literal
+          (record_field
+            (label
+              (identifier))
+            (decimal_integer_literal))
+          (record_field
+            (label
+              (identifier))
+            (string_literal))))
+      (annotation
+        (identifier))
+      (method_signature
+        (function_signature
+          (record_type
+            (record_type_field
+              (type_identifier))
+            (record_type_field
+              (type_identifier)))
+          (identifier)
+          (formal_parameter_list)))
+      (function_body
+        (block))
+      (annotation
+        (identifier))
+      (method_signature
+        (function_signature
+          (record_type
+            (record_type_field
+              (type_identifier)
+              (type_arguments
+                (type_identifier)))
+            (record_type_field
+              (function_type
+                (void_type)
+                (parameter_type_list))))
+          (nullable_type)
+          (identifier)
+          (formal_parameter_list)))
+      (function_body
+        (null_literal)))))
+
+=================================================
+Annotated record-return method (extension)
+=================================================
+
+extension StringX on String {
+  @override
+  (String, int) parse() => (this, 0);
+}
+
+---
+
+(program
+  (extension_declaration
+    (identifier)
+    (type_identifier)
+    (extension_body
+      (annotation
+        (identifier))
+      (method_signature
+        (function_signature
+          (record_type
+            (record_type_field
+              (type_identifier))
+            (record_type_field
+              (type_identifier)))
+          (identifier)
+          (formal_parameter_list)))
+      (function_body
+        (record_literal
+          (record_field
+            (this))
+          (record_field
+            (decimal_integer_literal)))))))
+
+=================================================
+Annotated record-return method (enum)
+=================================================
+
+enum Op {
+  add, sub;
+  @override
+  (int, int) pair() => (1, 2);
+}
+
+---
+
+(program
+  (enum_declaration
+    (identifier)
+    (enum_body
+      (enum_constant
+        (identifier))
+      (enum_constant
+        (identifier))
+      (annotation
+        (identifier))
+      (method_signature
+        (function_signature
+          (record_type
+            (record_type_field
+              (type_identifier))
+            (record_type_field
+              (type_identifier)))
+          (identifier)
+          (formal_parameter_list)))
+      (function_body
+        (record_literal
+          (record_field
+            (decimal_integer_literal))
+          (record_field
+            (decimal_integer_literal)))))))
+
+=================================================
+Annotated record-return function (top-level)
+=================================================
+
+@deprecated
+(int, String) parseNum(String s) => (0, s);
+
+@experimental
+(int x, {String? msg}) result() => (0,);
+
+---
+
+(program
+  (annotation
+    (identifier))
+  (function_signature
+    (record_type
+      (record_type_field
+        (type_identifier))
+      (record_type_field
+        (type_identifier)))
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (type_identifier)
+        (identifier))))
+  (function_body
+    (record_literal
+      (record_field
+        (decimal_integer_literal))
+      (record_field
+        (identifier))))
+  (annotation
+    (identifier))
+  (function_signature
+    (record_type
+      (record_type_field
+        (type_identifier)
+        (identifier))
+      (record_type_named_field
+        (typed_identifier
+          (type_identifier)
+          (nullable_type)
+          (identifier))))
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (record_literal
+      (decimal_integer_literal))))
+
+=================================================
+Empty annotation args don't trigger record-return path
+=================================================
+
+class A {
+  @Foo()
+  A();
+}
+
+@Foo()
+myFunc() {}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (annotation
+        (identifier)
+        (arguments))
+      (declaration
+        (constructor_signature
+          (identifier)
+          (formal_parameter_list)))))
+  (annotation
+    (identifier)
+    (arguments))
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block)))
