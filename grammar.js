@@ -93,6 +93,10 @@ module.exports = grammar({
     ],
 
     conflicts: $ => [
+        // `@override (X, Y) foo() { ... }` — the parser needs to keep
+        // both stacks alive (annotation-with-args vs bare-annotation +
+        // record-return method) until it sees what comes after `)`.
+        [$.annotation, $._bare_annotation],
         [$._record_literal_no_const, $.record_field],
         [$._record_literal_no_const, $.record_type],
         [$._record_literal_no_const, $._strict_formal_parameter_list],
@@ -235,6 +239,19 @@ module.exports = grammar({
                 $.function_signature,
                 $.function_body
             ),
+            // Top-level function with a record return type preceded by
+            // bare annotations. See `_record_return_class_member` for the
+            // rationale; this is the top-level analogue. Negative dynamic
+            // precedence so the standard annotation-with-args path wins
+            // when both are valid.
+            prec.dynamic(-10, seq(
+                repeat1(alias($._bare_annotation, $.annotation)),
+                alias(
+                    $._record_return_function_signature,
+                    $.function_signature
+                ),
+                $.function_body
+            )),
             //    final or const static final declaration list
             seq(
                 optional($._metadata),
@@ -1650,6 +1667,21 @@ module.exports = grammar({
             )
         )),
 
+        // A "bare" annotation: just `@name` with no argument list. This is
+        // structurally a strict subset of `annotation` and is used to
+        // disambiguate `@override (X, Y) foo() { ... }` from
+        // `@override(X, Y)`. Aliased to `annotation` at the use site so the
+        // resulting AST is indistinguishable from a normal annotation.
+        // Negative dynamic precedence so the standard `annotation` rule
+        // (which can also produce `@name` with no args) wins ties — this
+        // matters for inputs like `@Foo() bar() {}` where both
+        // `@Foo()` (annotation with empty args) and `@Foo` (bare) +
+        // `()` (empty-record return type) are syntactically valid.
+        _bare_annotation: $ => prec.dynamic(-1, seq(
+            '@',
+            field('name', choice($.identifier, $.scoped_identifier))
+        )),
+
         // Declarations
 
         _declaration: $ => prec(1, choice(
@@ -1766,7 +1798,10 @@ module.exports = grammar({
             '{',
             commaSep1TrailingComma($.enum_constant),
             optional(
-                seq(';', repeat(seq(optional($._metadata), $._class_member_definition)))
+                seq(';', repeat(choice(
+                    seq(optional($._metadata), $._class_member_definition),
+                    prec.dynamic(-10, $._record_return_class_member),
+                )))
             ),
             '}'
         ),
@@ -1934,12 +1969,89 @@ module.exports = grammar({
         class_body: $ => seq(
             '{',
             repeat(
-                seq(
-                    optional($._metadata),
-                    $._class_member_definition
+                choice(
+                    seq(
+                        optional($._metadata),
+                        $._class_member_definition
+                    ),
+                    // Methods whose return type is a record type, preceded by
+                    // bare annotations (no argument list). The standard arm
+                    // can't reach this case because `annotation`'s
+                    // `optional(arguments)` greedily eats the leading `(`,
+                    // which then mis-parses as the annotation's argument
+                    // list. The conflict between `annotation` and
+                    // `_bare_annotation` (declared at the top of this
+                    // grammar) lets GLR explore both stacks; the negative
+                    // dynamic precedence makes the standard path win when
+                    // both interpretations are valid (e.g. `@Foo() x() {}`
+                    // — empty annotation args + plain function — should
+                    // not be reinterpreted as bare-annotation + record
+                    // return; the standard `record_type` rule allows the
+                    // empty form so this can otherwise tie).
+                    prec.dynamic(-10, $._record_return_class_member),
                 )
             ),
             '}'
+        ),
+
+        _record_return_class_member: $ => seq(
+            repeat1(alias($._bare_annotation, $.annotation)),
+            // Hidden rule aliased to `method_signature` at this use site,
+            // so the AST is identical to a normal record-return method —
+            // downstream tools (highlight queries, OCaml mapper) don't
+            // need to learn a new node type.
+            alias(
+                $._record_return_method_signature,
+                $.method_signature
+            ),
+            $.function_body
+        ),
+
+        _record_return_method_signature: $ => seq(
+            optional($._static),
+            alias(
+                $._record_return_function_signature,
+                $.function_signature
+            ),
+        ),
+
+        // Same shape as `function_signature` but with the return type
+        // pinned to `record_type`. Note that the empty record form `()` is
+        // intentionally excluded here: `@Foo() bar() {}` is unambiguously
+        // an annotation with empty args followed by a function with no
+        // return type, not a bare annotation followed by an empty-record
+        // return. Aliased to `record_type` so the AST shape is the same.
+        _record_return_function_signature: $ => seq(
+            alias(
+                choice(
+                    seq(
+                        '(',
+                        commaSep1($.record_type_field),
+                        ',',
+                        '{',
+                        commaSep1TrailingComma($.record_type_named_field),
+                        '}',
+                        ')'
+                    ),
+                    seq(
+                        '(',
+                        commaSep1TrailingComma($.record_type_field),
+                        ')'
+                    ),
+                    seq(
+                        '(',
+                        '{',
+                        commaSep1TrailingComma($.record_type_named_field),
+                        '}',
+                        ')'
+                    ),
+                ),
+                $.record_type
+            ),
+            optional($.nullable_type),
+            field('name', $.identifier),
+            $._formal_parameter_part,
+            optional($._native),
         ),
         extension_body: $ => seq(
             '{',
@@ -1952,7 +2064,8 @@ module.exports = grammar({
                             $.method_signature,
                             $.function_body
                         ),
-                    )
+                    ),
+                    prec.dynamic(-10, $._record_return_class_member),
                 )
             ),
             '}'
@@ -2491,7 +2604,13 @@ module.exports = grammar({
         ),
 
         record_type: $ => choice(
-            seq('(', ')'),
+            // The empty record type `()` gets a strongly negative dynamic
+            // precedence so e.g. `@Foo() bar() {}` keeps parsing as
+            // (annotation with empty args) + (plain function). Without
+            // this, the bare-annotation/record-return path added below
+            // can win the GLR fork because `()` is also a valid empty
+            // record_type as the return type.
+            prec.dynamic(-20, seq('(', ')')),
             seq('(', commaSep1($.record_type_field), ',', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
             seq('(', commaSep1TrailingComma($.record_type_field), ')'),
             seq('(', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
