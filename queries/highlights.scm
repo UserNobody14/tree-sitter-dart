@@ -245,3 +245,35 @@
 (annotation
   "@" @attribute
   name: (identifier) @attribute)
+
+; Modern Dart 3+ Features
+; --------------------
+
+; Extension Types
+(extension_type_declaration
+  "type" @keyword)
+
+(extension_type_declaration
+  name: (identifier) @type)
+
+(representation_declaration
+  name: (identifier) @property)
+
+; Switch Guards ("when")
+(switch_expression_case
+  "when" @keyword)
+
+(switch_statement_case
+  "when" @keyword)
+
+; Patterns & Pattern Matching
+(object_pattern
+  (identifier) @property)
+
+(record_pattern
+  (identifier) @property)
+
+; Record Types
+(record_type_field
+  (identifier) @variable)
+
