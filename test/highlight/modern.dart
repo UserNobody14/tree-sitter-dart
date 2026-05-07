@@ -9,8 +9,8 @@ void testSwitch(Object x) {
   switch (x) {
     case Point(x: var px) when px > 0:
       //   ^ type
-      //         ^ property
-      //                ^ variable
+      //       ^ property
+      //              ^ variable
       //                    ^ keyword
       break;
   }
