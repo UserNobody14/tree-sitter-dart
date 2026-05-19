@@ -141,27 +141,7 @@
           "named": true
         },
         {
-          "type": "additive_expression",
-          "named": true
-        },
-        {
           "type": "additive_operator",
-          "named": true
-        },
-        {
-          "type": "bitwise_and_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
           "named": true
         },
         {
@@ -177,27 +157,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -217,15 +181,7 @@
           "named": true
         },
         {
-          "type": "relational_expression",
-          "named": true
-        },
-        {
           "type": "selector",
-          "named": true
-        },
-        {
-          "type": "shift_expression",
           "named": true
         },
         {
@@ -238,14 +194,6 @@
         },
         {
           "type": "this",
-          "named": true
-        },
-        {
-          "type": "type_cast_expression",
-          "named": true
-        },
-        {
-          "type": "type_test_expression",
           "named": true
         },
         {
@@ -1292,22 +1240,6 @@
           "named": true
         },
         {
-          "type": "bitwise_and_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -1320,27 +1252,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -1357,10 +1273,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -1381,14 +1293,6 @@
         },
         {
           "type": "this",
-          "named": true
-        },
-        {
-          "type": "type_cast_expression",
-          "named": true
-        },
-        {
-          "type": "type_test_expression",
           "named": true
         },
         {
@@ -1428,15 +1332,7 @@
           "named": true
         },
         {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
           "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
           "named": true
         },
         {
@@ -1452,27 +1348,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -1489,10 +1369,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -1555,18 +1431,6 @@
           "named": true
         },
         {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -1579,27 +1443,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -1616,10 +1464,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -1640,14 +1484,6 @@
         },
         {
           "type": "this",
-          "named": true
-        },
-        {
-          "type": "type_cast_expression",
-          "named": true
-        },
-        {
-          "type": "type_test_expression",
           "named": true
         },
         {
@@ -1903,10 +1739,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -1920,10 +1752,6 @@
         },
         {
           "type": "dot_shorthand",
-          "named": true
-        },
-        {
-          "type": "equality_expression",
           "named": true
         },
         {
@@ -1943,23 +1771,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -2008,10 +1824,6 @@
         },
         {
           "type": "record_type",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -2547,10 +2359,6 @@
         },
         {
           "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
           "named": true
         },
         {
@@ -3440,10 +3248,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -3456,10 +3260,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -3469,18 +3269,6 @@
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -4864,10 +4652,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_builtin",
           "named": true
         },
@@ -4885,10 +4669,6 @@
         },
         {
           "type": "dot_shorthand",
-          "named": true
-        },
-        {
-          "type": "equality_expression",
           "named": true
         },
         {
@@ -4912,10 +4692,6 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "inferred_type",
           "named": true
         },
@@ -4924,15 +4700,7 @@
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -4981,10 +4749,6 @@
         },
         {
           "type": "record_type",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -6225,10 +5989,6 @@
             "named": true
           },
           {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
             "type": "const_object_expression",
             "named": true
           },
@@ -6250,10 +6010,6 @@
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_null_expression",
             "named": true
           },
           {
@@ -6347,10 +6103,6 @@
             "named": true
           },
           {
-            "type": "conditional_expression",
-            "named": true
-          },
-          {
             "type": "const_object_expression",
             "named": true
           },
@@ -6372,10 +6124,6 @@
           },
           {
             "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "if_null_expression",
             "named": true
           },
           {
@@ -7627,10 +7375,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -7647,10 +7391,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -7663,23 +7403,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -7720,10 +7448,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -7852,10 +7576,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -7880,19 +7600,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_expression",
           "named": true
         },
         {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -7988,10 +7700,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -8013,10 +7721,6 @@
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
           "named": true
         },
         {
@@ -8864,10 +8568,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -8884,10 +8584,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -8900,23 +8596,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -8957,10 +8641,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -9043,10 +8723,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -9063,10 +8739,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -9079,23 +8751,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -9136,10 +8796,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -9237,10 +8893,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -9257,10 +8909,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -9273,23 +8921,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -9330,10 +8966,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -11094,10 +10726,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -11114,10 +10742,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -11130,23 +10754,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -11187,10 +10799,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -11452,10 +11060,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -11468,27 +11072,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -11505,10 +11093,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -11660,10 +11244,6 @@
           "named": true
         },
         {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -11680,10 +11260,6 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "equality_operator",
           "named": true
         },
@@ -11696,23 +11272,11 @@
           "named": true
         },
         {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
           "type": "list_pattern",
           "named": true
         },
         {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
           "type": "logical_and_operator",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -11753,10 +11317,6 @@
         },
         {
           "type": "record_pattern",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -12281,22 +11841,6 @@
           "named": true
         },
         {
-          "type": "bitwise_and_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
-          "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
-          "named": true
-        },
-        {
           "type": "const_object_expression",
           "named": true
         },
@@ -12309,27 +11853,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -12349,15 +11877,7 @@
           "named": true
         },
         {
-          "type": "relational_expression",
-          "named": true
-        },
-        {
           "type": "selector",
-          "named": true
-        },
-        {
-          "type": "shift_expression",
           "named": true
         },
         {
@@ -12374,14 +11894,6 @@
         },
         {
           "type": "this",
-          "named": true
-        },
-        {
-          "type": "type_cast_expression",
-          "named": true
-        },
-        {
-          "type": "type_test_expression",
           "named": true
         },
         {
@@ -14049,15 +13561,7 @@
           "named": true
         },
         {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
           "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
           "named": true
         },
         {
@@ -14073,27 +13577,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -14110,10 +13598,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {
@@ -14257,15 +13741,7 @@
           "named": true
         },
         {
-          "type": "bitwise_or_expression",
-          "named": true
-        },
-        {
           "type": "bitwise_xor_expression",
-          "named": true
-        },
-        {
-          "type": "conditional_expression",
           "named": true
         },
         {
@@ -14281,27 +13757,11 @@
           "named": true
         },
         {
-          "type": "equality_expression",
-          "named": true
-        },
-        {
           "type": "function_expression",
           "named": true
         },
         {
           "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "if_null_expression",
-          "named": true
-        },
-        {
-          "type": "logical_and_expression",
-          "named": true
-        },
-        {
-          "type": "logical_or_expression",
           "named": true
         },
         {
@@ -14318,10 +13778,6 @@
         },
         {
           "type": "postfix_expression",
-          "named": true
-        },
-        {
-          "type": "relational_expression",
           "named": true
         },
         {

@@ -114,7 +114,6 @@ module.exports = grammar({
         [$._primary, $.constructor_param],
         [$._normal_formal_parameters],
         [$._declared_identifier],
-        [$.equality_expression],
         [$.record_type_field, $._function_formal_parameter, $._var_or_type],
         [$.typed_identifier, $._var_or_type, $._function_formal_parameter],
         [$._type_name, $._simple_formal_parameter],
@@ -176,7 +175,6 @@ module.exports = grammar({
         [$._type_name, $.function_signature],
         // [$.relational_operator, $._shift_operator],
         [$.declaration, $._external],
-        [$.relational_expression],
         [$._function_type_tail],
         [$._type_not_void_not_function, $._function_type_tail],
         [$._type_not_void],
@@ -642,21 +640,70 @@ module.exports = grammar({
             $._real_expression,
             $.throw_expression_without_cascade
         ),
+        // Stratified-precedence hierarchy. Each "_X_tight" matches an
+        // X-precedence operator expression OR anything that binds tighter.
+        // `_real_expression` is the lowest-prec root; binary operator rules
+        // use the appropriate tighter helper as their operand so that
+        // `a + b == a + b` parses as `(a + b) == (a + b)` rather than
+        // `a + (b == (a + b))`. Without this stratification, every operator
+        // rule accepts `_real_expression` (any expression) as an operand,
+        // which lets a higher-precedence operator nest a lower-precedence
+        // one as its sub-expression, inverting precedence.
         _real_expression: $ => choice(
             $.conditional_expression,
-            $.logical_or_expression,
+            $._ifnull_tight
+        ),
+        _ifnull_tight: $ => choice(
             $.if_null_expression,
-            $.additive_expression,
-            $.multiplicative_expression,
-            $.relational_expression,
-            $.equality_expression,
+            $._logor_tight
+        ),
+        _logor_tight: $ => choice(
+            $.logical_or_expression,
+            $._logand_tight
+        ),
+        _logand_tight: $ => choice(
             $.logical_and_expression,
-            $.bitwise_and_expression,
+            $._eq_tight
+        ),
+        _eq_tight: $ => choice(
+            $.equality_expression,
+            $._rel_tight
+        ),
+        _rel_tight: $ => choice(
+            $.relational_expression,
+            $._bw_or_tight
+        ),
+        _bw_or_tight: $ => choice(
             $.bitwise_or_expression,
+            $._bw_xor_tight
+        ),
+        // `as` / `is` / `is!` live with the bitwise_xor tier even though
+        // the Dart spec puts them at relational precedence. This matches
+        // the existing grammar's pragmatic behavior where typecasts can
+        // appear as operands of bitwise/shift/arithmetic operators (e.g.
+        // `a as B | b as B` parses as `(a as B) | (b as B)`). Placing
+        // type_cast here (and only here, not in `_bw_or_tight`) keeps the
+        // tree-sitter LR(1) decision unambiguous.
+        _bw_xor_tight: $ => choice(
             $.bitwise_xor_expression,
-            $.shift_expression,
             $.type_cast_expression,
             $.type_test_expression,
+            $._bw_and_tight
+        ),
+        _bw_and_tight: $ => choice(
+            $.bitwise_and_expression,
+            $._shift_tight
+        ),
+        _shift_tight: $ => choice(
+            $.shift_expression,
+            $._additive_tight
+        ),
+        _additive_tight: $ => choice(
+            $.additive_expression,
+            $._mul_or_unary
+        ),
+        _mul_or_unary: $ => choice(
+            $.multiplicative_expression,
             $._unary_expression
         ),
 
@@ -833,7 +880,7 @@ module.exports = grammar({
             DART_PREC.If,
             seq(
                 field('first',
-                    $._real_expression // logical_or_expression
+                    $._logor_tight // logical_or_expression or tighter
                 ),
                 $._if_null_expression
                 // optional(
@@ -845,7 +892,7 @@ module.exports = grammar({
         _if_null_expression: $ => repeat1(
             seq(
                 '??',
-                field('second', $._real_expression)
+                field('second', $._logor_tight)
             )
         ),
 
@@ -853,7 +900,7 @@ module.exports = grammar({
             DART_PREC.Conditional,
             seq(
                 // $.if_null_expression,
-                $._real_expression,
+                $._ifnull_tight,
                 seq(
                     '?',
                     field('consequence', $._expression_without_cascade),
@@ -863,14 +910,19 @@ module.exports = grammar({
             )
         ),
 
-        logical_or_expression: $ => prec.left( //left
+        // Right-recursive shape so that `a || b || c` produces nested
+        // `logical_or_expression(a, ||, logical_or_expression(b, ||, c))`
+        // rather than a flat sep2-style sibling list. (Matches the
+        // existing grammar's behavior; downstream consumers expect this
+        // shape.)
+        logical_or_expression: $ => prec.right(
             DART_PREC.Logical_OR,
-            sep2($._real_expression, $.logical_or_operator)
+            seq($._logand_tight, $.logical_or_operator, $._logor_tight)
         ),
 
-        logical_and_expression: $ => prec.left( //left
+        logical_and_expression: $ => prec.right(
             DART_PREC.Logical_AND,
-            sep2($._real_expression, $.logical_and_operator)
+            seq($._eq_tight, $.logical_and_operator, $._logand_tight)
         ),
 
         equality_expression: $ => prec( //neither
@@ -878,13 +930,13 @@ module.exports = grammar({
             choice(
                 seq(
                     // $.relational_expression,
-                    $._real_expression,
+                    $._rel_tight,
                     // optional(
                     //
                     // )
 
                     $.equality_operator,
-                    $._real_expression
+                    $._rel_tight
                     // $.relational_expression
 
                 ),
@@ -892,7 +944,7 @@ module.exports = grammar({
                     $.super,
                     $.equality_operator,
                     // $.relational_expression
-                    $._real_expression
+                    $._rel_tight
                 )
             )
         ),
@@ -907,7 +959,7 @@ module.exports = grammar({
             DART_PREC.RelationalTypeCast,
             seq(
                 // $._below_relational_type_cast_expression,
-                $._real_expression,
+                $._bw_xor_tight,
                 $.type_cast,
             )
         ),
@@ -915,7 +967,7 @@ module.exports = grammar({
             DART_PREC.RelationalTypeTest,
             seq(
                 // $._below_relational_type_cast_expression,
-                $._real_expression,
+                $._bw_xor_tight,
                 $.type_test,
             )
         ),
@@ -937,9 +989,9 @@ module.exports = grammar({
                     // Modified to account for type casts being compared relationally!
                     // I am not certain this is what designers intended. (see other comments on github)
                     // optional(
-                    $._real_expression,
+                    $._bw_or_tight,
                     $.relational_operator,
-                    $._real_expression
+                    $._bw_or_tight
                     // choice(
                     //     $.type_test,
                     //     $.type_cast,
@@ -965,7 +1017,7 @@ module.exports = grammar({
                 seq(
                     $.super,
                     $.relational_operator,
-                    $._real_expression
+                    $._bw_or_tight
                 ),
             )
         ),
@@ -978,11 +1030,11 @@ module.exports = grammar({
         ),
 
         //BITWISE EXPRESSIONS
-        bitwise_or_expression: $ => binaryRunLeft($._real_expression, '|', $.super, DART_PREC.Bitwise_Or),
-        bitwise_xor_expression: $ => binaryRunLeft($._real_expression, '^', $.super, DART_PREC.Bitwise_XOR),
-        bitwise_and_expression: $ => binaryRunLeft($._real_expression, '&', $.super, DART_PREC.Bitwise_AND),
-        shift_expression: $ => binaryRunLeft($._real_expression, $.shift_operator, $.super, DART_PREC.Shift),
-        additive_expression: $ => binaryRunLeft($._real_expression, $.additive_operator, $.super, DART_PREC.Additive),
+        bitwise_or_expression: $ => binaryRunLeft($._bw_xor_tight, '|', $.super, DART_PREC.Bitwise_Or),
+        bitwise_xor_expression: $ => binaryRunLeft($._bw_and_tight, '^', $.super, DART_PREC.Bitwise_XOR),
+        bitwise_and_expression: $ => binaryRunLeft($._shift_tight, '&', $.super, DART_PREC.Bitwise_AND),
+        shift_expression: $ => binaryRunLeft($._additive_tight, $.shift_operator, $.super, DART_PREC.Shift),
+        additive_expression: $ => binaryRunLeft($._mul_or_unary, $.additive_operator, $.super, DART_PREC.Additive),
         multiplicative_expression: $ => binaryRunLeft($._unary_expression, $.multiplicative_operator, $.super, DART_PREC.Multiplicative),
         bitwise_operator: $ => $._bitwise_operator,
         _bitwise_operator: $ => choice(
@@ -1418,7 +1470,7 @@ module.exports = grammar({
         _logical_and_pattern: $ => seq($._relational_pattern, repeat(seq($.logical_and_operator, $._relational_pattern))),
         _relational_pattern: $ =>
             prec(DART_PREC.Relational, choice(
-                seq(choice($.relational_operator, $.equality_operator), $._real_expression),
+                seq(choice($.relational_operator, $.equality_operator), $._bw_or_tight),
                 $._unary_pattern,
             )
             ),
