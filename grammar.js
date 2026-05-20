@@ -991,7 +991,7 @@ module.exports = grammar({
         bitwise_and_expression: $ => binaryLeft($._real_expression, '&', $.super, DART_PREC.Bitwise_AND),
         shift_expression: $ => binaryLeft($._real_expression, $.shift_operator, $.super, DART_PREC.Shift),
         additive_expression: $ => binaryLeft($._real_expression, $.additive_operator, $.super, DART_PREC.Additive),
-        multiplicative_expression: $ => binaryLeft($._unary_expression, $.multiplicative_operator, $.super, DART_PREC.Multiplicative),
+        multiplicative_expression: $ => binaryLeft($._real_expression, $.multiplicative_operator, $.super, DART_PREC.Multiplicative),
         bitwise_operator: $ => $._bitwise_operator,
         _bitwise_operator: $ => choice(
             '&',

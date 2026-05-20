@@ -1289,3 +1289,52 @@ main() { a as B & b as B; }
             (type_cast
               (as_operator)
               (type_identifier))))))))
+
+==================================
+binary operator precedence: multiplicative chain left-nests
+==================================
+
+main() { a * b * c; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (multiplicative_expression
+          (multiplicative_expression
+            (identifier)
+            (multiplicative_operator)
+            (identifier))
+          (multiplicative_operator)
+          (identifier))))))
+
+==================================
+binary operator precedence: mixed multiplicative and additive chain
+==================================
+
+main() { a / b * c + d; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (additive_expression
+          (multiplicative_expression
+            (multiplicative_expression
+              (identifier)
+              (multiplicative_operator)
+              (identifier))
+            (multiplicative_operator)
+            (identifier))
+          (additive_operator)
+          (identifier))))))
