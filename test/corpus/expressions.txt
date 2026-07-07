@@ -1036,3 +1036,305 @@ void main() {
                     (selector
                       (argument_part
                         (arguments)))))))))))))
+
+
+==================================
+binary operator precedence: additive vs equality
+==================================
+
+main() { a + b == a + b; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (equality_expression
+          (additive_expression
+            (identifier)
+            (additive_operator)
+            (identifier))
+          (equality_operator)
+          (additive_expression
+            (identifier)
+            (additive_operator)
+            (identifier)))))))
+
+==================================
+binary operator precedence: equality vs logical_and
+==================================
+
+main() { a == b && c == d; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (logical_and_expression
+          (equality_expression
+            (identifier)
+            (equality_operator)
+            (identifier))
+          (logical_and_operator)
+          (equality_expression
+            (identifier)
+            (equality_operator)
+            (identifier)))))))
+
+==================================
+binary operator precedence: equality vs logical_or
+==================================
+
+main() { a == b || c == d; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (logical_or_expression
+          (equality_expression
+            (identifier)
+            (equality_operator)
+            (identifier))
+          (logical_or_operator)
+          (equality_expression
+            (identifier)
+            (equality_operator)
+            (identifier)))))))
+
+==================================
+binary operator precedence: relational vs logical_and
+==================================
+
+main() { a < b && c < d; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (logical_and_expression
+          (relational_expression
+            (identifier)
+            (relational_operator)
+            (identifier))
+          (logical_and_operator)
+          (relational_expression
+            (identifier)
+            (relational_operator)
+            (identifier)))))))
+
+==================================
+binary operator precedence: additive vs bitwise_or
+==================================
+
+main() { a + b | c; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (bitwise_or_expression
+          (additive_expression
+            (identifier)
+            (additive_operator)
+            (identifier))
+          (identifier))))))
+
+==================================
+binary operator precedence: if_null vs logical_and
+==================================
+
+main() { a ?? b && c; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (if_null_expression
+          (identifier)
+          (logical_and_expression
+            (identifier)
+            (logical_and_operator)
+            (identifier)))))))
+
+==================================
+binary operator: logical_and right-recursive chaining
+==================================
+
+main() { a && b && c; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (logical_and_expression
+          (identifier)
+          (logical_and_operator)
+          (logical_and_expression
+            (identifier)
+            (logical_and_operator)
+            (identifier)))))))
+
+==================================
+binary operator precedence: typecast as bitwise_or operand
+==================================
+
+main() { a as B | b as B; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (bitwise_or_expression
+          (type_cast_expression
+            (identifier)
+            (type_cast
+              (as_operator)
+              (type_identifier)))
+          (type_cast_expression
+            (identifier)
+            (type_cast
+              (as_operator)
+              (type_identifier))))))))
+
+==================================
+binary operator precedence: typetest as bitwise_or operand
+==================================
+
+main() { a is B | b is B; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (bitwise_or_expression
+          (type_test_expression
+            (identifier)
+            (type_test
+              (is_operator)
+              (type_identifier)))
+          (type_test_expression
+            (identifier)
+            (type_test
+              (is_operator)
+              (type_identifier))))))))
+
+==================================
+binary operator precedence: typecast as bitwise_and operand
+==================================
+
+main() { a as B & b as B; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (bitwise_and_expression
+          (type_cast_expression
+            (identifier)
+            (type_cast
+              (as_operator)
+              (type_identifier)))
+          (type_cast_expression
+            (identifier)
+            (type_cast
+              (as_operator)
+              (type_identifier))))))))
+
+==================================
+binary operator precedence: multiplicative chain left-nests
+==================================
+
+main() { a * b * c; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (multiplicative_expression
+          (multiplicative_expression
+            (identifier)
+            (multiplicative_operator)
+            (identifier))
+          (multiplicative_operator)
+          (identifier))))))
+
+==================================
+binary operator precedence: mixed multiplicative and additive chain
+==================================
+
+main() { a / b * c + d; }
+
+---
+
+(program
+  (function_signature
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (additive_expression
+          (multiplicative_expression
+            (multiplicative_expression
+              (identifier)
+              (multiplicative_operator)
+              (identifier))
+            (multiplicative_operator)
+            (identifier))
+          (additive_operator)
+          (identifier))))))
