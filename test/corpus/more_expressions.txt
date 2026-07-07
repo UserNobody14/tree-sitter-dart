@@ -689,3 +689,45 @@ main() {
                   consequence: (break_statement
                     (break_builtin)
                     (identifier))))))))))) 
+
+================================================================================
+generic method invocation with single type argument (issue #103)
+================================================================================
+
+void main() {
+  selector.field<int>(parametr);
+  a.b<T>(c);
+  foo<int>(bar);
+}
+
+--------------------------------------------------------------------------------
+
+(program
+  (function_signature
+    (void_type)
+    name: (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (unconditional_assignable_selector (identifier)))
+        (selector
+          (argument_part
+            (type_arguments (type_identifier))
+            (arguments (argument (identifier))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (unconditional_assignable_selector (identifier)))
+        (selector
+          (argument_part
+            (type_arguments (type_identifier))
+            (arguments (argument (identifier))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (type_arguments (type_identifier))
+            (arguments (argument (identifier)))))))))

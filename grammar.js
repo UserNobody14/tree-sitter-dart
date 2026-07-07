@@ -1274,7 +1274,13 @@ module.exports = grammar({
             ),
             $.identifier
         ),
-        argument_part: $ => seq(
+        // Dart resolves the `x.field<int>(arg)` ambiguity in favour of a
+        // generic method invocation rather than the chained comparison
+        // `(x.field < int) > (arg)`. The positive dynamic precedence makes the
+        // GLR parser prefer this `type_arguments arguments` reading over the
+        // relational_expression one (see conflict [$.type_arguments,
+        // $.relational_operator]). Issue #103.
+        argument_part: $ => prec.dynamic(1, seq(
             optional(
                 $.type_arguments
             ),
@@ -1283,7 +1289,7 @@ module.exports = grammar({
             //     $.arguments
             // ),
             $.arguments
-        ),
+        )),
 
         unconditional_assignable_selector: $ => choice(
             $.index_selector,

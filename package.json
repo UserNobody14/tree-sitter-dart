@@ -29,8 +29,8 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "node-addon-api": "^7.1.0",
-    "node-gyp-build": "^4.8.0"
+    "node-addon-api": "^8.9.0",
+    "node-gyp-build": "^4.8.4"
   },
   "peerDependencies": {
     "tree-sitter": "^0.25.0"
@@ -41,10 +41,10 @@
     }
   },
   "devDependencies": {
-    "node-gyp": "^10.2.0",
+    "node-gyp": "^11.5.0",
     "npm-watch": "^0.13.0",
-    "tree-sitter-cli": "^0.25.10",
-    "prebuildify": "^6.0.0"
+    "tree-sitter-cli": "^0.26.10",
+    "prebuildify": "^6.0.1"
   },
   "watch": {
     "test": {
