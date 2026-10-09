@@ -96,6 +96,8 @@ module.exports = grammar({
         $._ambiguous_name,
         $._class_member_definition,
         $._if_null_expression,
+        $._constructor_name,
+        $._class_name_maybe_primary,
     ],
 
     conflicts: $ => [
@@ -144,8 +146,6 @@ module.exports = grammar({
         [$._primary, $.constant_pattern, $._type_name, $._simple_formal_parameter],
         [$._parenthesized_pattern, $._pattern_field],
         [$.record_type_field, $._var_or_type, $._final_var_or_type, $._function_formal_parameter],
-        [$._var_or_type, $._final_var_or_type],
-        [$._final_const_var_or_type, $._final_var_or_type],
         [$._var_or_type, $._for_loop_parts, $.pattern_variable_declaration],
         [$.pattern_variable_declaration, $._for_loop_parts, $._final_const_var_or_type],
         [$._var_or_type, $._final_var_or_type, $._function_formal_parameter],
@@ -186,6 +186,10 @@ module.exports = grammar({
         [$._type_not_void],
         [$._type_not_void_not_function],
         [$.super_formal_parameter, $.unconditional_assignable_selector],
+        [$._final_const_var_or_type, $._function_formal_parameter],
+        [$.representation_declaration, $._final_const_var_or_type, $._function_formal_parameter],
+        [$.representation_declaration, $._var_or_type, $._function_formal_parameter],
+        [$._final_const_var_or_type, $._final_var_or_type, $._function_formal_parameter],
     ],
 
     word: $ => $.identifier,
@@ -1418,7 +1422,9 @@ module.exports = grammar({
             field('condition', $.parenthesized_expression),
             field('body',
                 seq('{',
-                    commaSep1TrailingComma($.switch_expression_case),
+                    // An empty body is valid when the scrutinee's type has
+                    // no values (e.g. `Never`, an empty sealed class).
+                    optional(commaSep1TrailingComma($.switch_expression_case)),
                     '}'
                 ))
         ),
@@ -1480,8 +1486,8 @@ module.exports = grammar({
             // type. The `const` form (`const .new(...)` / `const .named(...)`)
             // is reached via `const_object_expression` above.
             seq($.dot_shorthand, optional(seq(optional($.type_arguments), $.arguments))),
-            seq($.const_builtin, optional($.type_arguments), '[', commaSep1TrailingComma($._element), ']'),
-            seq($.const_builtin, optional($.type_arguments), '{', commaSep1TrailingComma($._element), '}'),
+            seq($.const_builtin, optional($.type_arguments), '[', optional(commaSep1TrailingComma($._element)), ']'),
+            seq($.const_builtin, optional($.type_arguments), '{', optional(commaSep1TrailingComma($._element)), '}'),
             seq($.const_builtin, '(', $._expression, ')'),
         ),
 
@@ -1511,12 +1517,14 @@ module.exports = grammar({
 
         pattern_assignment: $ => seq($._outer_pattern, '=', $._expression),
 
-        switch_block: $ => seq(
+        // A statement starting with `switch` is always a switch statement,
+        // never an (empty) switch expression statement.
+        switch_block: $ => prec(1, seq(
             '{',
             repeat($.switch_statement_case),
             optional($.switch_statement_default),
             '}'
-        ),
+        )),
 
         switch_statement_case: $ => seq(
             repeat($.label), $.case_builtin, $._guarded_pattern, ':', repeat($._statement),
@@ -1806,16 +1814,15 @@ module.exports = grammar({
         enum_declaration: $ => seq(
             optional($._metadata),
             'enum',
-            field('name', $.identifier),
-            optional($.type_parameters),
+            $._class_name_maybe_primary,
             optional($.mixins),
             optional($.interfaces),
-            field('body', $.enum_body),
+            choice(field('body', $.enum_body), $._semicolon),
         ),
 
         enum_body: $ => seq(
             '{',
-            commaSep1TrailingComma($.enum_constant),
+            optional(commaSep1TrailingComma($.enum_constant)),
             optional(
                 seq(';', repeat(choice(
                     seq(optional($._metadata), $._class_member_definition),
@@ -1863,17 +1870,46 @@ module.exports = grammar({
             seq(
                 optional($._metadata),
                 choice($._class_modifiers, $._mixin_class_modifiers),
-                field('name', $.identifier),
-                optional(field('type_parameters', $.type_parameters)),
+                $._class_name_maybe_primary,
                 optional(field('superclass', $.superclass)),
                 optional(field('interfaces', $.interfaces)),
-                field('body', $.class_body)
+                choice(field('body', $.class_body), $._semicolon)
             ),
             seq(
                 optional($._metadata),
-                $._class_modifiers,
+                choice($._class_modifiers, $._mixin_class_modifiers),
                 $.mixin_application_class
             )
+        ),
+
+        // Dart 3.13 primary constructors: the class/enum header may carry a
+        // constructor, e.g. `class const Point._(final int x, final int y)`.
+        // `const` and the type name stay direct children of the declaration
+        // so `name:` keeps pointing at the declared type.
+        _class_name_maybe_primary: $ => choice(
+            seq(
+                $.const_builtin,
+                field('name', $.identifier),
+                optional(field('type_parameters', $.type_parameters)),
+                field('primary_constructor', $.primary_constructor),
+            ),
+            seq(
+                field('name', $.identifier),
+                optional(field('type_parameters', $.type_parameters)),
+                optional(field('primary_constructor', $.primary_constructor)),
+            ),
+        ),
+
+        primary_constructor: $ => seq(
+            optional(seq('.', field('name', $._identifier_or_new))),
+            field('parameters', $.formal_parameter_list),
+        ),
+
+        // The in-body part of a primary constructor: `this : x = 1 {...}`,
+        // `this;`.
+        primary_constructor_body_signature: $ => seq(
+            $.this,
+            optional($.initializers),
         ),
 
         extension_declaration: $ => choice(
@@ -1884,7 +1920,7 @@ module.exports = grammar({
                 optional(field('type_parameters', $.type_parameters)),
                 'on',
                 field('class', $._type),
-                field('body', $.extension_body)
+                choice(field('body', $.extension_body), $._semicolon)
             ),
         ),
 
@@ -1897,16 +1933,28 @@ module.exports = grammar({
             optional(field('type_parameters', $.type_parameters)),
             field('representation', $.representation_declaration),
             optional(field('interfaces', $.interfaces)),
-            field('body', $.class_body)
+            choice(field('body', $.class_body), $._semicolon)
         ),
 
         representation_declaration: $ => seq(
             optional(seq('.', choice($.identifier, $._new_builtin))),
-            '(',
-            optional($._metadata),
-            field('type', $._type),
-            field('name', $.identifier),
-            ')'
+            choice(
+                seq(
+                    '(',
+                    optional($._metadata),
+                    // Dart 3.13: the representation variable may be marked
+                    // `final`.
+                    optional($.final_builtin),
+                    field('type', $._type),
+                    field('name', $.identifier),
+                    optional(','),
+                    ')'
+                ),
+                // Since Dart 3.13 the header is a regular primary
+                // constructor, so any declaring parameter list is
+                // syntactically allowed (`(i)`, `({required int i})`).
+                prec.dynamic(-1, field('parameters', $.formal_parameter_list)),
+            ),
         ),
 
         _metadata: $ => prec.right(repeat1($.annotation)),
@@ -1973,7 +2021,7 @@ module.exports = grammar({
                 $._type_not_void_list
             )),
             optional($.interfaces),
-            $.class_body
+            choice($.class_body, $._semicolon)
         ),
         interfaces: $ => seq(
             $._implements,
@@ -2114,6 +2162,7 @@ module.exports = grammar({
         method_signature: $ => choice(
             seq($.constructor_signature, optional($.initializers)),
             $.factory_constructor_signature,
+            $.primary_constructor_body_signature,
 
             seq(
                 optional($._static),
@@ -2127,6 +2176,7 @@ module.exports = grammar({
         ),
 
         declaration: $ => choice(
+            $.primary_constructor_body_signature,
             seq($.constant_constructor_signature, optional(choice($.redirection, $.initializers))),
             seq($.constructor_signature, optional(choice($.redirection, $.initializers))),
             seq($._external,
@@ -2395,20 +2445,22 @@ module.exports = grammar({
         //      // ))
         //  ),
 
+        // `factory C.name(...)`, or since Dart 3.13 the concise
+        // `factory name(...)` / `factory(...)` form.
         factory_constructor_signature: $ => seq(
             $._factory,
-            sep1($.identifier, '.'),
+            optional(sep1($.identifier, '.')),
             $.formal_parameter_list,
         ),
 
         redirecting_factory_constructor_signature: $ => seq(
             optional($.const_builtin),
             $._factory,
-            sep1($.identifier, '.'),
+            optional(sep1($.identifier, '.')),
             $.formal_parameter_list,
             '=',
             $._type_not_void,
-            optional(seq('.', $.identifier)),
+            optional(seq('.', $._identifier_or_new)),
         ),
 
         redirection: $ => seq(
@@ -2422,18 +2474,24 @@ module.exports = grammar({
         ),
 
         constructor_signature: $ => seq(
+            $._constructor_name,
+            field('parameters', $.formal_parameter_list)
+        ),
+        constant_constructor_signature: $ => seq(
+            $.const_builtin,
+            $._constructor_name,
+            $.formal_parameter_list
+        ),
+
+        // `C`, `C.name`, or since Dart 3.13 the concise `new` / `new name`.
+        _constructor_name: $ => choice(
             field('name', seq($.identifier, optional(
                 seq(
                     '.',
                     $._identifier_or_new
                 )
             ))),
-            field('parameters', $.formal_parameter_list)
-        ),
-        constant_constructor_signature: $ => seq(
-            $.const_builtin,
-            seq($.identifier, optional(seq('.', $._identifier_or_new))),
-            $.formal_parameter_list
+            seq($._new_builtin, optional(field('name', $.identifier))),
         ),
 
         constructor_body: $ => seq(
@@ -2900,6 +2958,9 @@ module.exports = grammar({
             optional(
                 $._covariant
             ),
+            // Dart 3.13 declaring parameter of a primary constructor:
+            // `class C(final int f(int x))`.
+            optional(choice($.inferred_type, $.final_builtin)),
             optional(
                 $._type
             ),
@@ -3140,6 +3201,10 @@ module.exports = grammar({
                 alias($._get, $.identifier),
                 alias($._set, $.identifier),
                 alias($._function_builtin_identifier, $.identifier),
+                // `await` is only reserved inside async bodies; it is a
+                // valid argument name, e.g. the public name of the private
+                // named parameter `this._await` (Dart 3.12).
+                alias('await', $.identifier),
             ),
             ':'
         ),

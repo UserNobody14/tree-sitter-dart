@@ -147,6 +147,8 @@
   name: (identifier) @type)
 (constructor_signature
   name: (identifier) @type)
+(primary_constructor
+  name: (identifier) @type)
 (scoped_identifier
   scope: (identifier) @type)
 (function_signature
