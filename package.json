@@ -41,7 +41,7 @@
     }
   },
   "devDependencies": {
-    "node-gyp": "^11.5.0",
+    "node-gyp": "^13.1.0",
     "npm-watch": "^0.13.0",
     "tree-sitter-cli": "^0.26.10",
     "prebuildify": "^6.0.1"
