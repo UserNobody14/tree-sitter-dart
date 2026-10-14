@@ -1,0 +1,624 @@
+==================================
+primary constructor - declaring parameters, empty body
+==================================
+
+class Point(var int x, var int y);
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (inferred_type)
+          (type_identifier)
+          (identifier))
+        (formal_parameter
+          (inferred_type)
+          (type_identifier)
+          (identifier))))))
+
+==================================
+primary constructor - const, named, type parameters, superclass
+==================================
+
+class const D<T extends Bound>.named(
+  final int x, [
+  final int y = 0,
+]) extends A with M implements B, C;
+
+---
+
+(program
+  (class_definition
+    (const_builtin)
+    (identifier)
+    (type_parameters
+      (type_parameter
+        (type_identifier)
+        (type_bound
+          (type_identifier))))
+    (primary_constructor
+      (identifier)
+      (formal_parameter_list
+        (formal_parameter
+          (final_builtin)
+          (type_identifier)
+          (identifier))
+        (optional_formal_parameters
+          (formal_parameter
+            (final_builtin)
+            (type_identifier)
+            (identifier))
+          (decimal_integer_literal))))
+    (superclass
+      (type_identifier)
+      (mixins
+        (type_identifier)))
+    (interfaces
+      (type_identifier)
+      (type_identifier))))
+
+==================================
+primary constructor - field and super parameters
+==================================
+
+class A(final int a);
+class B(super.a, this.b) extends A {
+  int b;
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (final_builtin)
+          (type_identifier)
+          (identifier)))))
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (super_formal_parameter
+            (super)
+            (identifier)))
+        (formal_parameter
+          (constructor_param
+            (this)
+            (identifier)))))
+    (superclass
+      (type_identifier))
+    (class_body
+      (declaration
+        (type_identifier)
+        (initialized_identifier_list
+          (initialized_identifier
+            (identifier)))))))
+
+==================================
+primary constructor - named and optional declaring parameters
+==================================
+
+class P(var int x, {required var int y, @meta final String s = 'a'});
+class Q(var int x, [var y = 0]);
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (inferred_type)
+          (type_identifier)
+          (identifier))
+        (optional_formal_parameters
+          (formal_parameter
+            (inferred_type)
+            (type_identifier)
+            (identifier))
+          (annotation
+            (identifier))
+          (formal_parameter
+            (final_builtin)
+            (type_identifier)
+            (identifier))
+          (string_literal)))))
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (inferred_type)
+          (type_identifier)
+          (identifier))
+        (optional_formal_parameters
+          (formal_parameter
+            (inferred_type)
+            (identifier))
+          (decimal_integer_literal))))))
+
+==================================
+primary constructor - function-typed declaring parameter
+==================================
+
+class C(covariant var num x, final int f(int a)?);
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (inferred_type)
+          (type_identifier)
+          (identifier))
+        (formal_parameter
+          (final_builtin)
+          (type_identifier)
+          (identifier)
+          (formal_parameter_list
+            (formal_parameter
+              (type_identifier)
+              (identifier)))
+          (nullable_type))))))
+
+==================================
+primary constructor - body part with initializers and body
+==================================
+
+class E(int x) extends A {
+  final int y;
+  this : y = x + 1, super('s') {
+    print(y);
+  }
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (type_identifier)
+          (identifier))))
+    (superclass
+      (type_identifier))
+    (class_body
+      (declaration
+        (final_builtin)
+        (type_identifier)
+        (initialized_identifier_list
+          (initialized_identifier
+            (identifier))))
+      (method_signature
+        (primary_constructor_body_signature
+          (this)
+          (initializers
+            (initializer_list_entry
+              (field_initializer
+                (identifier)
+                (additive_expression
+                  (identifier)
+                  (additive_operator)
+                  (decimal_integer_literal))))
+            (initializer_list_entry
+              (super)
+              (arguments
+                (argument
+                  (string_literal)))))))
+      (function_body
+        (block
+          (expression_statement
+            (identifier)
+            (selector
+              (argument_part
+                (arguments
+                  (argument
+                    (identifier)))))))))))
+
+==================================
+primary constructor - body part without initializers
+==================================
+
+class F() {
+  this;
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list))
+    (class_body
+      (declaration
+        (primary_constructor_body_signature
+          (this))))))
+
+==================================
+primary constructor - enum
+==================================
+
+enum const E(final int x) {
+  a(1), b(2);
+  this : assert(x > 0);
+}
+
+---
+
+(program
+  (enum_declaration
+    (const_builtin)
+    (identifier)
+    (primary_constructor
+      (formal_parameter_list
+        (formal_parameter
+          (final_builtin)
+          (type_identifier)
+          (identifier))))
+    (enum_body
+      (enum_constant
+        (identifier)
+        (argument_part
+          (arguments
+            (argument
+              (decimal_integer_literal)))))
+      (enum_constant
+        (identifier)
+        (argument_part
+          (arguments
+            (argument
+              (decimal_integer_literal)))))
+      (declaration
+        (primary_constructor_body_signature
+          (this)
+          (initializers
+            (initializer_list_entry
+              (assertion
+                (assert_builtin)
+                (assertion_arguments
+                  (relational_expression
+                    (identifier)
+                    (relational_operator)
+                    (decimal_integer_literal)))))))))))
+
+==================================
+primary constructor - extension type parameter list
+==================================
+
+extension type const E.name(final int x);
+extension type F(i);
+extension type G({required int i}) implements Object;
+
+---
+
+(program
+  (extension_type_declaration
+    (const_builtin)
+    (identifier)
+    (representation_declaration
+      (identifier)
+      (final_builtin)
+      (type_identifier)
+      (identifier)))
+  (extension_type_declaration
+    (identifier)
+    (representation_declaration
+      (formal_parameter_list
+        (formal_parameter
+          (identifier)))))
+  (extension_type_declaration
+    (identifier)
+    (representation_declaration
+      (formal_parameter_list
+        (optional_formal_parameters
+          (formal_parameter
+            (type_identifier)
+            (identifier)))))
+    (interfaces
+      (type_identifier))))
+
+==================================
+empty bodies
+==================================
+
+mixin M;
+base mixin N on Object;
+extension X on int;
+enum Empty;
+abstract class C extends B implements I;
+
+---
+
+(program
+  (mixin_declaration
+    (mixin)
+    (identifier))
+  (mixin_declaration
+    (base)
+    (mixin)
+    (identifier)
+    (type_identifier))
+  (extension_declaration
+    (identifier)
+    (type_identifier))
+  (enum_declaration
+    (identifier))
+  (class_definition
+    (abstract)
+    (identifier)
+    (superclass
+      (type_identifier))
+    (interfaces
+      (type_identifier))))
+
+==================================
+concise constructors - new
+==================================
+
+class C {
+  const new();
+  new named(this.x);
+  new redirect() : this.named(0);
+  new () {}
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (declaration
+        (constant_constructor_signature
+          (const_builtin)
+          (formal_parameter_list)))
+      (declaration
+        (constructor_signature
+          (identifier)
+          (formal_parameter_list
+            (formal_parameter
+              (constructor_param
+                (this)
+                (identifier))))))
+      (declaration
+        (constructor_signature
+          (identifier)
+          (formal_parameter_list))
+        (redirection
+          (this)
+          (identifier)
+          (arguments
+            (argument
+              (decimal_integer_literal)))))
+      (method_signature
+        (constructor_signature
+          (formal_parameter_list)))
+      (function_body
+        (block)))))
+
+==================================
+concise constructors - factory
+==================================
+
+class C {
+  factory make() => .new();
+  factory() => C();
+  const factory redirect() = C.new;
+  external factory ext();
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (method_signature
+        (factory_constructor_signature
+          (identifier)
+          (formal_parameter_list)))
+      (function_body
+        (dot_shorthand)
+        (selector
+          (argument_part
+            (arguments))))
+      (method_signature
+        (factory_constructor_signature
+          (formal_parameter_list)))
+      (function_body
+        (identifier)
+        (selector
+          (argument_part
+            (arguments))))
+      (declaration
+        (redirecting_factory_constructor_signature
+          (const_builtin)
+          (identifier)
+          (formal_parameter_list)
+          (type_identifier)
+          (type_identifier)))
+      (declaration
+        (factory_constructor_signature
+          (identifier)
+          (formal_parameter_list))))))
+
+==================================
+private named parameters
+==================================
+
+class Point {
+  final int _x;
+  Point({required this._x, int? _y});
+}
+void main() {
+  Point(x: 1);
+  f(await: 1);
+}
+
+---
+
+(program
+  (class_definition
+    (identifier)
+    (class_body
+      (declaration
+        (final_builtin)
+        (type_identifier)
+        (initialized_identifier_list
+          (initialized_identifier
+            (identifier))))
+      (declaration
+        (constructor_signature
+          (identifier)
+          (formal_parameter_list
+            (optional_formal_parameters
+              (formal_parameter
+                (constructor_param
+                  (this)
+                  (identifier)))
+              (formal_parameter
+                (type_identifier)
+                (nullable_type)
+                (identifier))))))))
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (named_argument
+                (label
+                  (identifier))
+                (decimal_integer_literal))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (named_argument
+                (label
+                  (identifier))
+                (decimal_integer_literal)))))))))
+
+==================================
+empty switch expression
+==================================
+
+void f(Never a) {
+  var x = switch (a) {};
+  switch (a) {}
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (type_identifier)
+        (identifier))))
+  (function_body
+    (block
+      (local_variable_declaration
+        (initialized_variable_definition
+          (inferred_type)
+          (identifier)
+          (switch_expression
+            (parenthesized_expression
+              (identifier)))))
+      (switch_statement
+        (parenthesized_expression
+          (identifier))
+        (switch_block)))))
+
+==================================
+empty constant collection patterns
+==================================
+
+void f(Object o) {
+  switch (o) {
+    case const []:
+    case const <int>{}:
+      break;
+  }
+}
+
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (type_identifier)
+        (identifier))))
+  (function_body
+    (block
+      (switch_statement
+        (parenthesized_expression
+          (identifier))
+        (switch_block
+          (switch_statement_case
+            (case_builtin)
+            (constant_pattern
+              (const_builtin)))
+          (switch_statement_case
+            (case_builtin)
+            (constant_pattern
+              (const_builtin)
+              (type_arguments
+                (type_identifier)))
+            (break_statement
+              (break_builtin))))))))
+
+==================================
+mixin class application
+==================================
+
+mixin class N = Object with M;
+base mixin class O = Object with M, P;
+
+---
+
+(program
+  (class_definition
+    (mixin)
+    (mixin_application_class
+      (identifier)
+      (mixin_application
+        (type_identifier)
+        (mixins
+          (type_identifier)))))
+  (class_definition
+    (base)
+    (mixin)
+    (mixin_application_class
+      (identifier)
+      (mixin_application
+        (type_identifier)
+        (mixins
+          (type_identifier)
+          (type_identifier))))))
