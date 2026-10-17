@@ -1211,10 +1211,11 @@ module.exports = grammar({
 
         _compound_access: $ => choice('.', '?.'),
 
-        constructor_invocation: $ => prec.right(choice(
+        // Prefer a complete generic call over comparisons split across commas.
+        constructor_invocation: $ => prec.dynamic(2, prec.right(choice(
             seq($._type_name, $.type_arguments, '.', $.identifier, $.arguments),
             seq($._type_name, '.', $._new_builtin, $.arguments),
-        )),
+        ))),
 
         constructor_tearoff: $ => prec.right(seq(
             $._type_name, optional($.type_arguments), '.', $._new_builtin,
