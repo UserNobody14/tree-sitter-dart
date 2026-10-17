@@ -1,0 +1,91 @@
+==================
+comparison arguments retain a genuine dot shorthand
+==================
+void run() { accept(a < (b), c > .zero()); }
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (relational_expression
+                  (identifier)
+                  (relational_operator)
+                  (parenthesized_expression
+                    (identifier))))
+              (argument
+                (relational_expression
+                  (identifier)
+                  (relational_operator)
+                  (dot_shorthand
+                    (identifier))
+                  (selector
+                    (argument_part
+                      (arguments))))))))))))
+
+==================
+single and multiple positional record types stay valid
+==================
+typedef Single = (int,);
+typedef NamedSingle = (int value,);
+typedef Pair = (int, String);
+typedef PairTrailing = (int, String,);
+typedef Named = ({int value});
+typedef Mixed = (int, {String name});
+typedef Empty = ();
+---
+
+(program
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_field
+        (type_identifier))))
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_field
+        (type_identifier)
+        (identifier))))
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_field
+        (type_identifier))
+      (record_type_field
+        (type_identifier))))
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_field
+        (type_identifier))
+      (record_type_field
+        (type_identifier))))
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_named_field
+        (typed_identifier
+          (type_identifier)
+          (identifier)))))
+  (type_alias
+    (type_identifier)
+    (record_type
+      (record_type_field
+        (type_identifier))
+      (record_type_named_field
+        (typed_identifier
+          (type_identifier)
+          (identifier)))))
+  (type_alias
+    (type_identifier)
+    (record_type)))
