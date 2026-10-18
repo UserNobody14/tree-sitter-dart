@@ -2689,7 +2689,8 @@ module.exports = grammar({
             // record_type as the return type.
             prec.dynamic(-20, seq('(', ')')),
             seq('(', commaSep1($.record_type_field), ',', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
-            seq('(', commaSep1TrailingComma($.record_type_field), ')'),
+            seq('(', $.record_type_field, ',', ')'),
+            seq('(', commaSep2TrailingComma($.record_type_field), ')'),
             seq('(', '{', commaSep1TrailingComma($.record_type_named_field), '}', ')'),
         ),
 
