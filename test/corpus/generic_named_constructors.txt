@@ -1,0 +1,217 @@
+==================
+generic named constructor in a map value
+==================
+Object copy(input) => {'copy': Map<String, Object>.of(input)};
+---
+
+(program
+  (function_signature
+    (type_identifier)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (set_or_map_literal
+      (pair
+        (string_literal)
+        (postfix_expression
+          (constructor_invocation
+            (type_identifier)
+            (type_arguments
+              (type_identifier)
+              (type_identifier))
+            (identifier)
+            (arguments
+              (argument
+                (identifier)))))))))
+
+==================
+generic named constructor in a conditional value
+==================
+Object? copy(input) => input == null ? null : Map<String, String>.of(input);
+---
+
+(program
+  (function_signature
+    (type_identifier)
+    (nullable_type)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (conditional_expression
+      (equality_expression
+        (identifier)
+        (equality_operator)
+        (null_literal))
+      (null_literal)
+      (postfix_expression
+        (constructor_invocation
+          (type_identifier)
+          (type_arguments
+            (type_identifier)
+            (type_identifier))
+          (identifier)
+          (arguments
+            (argument
+              (identifier))))))))
+
+==================
+generic named constructor in a named argument
+==================
+Object copy(messages) => Bundle(locale: 'en', messages: Map<String, String>.unmodifiable(messages));
+---
+
+(program
+  (function_signature
+    (type_identifier)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (identifier)
+    (selector
+      (argument_part
+        (arguments
+          (named_argument
+            (label
+              (identifier))
+            (string_literal))
+          (named_argument
+            (label
+              (identifier))
+            (postfix_expression
+              (constructor_invocation
+                (type_identifier)
+                (type_arguments
+                  (type_identifier)
+                  (type_identifier))
+                (identifier)
+                (arguments
+                  (argument
+                    (identifier)))))))))))
+
+==================
+generic named constructors retain nested record and function type arguments
+==================
+Object copy(input) => {'copy': Map<String, (int,)>.of(input)};
+Object second(input) => Map<String, (int, String)>.of(input);
+Object third(input) => Map<String, void Function(int)>.of(input);
+---
+
+(program
+  (function_signature
+    (type_identifier)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (set_or_map_literal
+      (pair
+        (string_literal)
+        (postfix_expression
+          (constructor_invocation
+            (type_identifier)
+            (type_arguments
+              (type_identifier)
+              (record_type
+                (record_type_field
+                  (type_identifier))))
+            (identifier)
+            (arguments
+              (argument
+                (identifier))))))))
+  (function_signature
+    (type_identifier)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (postfix_expression
+      (constructor_invocation
+        (type_identifier)
+        (type_arguments
+          (type_identifier)
+          (record_type
+            (record_type_field
+              (type_identifier))
+            (record_type_field
+              (type_identifier))))
+        (identifier)
+        (arguments
+          (argument
+            (identifier))))))
+  (function_signature
+    (type_identifier)
+    (identifier)
+    (formal_parameter_list
+      (formal_parameter
+        (identifier))))
+  (function_body
+    (postfix_expression
+      (constructor_invocation
+        (type_identifier)
+        (type_arguments
+          (type_identifier)
+          (function_type
+            (void_type)
+            (parameter_type_list
+              (normal_parameter_type
+                (type_identifier)))))
+        (identifier)
+        (arguments
+          (argument
+            (identifier)))))))
+
+==================
+grouped comparisons and arithmetic keep genuine dot shorthands
+==================
+void run() { accept((a < b), c > .zero()); accept(a + .zero()); }
+---
+
+(program
+  (function_signature
+    (void_type)
+    (identifier)
+    (formal_parameter_list))
+  (function_body
+    (block
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (parenthesized_expression
+                  (relational_expression
+                    (identifier)
+                    (relational_operator)
+                    (identifier))))
+              (argument
+                (relational_expression
+                  (identifier)
+                  (relational_operator)
+                  (dot_shorthand
+                    (identifier))
+                  (selector
+                    (argument_part
+                      (arguments)))))))))
+      (expression_statement
+        (identifier)
+        (selector
+          (argument_part
+            (arguments
+              (argument
+                (additive_expression
+                  (identifier)
+                  (additive_operator)
+                  (dot_shorthand
+                    (identifier))
+                  (selector
+                    (argument_part
+                      (arguments))))))))))))
