@@ -11798,6 +11798,27 @@
               "value": "("
             },
             {
+              "type": "SYMBOL",
+              "name": "record_type_field"
+            },
+            {
+              "type": "STRING",
+              "value": ","
+            },
+            {
+              "type": "STRING",
+              "value": ")"
+            }
+          ]
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "("
+            },
+            {
               "type": "SEQ",
               "members": [
                 {
@@ -11805,7 +11826,7 @@
                   "name": "record_type_field"
                 },
                 {
-                  "type": "REPEAT",
+                  "type": "REPEAT1",
                   "content": {
                     "type": "SEQ",
                     "members": [
